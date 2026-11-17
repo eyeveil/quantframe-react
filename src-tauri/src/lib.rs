@@ -2,22 +2,19 @@
 #![allow(non_snake_case)]
 #![allow(deprecated)]
 use ::utils::clear_logs;
-use ::utils::critical;
-use ::utils::error;
 use ::utils::get_location;
 use ::utils::info;
 use ::utils::init_logger;
 use ::utils::set_base_path;
 use ::utils::warning;
-use ::utils::Error;
+pub use ::utils::Error;
 use ::utils::LoggerOptions;
 use app::AppState;
 use migration::{Migrator, MigratorTrait};
 use service::sea_orm::{Database, DatabaseConnection};
 
-use std::panic;
-use std::sync::{Mutex, OnceLock};
-use tauri::{Emitter, Manager};
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex, OnceLock};
 
 use crate::cache::client::CacheState;
 use crate::live_scraper::LiveScraperState;
@@ -25,22 +22,29 @@ use crate::log_parser::init_detections;
 use crate::log_parser::LogParserState;
 use crate::wf_inventory::WFInventoryState;
 
-mod app;
-mod cache;
-mod commands;
-mod handlers;
-mod http_server;
+pub mod app;
+pub mod cache;
+pub mod commands;
+pub mod handlers;
+pub mod http_server;
 mod macros;
-mod utils;
-mod wf_inventory;
+pub mod utils;
+pub mod wf_inventory;
 
-mod enums;
-mod helper;
-mod live_scraper;
-mod log_parser;
-mod types;
+pub mod enums;
+mod fixtures;
+pub mod helper;
+pub mod host;
+pub mod live_scraper;
+pub mod log_parser;
+pub mod types;
 
-pub static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
+pub use ::entity;
+pub use ::qf_api;
+pub use ::service;
+pub use ::wf_market;
+pub use host::{Host, State};
+
 pub(crate) static HTTP_CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
 pub static DATABASE: OnceLock<DatabaseConnection> = OnceLock::new();
 pub static HAS_STARTED: OnceLock<bool> = OnceLock::new();
@@ -122,30 +126,103 @@ async fn init_database(use_debug: bool) -> Result<(), Error> {
     Ok(())
 }
 
-async fn setup_manages(app: tauri::AppHandle, use_temp_db: bool) -> Result<(), Error> {
+async fn setup_manages(use_temp_db: bool, offline: bool) -> Result<(), Error> {
     init_detections();
     // Clear the logs older then 7 days
     clear_logs(7)?;
 
     // Clone the fields needed for CacheState before moving app_state
-    let app_state = AppState::new(app.clone(), use_temp_db, false).await?;
+    let app_state = AppState::new(use_temp_db, false, offline).await?;
     let qf_client = app_state.qf_client.clone();
     let settings = app_state.settings.clone();
     let user = app_state.user.clone();
-    app.manage(Mutex::new(app_state));
+    host::manage(Mutex::new(app_state));
 
-    let cache_state = Mutex::new(CacheState::new(&qf_client, &user, &settings.lang).await?);
-    app.manage(cache_state);
+    let cache_state = if offline {
+        CacheState::new_offline(&settings.lang)?
+    } else {
+        CacheState::new(&qf_client, &user, &settings.lang).await?
+    };
+    host::manage(Mutex::new(cache_state));
 
-    let live_scraper_state = LiveScraperState::new();
-    app.manage(live_scraper_state);
-
-    app.manage(Mutex::new(LogParserState::new(&settings.log_settings)));
-    app.manage(Mutex::new(WFInventoryState::new(&settings)));
+    host::manage(LiveScraperState::new());
+    host::manage(Mutex::new(LogParserState::new(&settings.log_settings)));
+    host::manage(Mutex::new(WFInventoryState::new(&settings)));
     Ok(())
 }
+
+/// Hands Tauri a reference to every state slot that setup filled.
+#[cfg(feature = "tauri")]
+fn manage_in_tauri(app: &tauri::AppHandle) {
+    use tauri::Manager;
+    fn manage<T: host::Managed>(app: &tauri::AppHandle) {
+        if let Ok(state) = host::managed::<T>() {
+            app.manage(state);
+        }
+    }
+    manage::<Mutex<AppState>>(app);
+    manage::<Mutex<CacheState>>(app);
+    manage::<Arc<LiveScraperState>>(app);
+    manage::<Mutex<Arc<LogParserState>>>(app);
+    manage::<Mutex<Arc<WFInventoryState>>>(app);
+}
+
+/// Options for `init_headless`.
+#[derive(Clone, Debug, Default)]
+pub struct HeadlessOptions {
+    /// A fixture directory such as `src-tauri/fixtures`. Seeds the cache, the user,
+    /// the database, and the warframe.market caches from it, and makes no request
+    /// to warframe.market or the Quantframe API.
+    pub fixtures: Option<PathBuf>,
+    /// Replaces the OS data directory. Fixture mode defaults to a fresh temp directory.
+    pub storage_dir: Option<PathBuf>,
+    pub use_temp_db: bool,
+}
+
+impl HeadlessOptions {
+    /// Reads `QF_FIXTURES`, `QF_STORAGE_DIR`, and `QF_USE_TEMP_DB=1`.
+    pub fn from_env() -> Self {
+        HeadlessOptions {
+            fixtures: std::env::var_os("QF_FIXTURES").map(PathBuf::from),
+            storage_dir: std::env::var_os("QF_STORAGE_DIR").map(PathBuf::from),
+            use_temp_db: std::env::var("QF_USE_TEMP_DB").is_ok_and(|v| v == "1"),
+        }
+    }
+}
+
+/// Starts the backend without Tauri. Call once, inside a tokio runtime, before any command.
+pub async fn init_headless(opts: HeadlessOptions, host: Arc<dyn Host>) -> Result<(), Error> {
+    host::install(host, tokio::runtime::Handle::current());
+    let storage_dir = match (&opts.storage_dir, &opts.fixtures) {
+        (Some(dir), _) => Some(dir.clone()),
+        (None, Some(_)) => Some(fixtures::temp_storage_dir()?),
+        (None, None) => None,
+    };
+    if let Some(dir) = storage_dir {
+        helper::STORAGE_PATH.get_or_init(|| dir);
+    }
+    init_logger();
+    set_base_path(helper::get_app_storage_path().to_str().unwrap());
+    if let Some(dir) = &opts.fixtures {
+        fixtures::prepare_storage(dir)?;
+    }
+    let offline = opts.fixtures.is_some();
+    init_database(opts.use_temp_db).await?;
+    setup_manages(opts.use_temp_db, offline).await?;
+    if let Some(dir) = &opts.fixtures {
+        fixtures::seed(dir).await?;
+    }
+    HAS_STARTED.get_or_init(|| true);
+    host::emit("app:ready", serde_json::Value::Null)?;
+    Ok(())
+}
+
+#[cfg(feature = "tauri")]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    use ::utils::{critical, error};
+    use std::panic;
+
     let use_temp_db: bool = std::env::args().any(|a| a == "--use-temp-db");
 
     println!(
@@ -179,8 +256,11 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(move |app| {
-            // log_parser::types::trade_detection::init_detections();
-            APP.get_or_init(|| app.handle().clone());
+            use tauri::{Emitter, Manager};
+            host::install(
+                Arc::new(host::TauriHost(app.handle().clone())),
+                tauri::async_runtime::handle().inner().clone(),
+            );
             // Set the window title with the current package version so it doesn't need manual updating
             if let Some(window) = app.get_webview_window("main") {
                 let version = app.package_info().version.to_string();
@@ -197,7 +277,9 @@ pub fn run() {
                     e.log("init_database_error.log");
                     emit_error!(e);
                 }
-                if let Err(e) = setup_manages(app_handle.clone(), use_temp_db).await {
+                let setup = setup_manages(use_temp_db, false).await;
+                manage_in_tauri(&app_handle);
+                if let Err(e) = setup {
                     err = Some(e.clone());
                     e.log("setup_error.log");
                     emit_error!(e);
@@ -233,7 +315,6 @@ pub fn run() {
             commands::auth::auth_me,
             commands::auth::auth_login,
             commands::auth::auth_logout,
-            commands::auth::auth_has_permission,
             // User commands
             commands::user::user_set_status,
             // Analytics commands
@@ -394,6 +475,7 @@ pub fn run() {
         });
 }
 
+#[cfg(feature = "tauri")]
 /// Sends the `app_exit` analytics event and flushes the queue before the
 /// process terminates. Safe to call more than once.
 fn track_app_exit() {

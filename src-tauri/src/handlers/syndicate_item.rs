@@ -2,7 +2,6 @@ use std::sync::Mutex;
 
 use entity::{enums::*, syndicate_item::*};
 use service::{SyndicateItemMutation, SyndicateItemQuery};
-use tauri::Manager;
 use utils::SubType;
 use utils::{get_location, info, warning, Error, OperationSet};
 use wf_market::enums::OrderType;
@@ -10,7 +9,7 @@ use wf_market::enums::OrderType;
 use crate::app::AppState;
 use crate::types::UIEvent;
 use crate::{handlers::*, utils::CreateSyndicateItemExt, DATABASE};
-use crate::{send_event, APP};
+use crate::{host, send_event};
 
 // --------------------------------------------------
 // Helper functions.
@@ -143,9 +142,7 @@ pub async fn handle_syndicate_item_by_entity(
             .await
             .map_err(|e| e.with_location(get_location!()).log(file))?
             {
-                let app = APP.get().expect("APP not initialized");
-                let state = app.state::<Mutex<AppState>>();
-                let mut guard = state.lock()?;
+                let mut guard = host::managed::<Mutex<AppState>>()?.lock()?;
                 let settings = &mut guard.settings.live_scraper.syndicate.wts;
                 settings.deduct_standing(&item.syndicate_unique_name, item.standing_cost)?;
                 delete =

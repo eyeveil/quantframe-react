@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::{Arc, Mutex};
 
 use entity::{
@@ -7,13 +8,12 @@ use entity::{
 use qf_api::enums::ApplicationEvent;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use tauri_plugin_dialog::DialogExt;
 use utils::*;
 use wf_market::enums::OrderType;
 
 use crate::{
     app::AppState, enums::TradeMode, helper::paginate, log_parser::LogParserState, track_event,
-    utils::SubTypeExt, APP,
+    utils::SubTypeExt,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -40,8 +40,8 @@ pub struct LineEntryPaginationQueryDto {
     pub end_index: FieldChange<usize>,
 }
 
-#[tauri::command]
-pub fn debug_get_wfm_state(app: tauri::State<'_, Mutex<AppState>>) -> Result<Value, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub fn debug_get_wfm_state(app: State<'_, Mutex<AppState>>) -> Result<Value, Error> {
     let result = (|| {
         let app = app.lock()?.clone();
         let orders = app.wfm_client.order().cache_orders();
@@ -78,10 +78,10 @@ pub fn debug_get_wfm_state(app: tauri::State<'_, Mutex<AppState>>) -> Result<Val
     result
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub fn debug_get_ee_logs(
     query: LineEntryPaginationQueryDto,
-    log_parser: tauri::State<'_, Mutex<Arc<LogParserState>>>,
+    log_parser: State<'_, Mutex<Arc<LogParserState>>>,
 ) -> Result<PaginatedResult<LineEntry>, Error> {
     let log_parser = log_parser.lock()?;
     let cached_lines = if let (FieldChange::Value(start), FieldChange::Value(end)) =
@@ -119,12 +119,11 @@ pub fn debug_get_ee_logs(
     );
     Ok(paginate)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn debug_export_ee_logs(
     mut query: LineEntryPaginationQueryDto,
-    log_parser: tauri::State<'_, Mutex<Arc<LogParserState>>>,
+    log_parser: State<'_, Mutex<Arc<LogParserState>>>,
 ) -> Result<String, Error> {
-    let app = APP.get().unwrap();
     query.pagination.limit = -1;
     let trace_event_error = |error_type: &str| {
         track_event!(
@@ -136,12 +135,7 @@ pub async fn debug_export_ee_logs(
         );
     };
     let items = debug_get_ee_logs(query, log_parser)?;
-    let Some(file_path) = app
-        .dialog()
-        .file()
-        .add_filter("Quantframe_EE_Logs", &["json"])
-        .blocking_save_file()
-    else {
+    let Some(file_path) = crate::host::save_file("Quantframe_EE_Logs", &["json"], None) else {
         trace_event_error("cancelled");
         return Ok(String::new());
     };
@@ -155,7 +149,7 @@ pub async fn debug_export_ee_logs(
         )
     })?;
 
-    std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+    std::fs::write(&file_path, json).map_err(|e| {
         trace_event_error("file_write_error");
         Error::new(
             "Command::ExportEELogs",
@@ -172,10 +166,10 @@ pub async fn debug_export_ee_logs(
         ]
     );
 
-    Ok(file_path.to_string())
+    Ok(file_path.display().to_string())
 }
-#[tauri::command]
-pub async fn debug_test(app: tauri::State<'_, Mutex<AppState>>) -> Result<Properties, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn debug_test(app: State<'_, Mutex<AppState>>) -> Result<Properties, Error> {
     let mut properties = Properties::default();
     let app = app.lock()?.clone();
 

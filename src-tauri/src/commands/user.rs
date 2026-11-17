@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::Mutex;
 
 use serde_json::json;
@@ -5,11 +6,8 @@ use utils::{get_location, info, Error, LoggerOptions};
 
 use crate::app::AppState;
 
-#[tauri::command]
-pub async fn user_set_status(
-    status: String,
-    app: tauri::State<'_, Mutex<AppState>>,
-) -> Result<(), Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn user_set_status(status: String, app: State<'_, Mutex<AppState>>) -> Result<(), Error> {
     let app_state = app.lock().unwrap().clone();
     if app_state.wfm_socket.is_none() {
         return Err(Error::new(

@@ -1,3 +1,4 @@
+use crate::State;
 use std::{process::Command, sync::Mutex};
 
 use qf_api::enums::ApplicationEvent;
@@ -10,9 +11,9 @@ use crate::{
     types::ChatLink,
 };
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn cache_get_tradable_items(
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<Vec<CacheTradableItem>, Error> {
     let cache = cache.lock()?;
     match cache.tradable_item().get_items() {
@@ -25,9 +26,9 @@ pub async fn cache_get_tradable_items(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn cache_get_syndicates(
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<Vec<CacheSyndicate>, Error> {
     let cache = cache.lock()?;
     match cache.syndicate().get_items() {
@@ -40,9 +41,9 @@ pub async fn cache_get_syndicates(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn cache_get_riven_attributes(
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<Vec<CacheAttribute>, Error> {
     let cache = cache.lock()?;
     match cache.attribute().get_items() {
@@ -55,9 +56,9 @@ pub async fn cache_get_riven_attributes(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn cache_get_riven_weapons(
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<Vec<CacheWeaponBase>, Error> {
     let cache = cache.lock()?;
     match cache.weapon().get_all_items() {
@@ -74,9 +75,9 @@ pub async fn cache_get_riven_weapons(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn cache_get_chat_icons(
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<Vec<CacheChatIcon>, Error> {
     let cache = cache.lock()?;
     match cache.chat_icon().get_items() {
@@ -89,9 +90,9 @@ pub async fn cache_get_chat_icons(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn cache_get_theme_presets(
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<Vec<CacheTheme>, Error> {
     let cache = cache.lock()?;
     match cache.theme().get_items() {
@@ -104,12 +105,12 @@ pub async fn cache_get_theme_presets(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn cache_create_theme(
     name: String,
     author: String,
     properties: Value,
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<(), Error> {
     let cache = cache.lock()?;
 
@@ -138,8 +139,8 @@ pub async fn cache_create_theme(
     result
 }
 
-#[tauri::command]
-pub fn cache_open_theme_folder(cache: tauri::State<'_, Mutex<CacheState>>) -> Result<(), Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub fn cache_open_theme_folder(cache: State<'_, Mutex<CacheState>>) -> Result<(), Error> {
     let cache = cache.lock()?;
     let folder = cache.theme().get_theme_folder();
 
@@ -175,10 +176,10 @@ pub fn cache_open_theme_folder(cache: tauri::State<'_, Mutex<CacheState>>) -> Re
     result
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub fn cache_get_chat_link(
     unique_name: String,
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<ChatLink, Error> {
     let cache = cache.lock()?;
 

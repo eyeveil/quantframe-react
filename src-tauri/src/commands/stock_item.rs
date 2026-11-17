@@ -1,9 +1,9 @@
+use crate::State;
 use std::{collections::HashMap, sync::Mutex};
 
 use entity::{dto::*, stock_item::*};
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 use service::{StockItemMutation, StockItemQuery};
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, group_by, info, Error, LoggerOptions, OperationSet, SubType};
 use wf_market::enums::OrderType;
 
@@ -12,12 +12,10 @@ use crate::{
     cache::CacheState,
     handlers::{handle_item_by_entity, handle_wfm_item, stock_item::handle_item},
     helper::{self},
-    track_event,
-    types::PermissionsFlags,
-    APP, DATABASE,
+    track_event, DATABASE,
 };
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_stock_item_pagination(
     query: StockItemPaginationQueryDto,
 ) -> Result<PaginatedResult<stock_item::Model>, Error> {
@@ -28,7 +26,7 @@ pub async fn get_stock_item_pagination(
     };
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_stock_item_financial_report(
     query: StockItemPaginationQueryDto,
 ) -> Result<FinancialReport, Error> {
@@ -36,7 +34,7 @@ pub async fn get_stock_item_financial_report(
     Ok(FinancialReport::from(&items.results))
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_stock_item_status_counts(
     query: StockItemPaginationQueryDto,
 ) -> Result<HashMap<String, usize>, Error> {
@@ -47,7 +45,7 @@ pub async fn get_stock_item_status_counts(
         .collect::<HashMap<_, _>>())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_item_create(input: CreateStockItem) -> Result<stock_item::Model, Error> {
     match handle_item_by_entity(input, "", OrderType::Buy, &OperationSet::new()).await {
         Ok((_, updated_item)) => {
@@ -72,7 +70,7 @@ pub async fn stock_item_create(input: CreateStockItem) -> Result<stock_item::Mod
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_item_sell(
     wfm_url: String,
     sub_type: Option<SubType>,
@@ -110,7 +108,7 @@ pub async fn stock_item_sell(
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_item_delete(id: i64) -> Result<stock_item::Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -183,7 +181,7 @@ pub async fn stock_item_delete(id: i64) -> Result<stock_item::Model, Error> {
     Ok(item)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_item_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
     let mut deleted_count = 0;
@@ -213,7 +211,7 @@ pub async fn stock_item_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     Ok(deleted_count)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_item_update(input: UpdateStockItem) -> Result<stock_item::Model, Error> {
     let conn = DATABASE.get().unwrap();
     match StockItemMutation::update_by_id(conn, input).await {
@@ -237,7 +235,7 @@ pub async fn stock_item_update(input: UpdateStockItem) -> Result<stock_item::Mod
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_item_update_multiple(
     ids: Vec<i64>,
     input: UpdateStockItem,
@@ -272,12 +270,12 @@ pub async fn stock_item_update_multiple(
     Ok(updated_items)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_item_get_by_id(
     id: i64,
     operations: Option<Vec<String>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<stock_item::Model, Error> {
     let cache = cache.lock()?.clone();
     let app = app.lock()?.clone();
@@ -319,34 +317,16 @@ pub async fn stock_item_get_by_id(
 
     Ok(item)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_stock_item_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: StockItemPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
-    let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::StockItemExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_stock_item_json.log");
-        return Err(e);
-    }
 
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match StockItemQuery::get_all(conn, query).await {
         Ok(stock_items) => {
-            let file_path = app
-                .dialog()
-                .file()
-                .add_filter("Quantframe_Stock_Item", &["json"])
-                .blocking_save_file();
+            let file_path = crate::host::save_file("Quantframe_Stock_Item", &["json"], None);
             if let Some(file_path) = file_path {
                 let json = serde_json::to_string_pretty(&stock_items.results).map_err(|e| {
                     let err = Error::new(
@@ -363,7 +343,7 @@ pub async fn export_stock_item_json(
                     );
                     err
                 })?;
-                std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+                std::fs::write(&file_path, json).map_err(|e| {
                     let err = Error::new(
                         "Command::ExportStockItemJson",
                         format!("Failed to write stock item to file: {}", e),
@@ -380,7 +360,7 @@ pub async fn export_stock_item_json(
                 })?;
                 info(
                     "Command::ExportStockItemJson",
-                    format!("Exported stock item to JSON file: {}", file_path),
+                    format!("Exported stock item to JSON file: {}", file_path.display()),
                     &LoggerOptions::default(),
                 );
                 track_event!(
@@ -390,7 +370,7 @@ pub async fn export_stock_item_json(
                         ("count", stock_items.results.len().to_string()),
                     ]
                 );
-                return Ok(file_path.to_string());
+                return Ok(file_path.display().to_string());
             }
             // do something with the optional file path here
             // the file path is `None` if the user closed the dialog

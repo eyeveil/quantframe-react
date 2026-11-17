@@ -3,15 +3,12 @@ use std::sync::Mutex;
 use crate::{
     app::{AppState, Settings},
     cache::client::CacheState,
-    APP, APP_ERROR,
+    host, APP_ERROR,
 };
-use tauri::Manager;
 use utils::Error;
 
 pub fn app_state() -> Result<AppState, Error> {
-    let app = APP.get().expect("APP not initialized");
-    let state = app.state::<Mutex<AppState>>();
-    let guard = state.lock()?;
+    let guard = host::managed::<Mutex<AppState>>()?.lock()?;
     Ok(guard.clone())
 }
 
@@ -22,9 +19,7 @@ pub fn get_settings() -> Result<Settings, Error> {
 }
 
 pub fn cache_client() -> Result<CacheState, Error> {
-    let app = APP.get().expect("APP not initialized");
-    let state = app.state::<Mutex<CacheState>>();
-    let guard = state.lock()?;
+    let guard = host::managed::<Mutex<CacheState>>()?.lock()?;
     Ok(guard.clone())
 }
 pub fn get_app_error() -> Option<Error> {

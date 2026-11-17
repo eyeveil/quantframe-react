@@ -23,7 +23,7 @@ use wf_market::{
 };
 
 use crate::{
-    app::{AppState, ItemSettings, Settings},
+    app::{ItemSettings, Settings},
     cache::types::{CacheTradableItem, ItemPriceInfo},
     enums::*,
     live_scraper::*,
@@ -158,7 +158,6 @@ pub fn knapsack(
 }
 
 pub async fn collect_interesting_items(
-    app: &AppState,
     component: impl Into<String>,
     settings: &Settings,
 ) -> Result<Vec<ItemEntry>, Error> {
@@ -246,12 +245,6 @@ pub async fn collect_interesting_items(
 
     // --- Syndicate Mode --- Disabled for now, WIP
     if settings.live_scraper.has_trade_mode(TradeMode::Syndicate) {
-        let Ok(_) = app
-            .user
-            .has_permission(PermissionsFlags::from_str("syndicate_prices_search"))
-        else {
-            return Ok(interesting_items.into_values().collect());
-        };
         let items = SyndicateItemQuery::get_all(conn, SyndicateItemPaginationQueryDto::new(1, -1))
             .await
             .map_err(|e| e.with_location(get_location!()))?;

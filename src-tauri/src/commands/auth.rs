@@ -1,14 +1,15 @@
+use crate::State;
 use std::sync::{Arc, Mutex};
 
 use qf_api::enums::ApplicationEvent;
-use utils::{get_location, info, warning, Error, LoggerOptions};
+use utils::{get_location, info, Error, LoggerOptions};
 
 use crate::{
     app::{AppState, User},
     cache::client::CacheState,
     live_scraper::LiveScraperState,
     send_event, track_event,
-    types::{PermissionsFlags, UIEvent},
+    types::UIEvent,
     utils::{AuctionListExt, OrderListExt},
 };
 
@@ -16,8 +17,8 @@ use crate::{
 // Authentication
 // --------------------------------------------------
 
-#[tauri::command]
-pub async fn auth_me(app: tauri::State<'_, Mutex<AppState>>) -> Result<User, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn auth_me(app: State<'_, Mutex<AppState>>) -> Result<User, Error> {
     let app = app.lock().unwrap();
     let mut user = app.user.clone();
 
@@ -34,12 +35,12 @@ pub async fn auth_me(app: tauri::State<'_, Mutex<AppState>>) -> Result<User, Err
     Ok(user)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn auth_login(
     email: String,
     password: String,
-    app: tauri::State<'_, Mutex<AppState>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<User, Error> {
     let app_state = app.lock()?.clone();
     let mut cache_state = cache.lock()?.clone();
@@ -117,10 +118,10 @@ pub async fn auth_login(
     result
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn auth_logout(
-    app: tauri::State<'_, Mutex<AppState>>,
-    live_scraper: tauri::State<'_, Arc<LiveScraperState>>,
+    app: State<'_, Mutex<AppState>>,
+    live_scraper: State<'_, Arc<LiveScraperState>>,
 ) -> Result<User, Error> {
     let result = async {
         let app_state = app.lock()?.clone();
@@ -170,24 +171,3 @@ pub async fn auth_logout(
     result
 }
 
-#[tauri::command]
-pub async fn auth_has_permission(
-    flag: String,
-    app: tauri::State<'_, Mutex<AppState>>,
-) -> Result<bool, Error> {
-    let app_state = app.lock().unwrap().clone();
-
-    if let Err(_) = app_state
-        .user
-        .has_permission(PermissionsFlags::from_str(&flag))
-    {
-        warning(
-            "Commands:AuthHasPermission",
-            &format!("User does not have permission for flag: {}", flag),
-            &LoggerOptions::default(),
-        );
-
-        return Ok(false);
-    }
-    Ok(true)
-}

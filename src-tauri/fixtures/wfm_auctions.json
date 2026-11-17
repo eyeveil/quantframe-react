@@ -1,0 +1,224 @@
+{
+ "auctions": [
+  {
+   "id": "b40748a4dd37c51bb8063e29",
+   "minimal_reputation": 0,
+   "winner": null,
+   "private": false,
+   "visible": true,
+   "note_raw": "",
+   "note": "",
+   "starting_price": 322,
+   "buyout_price": 322,
+   "is_direct_sell": true,
+   "top_bid": null,
+   "created": "2026-11-02T18:00:00.000Z",
+   "updated": "2026-11-14T18:00:00.000Z",
+   "platform": "pc",
+   "closed": false,
+   "is_marked_for": null,
+   "marked_operation_at": null,
+   "item": {
+    "type": "riven",
+    "weapon_url_name": "rubico",
+    "name": "hexa-critatis",
+    "attributes": [
+     {
+      "url_name": "ammo_efficiency",
+      "positive": true,
+      "value": 136.2
+     },
+     {
+      "url_name": "status_chance",
+      "positive": true,
+      "value": 145.0
+     }
+    ],
+    "re_rolls": 33,
+    "mastery_level": 15,
+    "mod_rank": 0,
+    "polarity": "madurai"
+   },
+   "name": "Rubico Hexa-critatis",
+   "mod_name": "Hexa-critatis"
+  },
+  {
+   "id": "8ffb13a4bdcb73f7319f22a4",
+   "minimal_reputation": 0,
+   "winner": null,
+   "private": false,
+   "visible": true,
+   "note_raw": "",
+   "note": "",
+   "starting_price": 368,
+   "buyout_price": 368,
+   "is_direct_sell": true,
+   "top_bid": null,
+   "created": "2026-11-03T18:00:00.000Z",
+   "updated": "2026-11-14T18:00:00.000Z",
+   "platform": "pc",
+   "closed": false,
+   "is_marked_for": null,
+   "marked_operation_at": null,
+   "item": {
+    "type": "riven",
+    "weapon_url_name": "kuva_bramma",
+    "name": "igni-toxidex",
+    "attributes": [
+     {
+      "url_name": "status_duration",
+      "positive": true,
+      "value": 98.7
+     },
+     {
+      "url_name": "punch_through",
+      "positive": true,
+      "value": 75.7
+     }
+    ],
+    "re_rolls": 34,
+    "mastery_level": 16,
+    "mod_rank": 8,
+    "polarity": "vazarin"
+   },
+   "name": "Kuva Bramma Igni-toxidex",
+   "mod_name": "Igni-toxidex"
+  },
+  {
+   "id": "ed77f1314fe73a88ea299f3b",
+   "minimal_reputation": 0,
+   "winner": null,
+   "private": false,
+   "visible": true,
+   "note_raw": "",
+   "note": "",
+   "starting_price": 545,
+   "buyout_price": 545,
+   "is_direct_sell": true,
+   "top_bid": null,
+   "created": "2026-11-04T18:00:00.000Z",
+   "updated": "2026-11-14T18:00:00.000Z",
+   "platform": "pc",
+   "closed": false,
+   "is_marked_for": null,
+   "marked_operation_at": null,
+   "item": {
+    "type": "riven",
+    "weapon_url_name": "acceltra",
+    "name": "igni-critadex",
+    "attributes": [
+     {
+      "url_name": "multishot",
+      "positive": true,
+      "value": 135.5
+     },
+     {
+      "url_name": "critical_chance",
+      "positive": true,
+      "value": 48.5
+     },
+     {
+      "url_name": "slash_damage",
+      "positive": false,
+      "value": -43.7
+     }
+    ],
+    "re_rolls": 23,
+    "mastery_level": 13,
+    "mod_rank": 8,
+    "polarity": "naramon"
+   },
+   "name": "Acceltra Igni-critadex",
+   "mod_name": "Igni-critadex"
+  },
+  {
+   "id": "616190d15e22732e02e89731",
+   "minimal_reputation": 0,
+   "winner": null,
+   "private": false,
+   "visible": true,
+   "note_raw": "",
+   "note": "",
+   "starting_price": 191,
+   "buyout_price": 191,
+   "is_direct_sell": true,
+   "top_bid": null,
+   "created": "2026-11-05T18:00:00.000Z",
+   "updated": "2026-11-14T18:00:00.000Z",
+   "platform": "pc",
+   "closed": false,
+   "is_marked_for": null,
+   "marked_operation_at": null,
+   "item": {
+    "type": "riven",
+    "weapon_url_name": "torid",
+    "name": "toxi-satidex",
+    "attributes": [
+     {
+      "url_name": "recoil",
+      "positive": true,
+      "value": 74.4
+     },
+     {
+      "url_name": "projectile_speed",
+      "positive": true,
+      "value": 99.7
+     },
+     {
+      "url_name": "damage_vs_corpus",
+      "positive": false,
+      "value": -31.2
+     }
+    ],
+    "re_rolls": 14,
+    "mastery_level": 16,
+    "mod_rank": 0,
+    "polarity": "madurai"
+   },
+   "name": "Torid Toxi-satidex",
+   "mod_name": "Toxi-satidex"
+  },
+  {
+   "id": "263cbe8f66b74bd73c276aae",
+   "minimal_reputation": 0,
+   "winner": null,
+   "private": false,
+   "visible": false,
+   "note_raw": "",
+   "note": "",
+   "starting_price": 263,
+   "buyout_price": 263,
+   "is_direct_sell": true,
+   "top_bid": null,
+   "created": "2026-11-06T18:00:00.000Z",
+   "updated": "2026-11-14T18:00:00.000Z",
+   "platform": "pc",
+   "closed": false,
+   "is_marked_for": null,
+   "marked_operation_at": null,
+   "item": {
+    "type": "riven",
+    "weapon_url_name": "nikana",
+    "name": "acri-satican",
+    "attributes": [
+     {
+      "url_name": "cold_damage",
+      "positive": true,
+      "value": 79.4
+     },
+     {
+      "url_name": "damage_vs_corpus",
+      "positive": true,
+      "value": 90.3
+     }
+    ],
+    "re_rolls": 13,
+    "mastery_level": 12,
+    "mod_rank": 8,
+    "polarity": "vazarin"
+   },
+   "name": "Nikana Acri-satican",
+   "mod_name": "Acri-satican"
+  }
+ ]
+}

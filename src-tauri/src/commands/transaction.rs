@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::Mutex;
 
 use entity::{
@@ -8,12 +9,11 @@ use entity::{
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 use serde_json::json;
 use service::{TransactionMutation, TransactionQuery};
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, group_by, info, warning, Error, LoggerOptions};
 
-use crate::{app::AppState, track_event, types::PermissionsFlags, APP, DATABASE};
+use crate::{track_event, DATABASE};
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_transaction_pagination(
     query: TransactionPaginationQueryDto,
 ) -> Result<PaginatedResult<transaction::Model>, Error> {
@@ -24,7 +24,7 @@ pub async fn get_transaction_pagination(
     };
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_transaction_financial_report(
     query: TransactionPaginationQueryDto,
 ) -> Result<FinancialReport, Error> {
@@ -57,7 +57,7 @@ pub async fn get_transaction_financial_report(
     Ok(report)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn transaction_delete(id: i64) -> Result<transaction::Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -110,7 +110,7 @@ pub async fn transaction_delete(id: i64) -> Result<transaction::Model, Error> {
     );
     Ok(item)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn transaction_delete_bulk(ids: Vec<i64>) -> Result<u64, Error> {
     let conn = DATABASE.get().unwrap();
     let mut deleted_count = 0;
@@ -147,7 +147,7 @@ pub async fn transaction_delete_bulk(ids: Vec<i64>) -> Result<u64, Error> {
     Ok(deleted_count)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn transaction_update(input: UpdateTransaction) -> Result<transaction::Model, Error> {
     let conn = DATABASE.get().unwrap();
     match TransactionMutation::update_by_id(conn, input).await {
@@ -170,33 +170,15 @@ pub async fn transaction_update(input: UpdateTransaction) -> Result<transaction:
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_transaction_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: TransactionPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
-    let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::TransactionExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_transaction_json.log");
-        return Err(e);
-    }
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match TransactionQuery::get_all(conn, query).await {
         Ok(transaction) => {
-            let file_path = app
-                .dialog()
-                .file()
-                .add_filter("Quantframe_Transactions", &["json"])
-                .blocking_save_file();
+            let file_path = crate::host::save_file("Quantframe_Transactions", &["json"], None);
             if let Some(file_path) = file_path {
                 let json = serde_json::to_string_pretty(&transaction.results).map_err(|e| {
                     let err = Error::new(
@@ -213,7 +195,7 @@ pub async fn export_transaction_json(
                     );
                     err
                 })?;
-                std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+                std::fs::write(&file_path, json).map_err(|e| {
                     let err = Error::new(
                         "Command::ExportTransactionJson",
                         format!("Failed to write transactions to file: {}", e),
@@ -230,7 +212,7 @@ pub async fn export_transaction_json(
                 })?;
                 info(
                     "Command::ExportTransactionJson",
-                    format!("Exported transactions to JSON file: {}", file_path),
+                    format!("Exported transactions to JSON file: {}", file_path.display()),
                     &LoggerOptions::default(),
                 );
                 track_event!(
@@ -240,7 +222,7 @@ pub async fn export_transaction_json(
                         ("count", transaction.results.len().to_string()),
                     ]
                 );
-                return Ok(file_path.to_string());
+                return Ok(file_path.display().to_string());
             }
             // do something with the optional file path here
             // the file path is `None` if the user closed the dialog
@@ -266,9 +248,9 @@ pub async fn export_transaction_json(
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn transaction_calculate_tax(
-    cache: tauri::State<'_, Mutex<crate::cache::CacheState>>,
+    cache: State<'_, Mutex<crate::cache::CacheState>>,
 ) -> Result<(), Error> {
     let conn = DATABASE.get().unwrap();
     let cache = cache.lock()?.clone();

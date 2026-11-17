@@ -10,8 +10,8 @@ use service::TransactionQuery;
 use std::{
     fs::{self},
     path::PathBuf,
+    sync::OnceLock,
 };
-use tauri::{Manager, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 use utils::SubType;
 use utils::*;
 use wf_market::{enums::OrderType, types::AuctionLike, Authenticated};
@@ -21,16 +21,16 @@ use crate::{
         derive_riven_summary_attributes, grade_riven, scale_attributes, CacheState, CacheWeaponBase,
     },
     utils::{auction_list_ext::AuctionWithOwnerListExt, ErrorFromExt, OrderListExt, SubTypeExt},
-    APP, DATABASE,
+    DATABASE,
 };
 
 pub static APP_PATH: &str = "dev.kenya.quantframe";
+pub(crate) static STORAGE_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 pub fn get_device_id() -> String {
-    let app = APP.get().unwrap();
-    let home_dir = match app.path().home_dir() {
-        Ok(val) => val,
-        Err(_) => {
+    let home_dir = match dirs::home_dir() {
+        Some(val) => val,
+        None => {
             panic!("Could not find home directory");
         }
     };
@@ -38,15 +38,10 @@ pub fn get_device_id() -> String {
     device_name.to_string()
 }
 pub fn get_app_storage_path() -> PathBuf {
-    let app = APP.get().unwrap();
-    let local_path = match app.path().local_data_dir() {
-        Ok(val) => val,
-        Err(_) => {
-            panic!("Could not find app path");
-        }
+    let app_path = match STORAGE_PATH.get() {
+        Some(path) => path.clone(),
+        None => get_local_data_path().join(APP_PATH),
     };
-
-    let app_path = local_path.join(APP_PATH);
     if !app_path.exists() {
         fs::create_dir_all(&app_path).unwrap()
     }
@@ -62,10 +57,9 @@ pub fn get_sounds_path() -> PathBuf {
 }
 
 pub fn get_desktop_path() -> PathBuf {
-    let app = APP.get().unwrap();
-    let desktop_path = match app.path().desktop_dir() {
-        Ok(val) => val,
-        Err(_) => {
+    let desktop_path = match dirs::desktop_dir() {
+        Some(val) => val,
+        None => {
             panic!("Could not find desktop path");
         }
     };
@@ -125,58 +119,13 @@ pub fn paginate<T: Clone>(items: &[T], page: i64, per_page: i64) -> PaginatedRes
 }
 
 pub fn get_local_data_path() -> PathBuf {
-    let app = APP.get().unwrap();
-    let local_path = match app.path().local_data_dir() {
-        Ok(val) => val,
-        Err(_) => {
+    let local_path = match dirs::data_local_dir() {
+        Some(val) => val,
+        None => {
             panic!("Could not find local data path");
         }
     };
     local_path
-}
-
-pub fn get_or_create_window(
-    label: &str,
-    url: &str,
-    title: &str,
-    size: Option<(f64, f64)>,
-    resizable: bool,
-) -> Result<(bool, WebviewWindow), Error> {
-    let t_app = match APP.get() {
-        Some(app) => app,
-        None => {
-            return Err(Error::new(
-                "Helper::GetOrCreateWindow",
-                "App state not found.",
-                get_location!(),
-            ));
-        }
-    };
-
-    let app_handle = t_app.app_handle();
-
-    // Return existing window
-    if let Some(window) = app_handle.get_webview_window(label) {
-        return Ok((true, window));
-    }
-
-    // Build new window
-    let mut builder = WebviewWindowBuilder::new(app_handle, label, WebviewUrl::App(url.into()))
-        .title(title)
-        .resizable(resizable);
-
-    if let Some((w, h)) = size {
-        builder = builder.inner_size(w, h);
-    }
-
-    let window = builder.build().map_err(|e| {
-        Error::new(
-            "Helper::GetOrCreateWindow",
-            &format!("Failed to build window: {}", e),
-            get_location!(),
-        )
-    })?;
-    Ok((false, window))
 }
 
 pub async fn populate_item_market_properties(

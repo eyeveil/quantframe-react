@@ -70,7 +70,7 @@ impl Analytics {
             Err(_) => return,
         };
 
-        if let Err(e) = tauri::async_runtime::block_on(events.flush_now()) {
+        if let Err(e) = crate::host::block_on(events.flush_now()) {
             utils::warning(
                 "Analytics:Flush",
                 format!("Failed to flush events on shutdown: {e:?}"),

@@ -19,14 +19,7 @@ pub struct UserPrivate {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub banned_until: Option<String>,
 
-    #[serde(rename = "permissions")]
-    pub permissions: Option<String>,
-
     #[serde(rename = "token")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub token: Option<String>,
-
-    #[serde(rename = "patreon_tier")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub patreon_tier: Option<String>,
 }

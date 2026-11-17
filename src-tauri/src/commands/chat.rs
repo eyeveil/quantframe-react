@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::Mutex;
 
 use entity::{dto::PaginatedResult, enums::FieldChange};
@@ -18,8 +19,8 @@ use crate::{
 // Refresh
 // --------------------------------------------------
 
-#[tauri::command]
-pub async fn chat_refresh(app: tauri::State<'_, Mutex<AppState>>) -> Result<(), Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn chat_refresh(app: State<'_, Mutex<AppState>>) -> Result<(), Error> {
     let app = app.lock()?.clone();
 
     let result = app.wfm_client.chat().get_chats().await;
@@ -58,10 +59,10 @@ pub async fn chat_refresh(app: tauri::State<'_, Mutex<AppState>>) -> Result<(), 
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_chat_pagination(
     query: WfmChatPaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<PaginatedResult<Chat>, Error> {
     let app = app.lock()?;
     let mut filtered_chats = filters_by(&app.wfm_client.chat().cache_chats().chats, |o| {
@@ -110,11 +111,8 @@ pub async fn get_chat_pagination(
 // Delete
 // --------------------------------------------------
 
-#[tauri::command]
-pub async fn chat_delete(
-    id: String,
-    app: tauri::State<'_, Mutex<AppState>>,
-) -> Result<String, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn chat_delete(id: String, app: State<'_, Mutex<AppState>>) -> Result<String, Error> {
     let app = app.lock()?.clone();
 
     let result = app.wfm_client.chat().leave_chat(&id).await;
@@ -153,10 +151,10 @@ pub async fn chat_delete(
 // Get Messages
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn chat_get_messages_by_id(
     id: String,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Vec<ChatMessage>, Error> {
     let app = app.lock()?.clone();
     match app.wfm_client.chat().get_chat_messages(&id).await {
@@ -202,7 +200,7 @@ pub async fn chat_get_messages_by_id(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn chat_set_active(id: Option<String>) -> Result<(), Error> {
     set_active_chat_id(id);
     Ok(())
@@ -211,11 +209,11 @@ pub async fn chat_set_active(id: Option<String>) -> Result<(), Error> {
 // Send Message
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn chat_send_message(
     id: String,
     msg: String,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
     let app = app.lock()?.clone();
 

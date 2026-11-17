@@ -1,9 +1,9 @@
+use crate::State;
 use std::{collections::HashMap, sync::Mutex};
 
 use entity::{dto::*, stock_riven::*};
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 use service::{StockRivenMutation, StockRivenQuery};
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, group_by, info, Error, LoggerOptions, OperationSet};
 use wf_market::enums::OrderType;
 
@@ -12,12 +12,10 @@ use crate::{
     cache::CacheState,
     handlers::{handle_riven, handle_riven_by_entity},
     helper, track_event,
-    types::PermissionsFlags,
-    utils::ErrorFromExt,
-    APP, DATABASE,
+    utils::ErrorFromExt, DATABASE,
 };
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_stock_riven_pagination(
     query: StockRivenPaginationQueryDto,
 ) -> Result<PaginatedResult<stock_riven::Model>, Error> {
@@ -28,7 +26,7 @@ pub async fn get_stock_riven_pagination(
     };
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_stock_riven_financial_report(
     query: StockRivenPaginationQueryDto,
 ) -> Result<FinancialReport, Error> {
@@ -36,7 +34,7 @@ pub async fn get_stock_riven_financial_report(
     Ok(FinancialReport::from(&items.results))
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_stock_riven_status_counts(
     query: StockRivenPaginationQueryDto,
 ) -> Result<HashMap<String, usize>, Error> {
@@ -47,7 +45,7 @@ pub async fn get_stock_riven_status_counts(
         .collect::<HashMap<_, _>>())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_riven_create(input: CreateStockRiven) -> Result<stock_riven::Model, Error> {
     match handle_riven_by_entity(input, "", OrderType::Buy, &OperationSet::new()).await {
         Ok((operations, updated_item)) => {
@@ -77,7 +75,7 @@ pub async fn stock_riven_create(input: CreateStockRiven) -> Result<stock_riven::
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_riven_sell(
     wfm_url: String,
     mod_name: String,
@@ -123,10 +121,10 @@ pub async fn stock_riven_sell(
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_riven_delete(
     id: i64,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<stock_riven::Model, Error> {
     let app = app.lock()?.clone();
     let conn = DATABASE.get().unwrap();
@@ -211,7 +209,7 @@ pub async fn stock_riven_delete(
     );
     Ok(item)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_riven_update(input: UpdateStockRiven) -> Result<stock_riven::Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -235,7 +233,7 @@ pub async fn stock_riven_update(input: UpdateStockRiven) -> Result<stock_riven::
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_riven_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
     let mut deleted_count = 0;
@@ -263,7 +261,7 @@ pub async fn stock_riven_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     );
     Ok(deleted_count)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_riven_update_multiple(
     ids: Vec<i64>,
     input: UpdateStockRiven,
@@ -297,12 +295,12 @@ pub async fn stock_riven_update_multiple(
     );
     Ok(updated_items)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn stock_riven_get_by_id(
     id: i64,
     operations: Option<Vec<String>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<stock_riven::Model, Error> {
     let cache = cache.lock()?.clone();
     let app = app.lock()?.clone();
@@ -354,33 +352,15 @@ pub async fn stock_riven_get_by_id(
     Ok(item)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_stock_riven_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: StockRivenPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
-    let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::StockRivenExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_stock_riven_json.log");
-        return Err(e);
-    }
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match StockRivenQuery::get_all(conn, query).await {
         Ok(stock_riven) => {
-            let file_path = app
-                .dialog()
-                .file()
-                .add_filter("Quantframe_Stock_Riven", &["json"])
-                .blocking_save_file();
+            let file_path = crate::host::save_file("Quantframe_Stock_Riven", &["json"], None);
             if let Some(file_path) = file_path {
                 let json = serde_json::to_string_pretty(&stock_riven.results).map_err(|e| {
                     let err = Error::new(
@@ -397,7 +377,7 @@ pub async fn export_stock_riven_json(
                     );
                     err
                 })?;
-                std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+                std::fs::write(&file_path, json).map_err(|e| {
                     let err = Error::new(
                         "Command::ExportStockRivenJson",
                         format!("Failed to write stock riven to file: {}", e),
@@ -414,7 +394,7 @@ pub async fn export_stock_riven_json(
                 })?;
                 info(
                     "Command::ExportStockRivenJson",
-                    format!("Exported stock riven to JSON file: {}", file_path),
+                    format!("Exported stock riven to JSON file: {}", file_path.display()),
                     &LoggerOptions::default(),
                 );
                 track_event!(
@@ -424,7 +404,7 @@ pub async fn export_stock_riven_json(
                         ("count", stock_riven.results.len().to_string()),
                     ]
                 );
-                return Ok(file_path.to_string());
+                return Ok(file_path.display().to_string());
             }
             // do something with the optional file path here
             // the file path is `None` if the user closed the dialog

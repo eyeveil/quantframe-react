@@ -1,8 +1,8 @@
+use crate::State;
 use entity::{dto::*, wish_list::*};
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 use service::{WishListMutation, WishListQuery};
 use std::{collections::HashMap, sync::Mutex};
-use tauri_plugin_dialog::DialogExt;
 use utils::SubType;
 use utils::{get_location, group_by, info, Error, LoggerOptions, OperationSet};
 use wf_market::enums::OrderType;
@@ -11,12 +11,10 @@ use crate::{
     app::AppState,
     cache::CacheState,
     handlers::{handle_wfm_item, handle_wish_list, handle_wish_list_by_entity},
-    helper, track_event,
-    types::PermissionsFlags,
-    APP, DATABASE,
+    helper, track_event, DATABASE,
 };
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wish_list_pagination(
     query: WishListPaginationQueryDto,
 ) -> Result<PaginatedResult<Model>, Error> {
@@ -27,7 +25,7 @@ pub async fn get_wish_list_pagination(
     };
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wish_list_financial_report(
     query: WishListPaginationQueryDto,
 ) -> Result<FinancialReport, Error> {
@@ -35,7 +33,7 @@ pub async fn get_wish_list_financial_report(
     Ok(FinancialReport::from(&items.results))
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wish_list_status_counts(
     query: WishListPaginationQueryDto,
 ) -> Result<HashMap<String, usize>, Error> {
@@ -46,7 +44,7 @@ pub async fn get_wish_list_status_counts(
         .collect::<HashMap<_, _>>())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wish_list_create(input: CreateWishListItem) -> Result<Model, Error> {
     match handle_wish_list_by_entity(input, "", OrderType::Sell, &OperationSet::new()).await {
         Ok((_, item)) => {
@@ -69,7 +67,7 @@ pub async fn wish_list_create(input: CreateWishListItem) -> Result<Model, Error>
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wish_list_bought(
     wfm_url: String,
     sub_type: Option<SubType>,
@@ -107,7 +105,7 @@ pub async fn wish_list_bought(
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wish_list_delete(id: i64) -> Result<Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -178,7 +176,7 @@ pub async fn wish_list_delete(id: i64) -> Result<Model, Error> {
     );
     Ok(item)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wish_list_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
     let mut deleted_count = 0;
@@ -207,7 +205,7 @@ pub async fn wish_list_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     );
     Ok(deleted_count)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wish_list_update(input: UpdateWishList) -> Result<Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -231,7 +229,7 @@ pub async fn wish_list_update(input: UpdateWishList) -> Result<Model, Error> {
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wish_list_update_multiple(
     ids: Vec<i64>,
     input: UpdateWishList,
@@ -265,13 +263,13 @@ pub async fn wish_list_update_multiple(
     );
     Ok(updated_items)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 
 pub async fn wish_list_get_by_id(
     id: i64,
     operations: Option<Vec<String>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<wish_list::Model, Error> {
     let cache = cache.lock()?.clone();
     let app = app.lock()?.clone();
@@ -313,33 +311,15 @@ pub async fn wish_list_get_by_id(
 
     Ok(item)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_wish_list_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: WishListPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
-    let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::WishListExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_wish_list_json.log");
-        return Err(e);
-    }
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match WishListQuery::get_all(conn, query).await {
         Ok(wish_list) => {
-            let file_path = app
-                .dialog()
-                .file()
-                .add_filter("Quantframe_Wish_List", &["json"])
-                .blocking_save_file();
+            let file_path = crate::host::save_file("Quantframe_Wish_List", &["json"], None);
             if let Some(file_path) = file_path {
                 let json = serde_json::to_string_pretty(&wish_list.results).map_err(|e| {
                     let err = Error::new(
@@ -356,7 +336,7 @@ pub async fn export_wish_list_json(
                     );
                     err
                 })?;
-                std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+                std::fs::write(&file_path, json).map_err(|e| {
                     let err = Error::new(
                         "Command::ExportWishListJson",
                         format!("Failed to write wish list to file: {}", e),
@@ -373,7 +353,7 @@ pub async fn export_wish_list_json(
                 })?;
                 info(
                     "Command::ExportWishListJson",
-                    format!("Exported wish list to JSON file: {}", file_path),
+                    format!("Exported wish list to JSON file: {}", file_path.display()),
                     &LoggerOptions::default(),
                 );
                 track_event!(
@@ -383,7 +363,7 @@ pub async fn export_wish_list_json(
                         ("count", wish_list.results.len().to_string()),
                     ]
                 );
-                return Ok(file_path.to_string());
+                return Ok(file_path.display().to_string());
             }
             // do something with the optional file path here
             // the file path is `None` if the user closed the dialog

@@ -110,9 +110,9 @@ impl HttpServer {
                     match listener.accept() {
                         Ok((stream, _)) => {
                             let client_clone = client.clone();
-                            tauri::async_runtime::spawn(async move {
-                                handle_client(stream, client_clone).await
-                            });
+                            crate::host::spawn(
+                                async move { handle_client(stream, client_clone).await },
+                            );
                         }
                         Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
                             // No connection available, sleep briefly and continue

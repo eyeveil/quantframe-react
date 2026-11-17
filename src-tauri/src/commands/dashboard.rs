@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::Mutex;
 
 use crate::{
@@ -149,8 +150,8 @@ pub async fn get_category_summary(
     }
     Ok(items)
 }
-#[tauri::command]
-pub async fn dashboard_summary(app: tauri::State<'_, Mutex<AppState>>) -> Result<Value, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn dashboard_summary(app: State<'_, Mutex<AppState>>) -> Result<Value, Error> {
     let conn = DATABASE.get().unwrap();
     let transactions = TransactionQuery::get_all(
         &conn,

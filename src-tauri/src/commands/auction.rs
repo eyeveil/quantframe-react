@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::{Arc, Mutex};
 
 use entity::{
@@ -26,10 +27,10 @@ use crate::{
 // Auction
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn auction_refresh(
-    app: tauri::State<'_, Mutex<AppState>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<(), Error> {
     let app = app.lock()?.clone();
     let cache = cache.lock()?.clone();
@@ -77,10 +78,10 @@ pub async fn auction_refresh(
 // Pagination
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wfm_auctions_pagination(
     query: WfmAuctionPaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<PaginatedResult<Auction>, Error> {
     let conn = DATABASE.get().expect("Database not initialized");
     let app = app.lock()?.clone();
@@ -174,10 +175,10 @@ pub async fn get_wfm_auctions_pagination(
 // Overview
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wfm_auctions_overview(
     query: WfmAuctionPaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<(i64, i32, i64), Error> {
     let items = get_wfm_auctions_pagination(query, app).await?.results;
 
@@ -202,12 +203,12 @@ pub async fn get_wfm_auctions_overview(
 // Get auction
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wfm_auction_by_id(
     id: String,
     operations: Option<Vec<String>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Auction, Error> {
     let cache = cache.lock()?.clone();
     let app = app.lock()?.clone();
@@ -267,10 +268,10 @@ pub async fn get_wfm_auction_by_id(
 // Delete all
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn auction_delete_all(
-    live_scraper: tauri::State<'_, Arc<LiveScraperState>>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    live_scraper: State<'_, Arc<LiveScraperState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
     let app = app.lock()?.clone();
 
@@ -347,10 +348,10 @@ pub async fn auction_delete_all(
 // Delete by ID
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn auction_delete_by_id(
     id: String,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
     let app = app.lock()?.clone();
 
@@ -411,11 +412,11 @@ pub async fn auction_delete_by_id(
 // Import by ID
 // --------------------------------------------------
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn auction_import_by_id(
     id: String,
     bought: i64,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<stock_riven::Model, Error> {
     let app = app.lock()?.clone();
 

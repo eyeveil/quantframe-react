@@ -11,14 +11,13 @@ use service::{
     SettingMutation, SettingQuery, StockItemMutation, StockRivenMutation, TransactionMutation,
     WishListMutation,
 };
-use tauri::Manager;
 
 use crate::{
     app::{AppState, User},
     cache::{types::CacheVersion, CacheWeaponBase},
-    emit_startup, helper,
+    emit_startup, helper, host,
     utils::{AuctionListExt, ErrorFromExt, OrderListExt},
-    APP, DATABASE,
+    DATABASE,
 };
 
 use super::modules::*;
@@ -112,16 +111,8 @@ impl CacheState {
             .clone()
     }
 
-    pub async fn new(
-        qf_client: &QFClient,
-        user: &User,
-        lang: impl Into<String>,
-    ) -> Result<Self, Error> {
-        let lang = lang.into();
-        let version =
-            CacheVersion::load().expect("Failed to load cache version from cache_version.json");
-
-        let mut client = CacheState {
+    fn empty(version: CacheVersion) -> Self {
+        CacheState {
             self_arc: OnceLock::new(),
             base_path: helper::get_app_storage_path().join("cache"),
             version,
@@ -158,7 +149,28 @@ impl CacheState {
             quest_module: OnceLock::new(),
             gear_module: OnceLock::new(),
             syndicate_module: OnceLock::new(),
-        };
+        }
+    }
+
+    /// Loads the cache already on disk without contacting the Quantframe API.
+    pub fn new_offline(lang: impl Into<String>) -> Result<Self, Error> {
+        let version =
+            CacheVersion::load().expect("Failed to load cache version from cache_version.json");
+        let client = Self::empty(version);
+        client.load_modules(&lang.into())?;
+        Ok(client)
+    }
+
+    pub async fn new(
+        qf_client: &QFClient,
+        user: &User,
+        lang: impl Into<String>,
+    ) -> Result<Self, Error> {
+        let lang = lang.into();
+        let version =
+            CacheVersion::load().expect("Failed to load cache version from cache_version.json");
+
+        let mut client = Self::empty(version);
         if !user.verification || user.qf_banned || user.wfm_banned {
             warning(
                 "Cache:Client",
@@ -177,9 +189,7 @@ impl CacheState {
                     "Cache loaded successfully.",
                     &LoggerOptions::default(),
                 );
-                let app = APP.get().expect("APP not initialized");
-                let state = app.state::<Mutex<AppState>>();
-                let guard = state.lock()?;
+                let guard = host::managed::<Mutex<AppState>>()?.lock()?;
                 guard
                     .wfm_client
                     .order()
@@ -260,13 +270,17 @@ impl CacheState {
             );
         }
 
-        // Update Item Prices if user is verified
-        self.language().load(&lang)?;
-        let language_module = self.language();
-        let language = language_module.as_ref();
         self.item_price()
             .load(qf_client, price_require_update)
             .await?;
+        self.load_modules(&lang)?;
+        Ok((cache_version_id, price_version_id))
+    }
+
+    fn load_modules(&self, lang: &str) -> Result<(), Error> {
+        self.language().load(lang)?;
+        let language_module = self.language();
+        let language = language_module.as_ref();
         self.tradable_item().load(language)?;
         self.arcane().load(language)?;
         self.archgun().load(language)?;
@@ -297,7 +311,7 @@ impl CacheState {
         self.syndicate().load(language)?;
         self.weapon().load(&self)?;
         self.all_items().load(&self)?;
-        Ok((cache_version_id, price_version_id))
+        Ok(())
     }
 
     async fn extract(&self, qf_client: &QFClient) -> Result<(), Error> {

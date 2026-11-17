@@ -1,3 +1,4 @@
+use crate::State;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -20,10 +21,10 @@ use crate::{
     types::*,
     utils::*,
 };
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn order_refresh(
-    app: tauri::State<'_, Mutex<AppState>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<(), Error> {
     let app_state = app.lock()?.clone();
     let cache_state = cache.lock()?.clone();
@@ -60,10 +61,10 @@ pub async fn order_refresh(
     Ok(())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub fn get_wfm_orders_pagination(
     query: WfmOrderPaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<PaginatedResult<Order>, Error> {
     let app = app.lock()?.clone();
 
@@ -144,10 +145,10 @@ pub fn get_wfm_orders_pagination(
     Ok(p)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wfm_orders_status_counts(
     query: WfmOrderPaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<HashMap<String, (usize, i64, f64)>, Error> {
     let items = get_wfm_orders_pagination(query, app)?.results;
     let mut grouped = group_by(&items, |item| item.order_type.to_string())
@@ -182,12 +183,12 @@ pub async fn get_wfm_orders_status_counts(
     Ok(grouped)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn order_delete_all(
     order_type: Option<OrderType>,
-    live_scraper: tauri::State<'_, Arc<LiveScraperState>>,
-    app_state: tauri::State<'_, Mutex<AppState>>,
-    cache_state: tauri::State<'_, Mutex<CacheState>>,
+    live_scraper: State<'_, Arc<LiveScraperState>>,
+    app_state: State<'_, Mutex<AppState>>,
+    cache_state: State<'_, Mutex<CacheState>>,
 ) -> Result<(), Error> {
     let app = app_state.lock()?.clone();
     order_refresh(app_state, cache_state).await.map_err(|e| {
@@ -243,10 +244,10 @@ pub async fn order_delete_all(
     );
     Ok(())
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn order_delete_by_id(
     id: String,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
     let app = app.lock()?.clone();
     let order = app.wfm_client.order().cache_orders().get_by_id(&id);
@@ -291,12 +292,12 @@ pub async fn order_delete_by_id(
     track_event!(EventType::OrderDeleteById, [("success", "true".to_string())]);
     Ok(())
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_wfm_order_by_id(
     id: String,
     operations: Option<Vec<String>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Order, Error> {
     let cache = cache.lock()?.clone();
     let app = app.lock()?.clone();
