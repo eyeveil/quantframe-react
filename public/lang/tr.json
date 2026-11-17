@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "Öğe Bileşenleri",
-    "patreon_overlay": {
-      "title": "Kısıtlanmış İçerik",
-      "description": "Bu içerik <blue>{{tier}}</blue> veya daha yüksek seviyedeki Patreon destekçileriyle sınırlıdır.",
-      "buttons": {
-        "become_a_patron": "Kullanıcı Ol"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}} yıl önce",
       "months": "{{months}} ay önce",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Quantframe'in gelişimini destekleyin",
-        "description": "Beni Patreon'da destekleyerek premium özelliklere erişin",
-        "premium_content": "Kullanıcı etkinliği | Riven Fiyat Arama | Verileri Dışa Aktar | Öğe İstatistikleri",
-        "join_the_community": "Destekçi topluluğuna katılın ve Quantframe'in geleceğini şekillendirmeye yardımcı olun.",
-        "link_your_account": "2. Patreon hesabınızı bağlayın",
-        "buttons": {
-          "info": "Patreon",
-          "link": "Hesabınızı bağlayın"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "Kahve"
         },
-        "patreon": {
-          "title": "Beni Patreon'da destekleyin"
-        },
         "discord": {
           "title": "Anlaşmazlık"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "Versiyon: <blue>{{version}}</blue> ❤️ ile 🇩🇰 yılında yapılmıştır. © 2023-{{year}} Kenya-DK. Her hakkı saklıdır",
-        "patreon_thanks": "Quantframe'i mümkün kıldıkları için Patreon 'Quantframe Kullanıcıları' destekçilerine özel teşekkürler: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe bir üçüncü taraf uygulamasıdır ve Digital Extremes'e bağlı değildir."
       },
       "button_check_for_updates": "Güncellemeleri Kontrol Et"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "Öğeleri JSON'a Aktar (Patreon T1+)",
+      "export_json_tooltip": "Öğeleri JSON'a Aktar",
       "update_multiple_tooltip": "Birden Çok Öğeyi Güncelle",
       "delete_multiple_tooltip": "Birden Çok Öğeyi Sil",
       "wts_multiple_tooltip": "WTS mesajı oluştur",
@@ -2199,7 +2177,7 @@
             "update_title": "İşlemi Güncelle"
           },
           "buttons": {
-            "export_transactions_tooltip": "İşlemleri JSON'a aktar (Patreon T1+)",
+            "export_transactions_tooltip": "İşlemleri JSON'a aktar",
             "show_financial_report_tooltip": "Raporu göster",
             "delete_all_tooltip": "Tüm işlemleri sil {{count}}",
             "calculate_tax_tooltip": "Tüm işlemler için Ticaret Vergisini hesaplayın"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "Öğe",
-          "export_json_tooltip": "Öğeleri JSON'a Aktar (Patreon T1+)",
+          "export_json_tooltip": "Öğeleri JSON'a Aktar",
           "open_table_options_tooltip": "Tablo seçeneklerini aç",
           "date_range_placeholder": "Tarih aralığını seçin",
           "volume_label": "Hacim",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "Sendika",
-          "export_json_tooltip": "Syndicate'i JSON'a Aktar (Patreon T1+)",
+          "export_json_tooltip": "Syndicate'i JSON'a Aktar",
           "volume_label": "Hacim",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "Yırtılmış",
-          "export_json_tooltip": "Riven'ı JSON'a aktar (Patreon T1+)",
+          "export_json_tooltip": "Riven'ı JSON'a aktar",
           "open_table_options_tooltip": "Tablo seçeneklerini aç",
           "date_range_placeholder": "Tarih aralığını seçin",
           "volume_label": "Hacim",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "{{count}} ürün(ler) için ticari mesajlar oluştur",
         "update_multiple_tooltip": "Birden Fazla Takas Mesajını Güncelleyin",
-        "export_json_tooltip": "Ticari mesajları JSON'a aktar (Patreon T1+)",
+        "export_json_tooltip": "Ticari mesajları JSON'a aktar",
         "delete_multiple_tooltip": "Tüm işlemleri sil {{count}}",
         "add_tooltip": "Ticari Mesaj Ekle",
-        "find_interesting_tooltip": "İlginç Takas Mesajlarını Bulun (Patreon T2+)",
+        "find_interesting_tooltip": "İlginç Takas Mesajlarını Bulun",
         "calibrate_prices_tooltip": "Fiyatları Kalibre Et"
       },
       "datatable": {

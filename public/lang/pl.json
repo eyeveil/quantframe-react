@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "Składniki przedmiotu",
-    "patreon_overlay": {
-      "title": "Ograniczona zawartość",
-      "description": "Ta treść jest przeznaczona wyłącznie dla osób wspierających Patreona na poziomie <blue>{{tier}}</blue> lub wyższym.",
-      "buttons": {
-        "become_a_patron": "Zostań Patronem"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}} lat temu",
       "months": "{{months}} miesięcy temu",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Wesprzyj rozwój Quantframe",
-        "description": "Uzyskaj dostęp do funkcji premium, wspierając mnie na Patreonie",
-        "premium_content": "Aktywność użytkownika | Wyszukiwanie cen Riven | Eksportuj dane | Statystyki przedmiotu",
-        "join_the_community": "Dołącz do społeczności zwolenników i pomóż kształtować przyszłość Quantframe.",
-        "link_your_account": "2. Połącz swoje konto Patreon",
-        "buttons": {
-          "info": "Patreona",
-          "link": "Połącz swoje konto"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "Kawa"
         },
-        "patreon": {
-          "title": "Wesprzyj mnie na Patreonie"
-        },
         "discord": {
           "title": "Niezgoda"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "Wersja: <blue>{{version}}</blue> Wykonane z ❤️ w 🇩🇰. © 2023-{{year}} Kenia-DK. Wszelkie prawa zastrzeżone",
-        "patreon_thanks": "Specjalne podziękowania dla zwolenników „Użytkowników Quantframe” Patreona za umożliwienie Quantframe: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe to aplikacja strony trzeciej, która nie jest powiązana z Digital Extremes."
       },
       "button_check_for_updates": "Sprawdź aktualizacje"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "Eksportuj elementy do formatu JSON (Patreon T1+)",
+      "export_json_tooltip": "Eksportuj elementy do formatu JSON",
       "update_multiple_tooltip": "Zaktualizuj wiele elementów",
       "delete_multiple_tooltip": "Usuń wiele elementów",
       "wts_multiple_tooltip": "Wygeneruj wiadomość WTS",
@@ -2199,7 +2177,7 @@
             "update_title": "Zaktualizuj transakcję"
           },
           "buttons": {
-            "export_transactions_tooltip": "Eksportuj transakcje do JSON (Patreon T1+)",
+            "export_transactions_tooltip": "Eksportuj transakcje do JSON",
             "show_financial_report_tooltip": "Pokaż raport",
             "delete_all_tooltip": "Usuń wszystkie transakcje {{count}}",
             "calculate_tax_tooltip": "Oblicz podatek handlowy dla wszystkich transakcji"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "Przedmiot",
-          "export_json_tooltip": "Eksportuj elementy do formatu JSON (Patreon T1+)",
+          "export_json_tooltip": "Eksportuj elementy do formatu JSON",
           "open_table_options_tooltip": "Otwórz opcje stołu",
           "date_range_placeholder": "Wybierz zakres dat",
           "volume_label": "Tom",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "Konsorcjum",
-          "export_json_tooltip": "Eksportuj syndykat do JSON (Patreon T1+)",
+          "export_json_tooltip": "Eksportuj syndykat do JSON",
           "volume_label": "Tom",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "Rozdarty",
-          "export_json_tooltip": "Eksportuj Riven do JSON (Patreon T1+)",
+          "export_json_tooltip": "Eksportuj Riven do JSON",
           "open_table_options_tooltip": "Otwórz opcje stołu",
           "date_range_placeholder": "Wybierz zakres dat",
           "volume_label": "Tom",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "Generuj wiadomości handlowe dla {{count}} artykułów",
         "update_multiple_tooltip": "Zaktualizuj wiele wiadomości handlowych",
-        "export_json_tooltip": "Eksportuj wiadomości handlowe do JSON (Patreon T1+)",
+        "export_json_tooltip": "Eksportuj wiadomości handlowe do JSON",
         "delete_multiple_tooltip": "Usuń całą transakcję {{count}}",
         "add_tooltip": "Dodaj wiadomość handlową",
-        "find_interesting_tooltip": "Znajdź interesujące wiadomości handlowe (Patreon T2+)",
+        "find_interesting_tooltip": "Znajdź interesujące wiadomości handlowe",
         "calibrate_prices_tooltip": "Kalibracja cen"
       },
       "datatable": {

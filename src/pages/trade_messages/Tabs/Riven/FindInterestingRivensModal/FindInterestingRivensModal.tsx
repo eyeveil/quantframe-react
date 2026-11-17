@@ -1,13 +1,11 @@
 import { Box, Button, Card, Checkbox, Divider, Grid, Group, NumberInput, TagsInput, Title } from "@mantine/core";
-import { QuantframeApiTypes, TauriTypes } from "$types";
+import { QuantframeApiTypes } from "$types";
 import { useForm } from "@mantine/form";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Round } from "@utils/helper";
 import { DataTable } from "mantine-datatable";
 import { useTranslatePages } from "@hooks/useTranslate.hook";
-import { HasPermission } from "@api/index";
-import { PatreonOverlay } from "@components/Shared/PatreonOverlay";
 export interface FindInterestingRivensModalProps {
   date: Date;
   rivens: QuantframeApiTypes.RivenPriceDto[];
@@ -22,7 +20,6 @@ interface RivenPriceWithDiscount extends QuantframeApiTypes.RivenPriceDto {
 // FindInteresting
 export function FindInterestingRivensModal({ date, rivens, onSubmit }: FindInterestingRivensModalProps) {
   const [filteredRivens, setFilteredRivens] = useState<RivenPriceWithDiscount[]>([]);
-  const [canUse, setCanUse] = useState<boolean>(false);
   const filterForm = useForm({
     initialValues: {
       minPrice: 50,
@@ -64,21 +61,16 @@ export function FindInterestingRivensModal({ date, rivens, onSubmit }: FindInter
   useEffect(() => {
     UpdateFilteredRivens();
   }, []);
-  // Check permissions for export on mount
-  useEffect(() => {
-    HasPermission(TauriTypes.PermissionsFlags.FIND_INTERESTING_RIVENS).then((res) => setCanUse(res));
-  }, []);
   return (
     <Box pos={"relative"}>
-      <PatreonOverlay permission={TauriTypes.PermissionsFlags.FIND_INTERESTING_RIVENS} tier="T2+" />
       <Title order={4}>{useTranslate("title", { date: dayjs(date).format("YYYY-MM-DD HH:mm:ss") })}</Title>
       <Grid>
         <Grid.Col span={4}>
           <Card withBorder mt="md" p="sm">
             <Title order={4}>{useTranslateTitle("filtered")}</Title>
             <Group grow>
-              <NumberInput disabled={!canUse} min={0} label={useTranslateFields("min_price_label")} {...filterForm.getInputProps("minPrice")} />
-              <NumberInput disabled={!canUse} min={0} label={useTranslateFields("min_volume_label")} {...filterForm.getInputProps("minVolume")} />
+              <NumberInput min={0} label={useTranslateFields("min_price_label")} {...filterForm.getInputProps("minPrice")} />
+              <NumberInput min={0} label={useTranslateFields("min_volume_label")} {...filterForm.getInputProps("minVolume")} />
             </Group>
           </Card>
           <Divider my="md" />
@@ -92,7 +84,6 @@ export function FindInterestingRivensModal({ date, rivens, onSubmit }: FindInter
                 {...filterForm.getInputProps("discountPercentage")}
               />
               <NumberInput
-                disabled={!canUse}
                 min={1}
                 label={useTranslateFields("round_to_nearest_label")}
                 {...filterForm.getInputProps("roundToNearest")}
@@ -107,11 +98,11 @@ export function FindInterestingRivensModal({ date, rivens, onSubmit }: FindInter
                 {...exportSettingsForm.getInputProps("overrideExistingPrices", { type: "checkbox" })}
               />
             </Group>
-            <TagsInput disabled={!canUse} label={useTranslateFields("tags_label")} {...exportSettingsForm.getInputProps("tags")} />
+            <TagsInput label={useTranslateFields("tags_label")} {...exportSettingsForm.getInputProps("tags")} />
             <Divider my="md" />
             <Button
               fullWidth
-              disabled={filteredRivens.length === 0 || !canUse}
+              disabled={filteredRivens.length === 0}
               onClick={() => {
                 if (!onSubmit) return;
                 if (filteredRivens.length === 0) return;

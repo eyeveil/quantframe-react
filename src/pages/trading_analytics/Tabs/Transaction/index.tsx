@@ -1,5 +1,4 @@
 import { TauriTypes } from "$types";
-import { HasPermission } from "@api/index";
 import { SearchField } from "@components/Forms/SearchField";
 import { SelectItemTags } from "@components/Forms/SelectItemTags";
 import { ActionWithTooltip } from "@components/Shared/ActionWithTooltip";
@@ -60,7 +59,6 @@ export const TransactionPanel = ({ isActive }: TransactionPanelProps = {}) => {
   const [selectedRecords, setSelectedRecords] = useState<TauriTypes.TransactionDto[]>([]); // New state for selected records
   const [showReport, setShowReport] = useState<boolean>(false);
   const [filterOpened, setFilterOpened] = useState<boolean>(false);
-  const [canExport, setCanExport] = useState<boolean>(false);
   const [viewMode, setViewMode] = useLocalStorage<string>({
     key: "transaction_view_mode",
     getInitialValueInEffect: false,
@@ -76,10 +74,6 @@ export const TransactionPanel = ({ isActive }: TransactionPanelProps = {}) => {
   const [isPending, startTransition] = useTransition();
   const [displayedRecords, setDisplayedRecords] = useState<TauriTypes.TransactionDto[]>([]);
 
-  // Check permissions for export on mount
-  useEffect(() => {
-    HasPermission(TauriTypes.PermissionsFlags.EXPORT_DATA).then((res) => setCanExport(res));
-  }, []);
 
   // Chart range is independent of the list filter; it defaults to the last 90 days.
   const chartParams = useMemo<TauriTypes.TransactionControllerGetListParams>(() => {
@@ -173,7 +167,7 @@ export const TransactionPanel = ({ isActive }: TransactionPanelProps = {}) => {
               tooltip={useTranslateButtons("export_transactions_tooltip")}
               icon={faDownload}
               iconProps={{ size: "xs" }}
-              actionProps={{ size: "sm", disabled: !canExport }}
+              actionProps={{ size: "sm" }}
               onClick={() => exportMutation.mutate(queryData)}
             />
             <ActionWithTooltip

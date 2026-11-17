@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "專案組件",
-    "patreon_overlay": {
-      "title": "受限內容",
-      "description": "此內容僅限 <blue>{{tier}}</blue> 或更高級別的 Patreon 支持者使用。",
-      "buttons": {
-        "become_a_patron": "成為贊助人"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}} 年前",
       "months": "{{months}} 個月前",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "支援Quantframe的開發",
-        "description": "透過在 Patreon 上支持我來獲取高級功能",
-        "premium_content": "使用者活動 | Riven 價格查詢 |匯出資料|項目統計",
-        "join_the_community": "加入支持者社區，幫助塑造 Quantframe 的未來。",
-        "link_your_account": "2. 關聯您的 Patreon 帳戶",
-        "buttons": {
-          "info": "派特雷恩",
-          "link": "關聯您的帳戶"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "咖啡"
         },
-        "patreon": {
-          "title": "在 Patreon 上支持我"
-        },
         "discord": {
           "title": "不和諧"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "版本：<blue>{{version}}</blue> 在 🇩🇰 中使用 ❤️ 製作。 © 2023-{{year}} Kenya-DK。版權所有",
-        "patreon_thanks": "特別感謝 Patreon「Quantframe 用戶」支持者讓 Quantframe 成為可能：<blue>{{users}}</blue>。",
         "disclaimer": "Quantframe 是第三方應用程序，不隸屬於 Digital Extremes。"
       },
       "button_check_for_updates": "檢查更新"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "將項目匯出為 JSON (Patreon T1+)",
+      "export_json_tooltip": "將項目匯出為 JSON",
       "update_multiple_tooltip": "更新多個項目",
       "delete_multiple_tooltip": "刪除多個項目",
       "wts_multiple_tooltip": "產生WTS訊息",
@@ -2199,7 +2177,7 @@
             "update_title": "更新交易"
           },
           "buttons": {
-            "export_transactions_tooltip": "將交易匯出為 JSON (Patreon T1+)",
+            "export_transactions_tooltip": "將交易匯出為 JSON",
             "show_financial_report_tooltip": "顯示報告",
             "delete_all_tooltip": "刪除所有交易{{count}}",
             "calculate_tax_tooltip": "計算所有交易的交易稅"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "物品",
-          "export_json_tooltip": "將項目匯出為 JSON (Patreon T1+)",
+          "export_json_tooltip": "將項目匯出為 JSON",
           "open_table_options_tooltip": "開啟表選項",
           "date_range_placeholder": "選擇日期範圍",
           "volume_label": "體積",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "辛迪加",
-          "export_json_tooltip": "將 Syndicate 匯出為 JSON (Patreon T1+)",
+          "export_json_tooltip": "將 Syndicate 匯出為 JSON",
           "volume_label": "體積",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "銳文",
-          "export_json_tooltip": "將 Riven 導出為 JSON (Patreon T1+)",
+          "export_json_tooltip": "將 Riven 導出為 JSON",
           "open_table_options_tooltip": "開啟表選項",
           "date_range_placeholder": "選擇日期範圍",
           "volume_label": "體積",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "產生 {{count}} 商品的交易訊息",
         "update_multiple_tooltip": "更新多條貿易消息",
-        "export_json_tooltip": "將交易訊息匯出為 JSON (Patreon T1+)",
+        "export_json_tooltip": "將交易訊息匯出為 JSON",
         "delete_multiple_tooltip": "刪除所有交易 {{count}}",
         "add_tooltip": "添加貿易留言",
-        "find_interesting_tooltip": "尋找有趣的貿易消息 (Patreon T2+)",
+        "find_interesting_tooltip": "尋找有趣的貿易消息",
         "calibrate_prices_tooltip": "校準價格"
       },
       "datatable": {

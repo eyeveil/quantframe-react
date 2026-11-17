@@ -9,14 +9,6 @@ export namespace TauriTypes {
     Riven = "riven",
     Item = "item",
   }
-  export enum PermissionsFlags {
-    ALL = "all",
-    EXPORT_DATA = "export_data",
-    RIVEN_PRICES_SEARCH = "riven_prices_search",
-    WFM_USER_ACTIVE_HISTORY = "wfm_user_active_history",
-    SYNDICATE_PRICES_SEARCH = "syndicate_prices_search",
-    FIND_INTERESTING_RIVENS = "find_interesting_rivens",
-  }
   export enum TradeMode {
     Buy = "buy",
     Sell = "sell",
@@ -324,8 +316,6 @@ export namespace TauriTypes {
     wfm_banned: boolean;
     wfm_banned_reason?: string;
     wfm_banned_until?: string;
-    patreon_tier?: string;
-    permissions?: string;
   }
 
   //--------------------------------------------------------------------------------
@@ -340,7 +330,6 @@ export namespace TauriTypes {
     is_pre_release: boolean;
     tos_uuid: string;
     use_temp_db: boolean;
-    patreon_usernames: string[];
   }
   export interface InitializeResponds {
     app_info: AppInfo;

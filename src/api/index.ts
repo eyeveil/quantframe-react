@@ -235,12 +235,8 @@ const WFMThumbnail = (thumb: string) => `https://warframe.market/static/assets/$
 const AddMetric = (metric: string, value: Record<string, string>) => {
   window.api.analytics.add_metric(metric, value);
 };
-const HasPermission = async (flag: TauriTypes.PermissionsFlags): Promise<boolean> => {
-  return await window.api.auth.hasPermission(flag);
-};
 export {
   AddMetric,
-  HasPermission,
   OffTauriDataEvent,
   OffTauriEvent,
   OnTauriDataEvent,

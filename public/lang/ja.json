@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "アイテムのコンポーネント",
-    "patreon_overlay": {
-      "title": "制限されたコンテンツ",
-      "description": "このコンテンツは、ティア <blue>{{tier}}</blue> 以上の Patreon サポーターに限定されています。",
-      "buttons": {
-        "become_a_patron": "パトロンになる"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}}年前",
       "months": "{{months}} か月前",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Quantframeの開発をサポート",
-        "description": "Patreon で私をサポートしてプレミアム機能にアクセスしてください",
-        "premium_content": "ユーザーアクティビティ | Rivenの価格検索 |データのエクスポート |アイテムの統計",
-        "join_the_community": "サポーターのコミュニティに参加して、Quantframe の未来の形成に貢献してください。",
-        "link_your_account": "2.Patreonアカウントをリンクする",
-        "buttons": {
-          "info": "パトレオン",
-          "link": "アカウントをリンクする"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "コーヒー"
         },
-        "patreon": {
-          "title": "Patreonでサポートしてください"
-        },
         "discord": {
           "title": "不和"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "バージョン: <blue>{{version}}</blue> 🇩🇰の❤️で作成されました。 © 2023-{{year}} ケニア-DK。無断転載を禁じます",
-        "patreon_thanks": "Quantframe を実現してくれた Patreon の「Quantframe ユーザー」サポーターに特別に感謝します: <blue>{{users}}</blue>。",
         "disclaimer": "Quantframe はサードパーティのアプリであり、Digital Extremes とは提携していません。"
       },
       "button_check_for_updates": "アップデートをチェックする"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "アイテムを JSON にエクスポート (Patreon T1+)",
+      "export_json_tooltip": "アイテムを JSON にエクスポート",
       "update_multiple_tooltip": "複数のアイテムを更新する",
       "delete_multiple_tooltip": "複数のアイテムを削除する",
       "wts_multiple_tooltip": "WTSメッセージの生成",
@@ -2199,7 +2177,7 @@
             "update_title": "トランザクションの更新"
           },
           "buttons": {
-            "export_transactions_tooltip": "トランザクションを JSON にエクスポート (Patreon T1+)",
+            "export_transactions_tooltip": "トランザクションを JSON にエクスポート",
             "show_financial_report_tooltip": "レポートを表示する",
             "delete_all_tooltip": "すべてのトランザクションを削除します {{count}}",
             "calculate_tax_tooltip": "すべての取引の取引税を計算します"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "アイテム",
-          "export_json_tooltip": "アイテムを JSON にエクスポート (Patreon T1+)",
+          "export_json_tooltip": "アイテムを JSON にエクスポート",
           "open_table_options_tooltip": "テーブルオプションを開く",
           "date_range_placeholder": "日付範囲を選択してください",
           "volume_label": "音量",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "シンジケート",
-          "export_json_tooltip": "シンジケートを JSON にエクスポート (Patreon T1+)",
+          "export_json_tooltip": "シンジケートを JSON にエクスポート",
           "volume_label": "音量",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "リヴェン",
-          "export_json_tooltip": "Riven を JSON にエクスポート (Patreon T1+)",
+          "export_json_tooltip": "Riven を JSON にエクスポート",
           "open_table_options_tooltip": "テーブルオプションを開く",
           "date_range_placeholder": "日付範囲を選択してください",
           "volume_label": "音量",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "{{count}} アイテムの取引メッセージを生成します",
         "update_multiple_tooltip": "複数の取引メッセージを更新する",
-        "export_json_tooltip": "取引メッセージを JSON にエクスポート (Patreon T1+)",
+        "export_json_tooltip": "取引メッセージを JSON にエクスポート",
         "delete_multiple_tooltip": "すべての取引を削除 {{count}}",
         "add_tooltip": "トレードメッセージの追加",
-        "find_interesting_tooltip": "興味深いトレードメッセージを見つける (Patreon T2+)",
+        "find_interesting_tooltip": "興味深いトレードメッセージを見つける",
         "calibrate_prices_tooltip": "価格の調整"
       },
       "datatable": {

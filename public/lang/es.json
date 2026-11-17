@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "Componentes del artículo",
-    "patreon_overlay": {
-      "title": "Contenido restringido",
-      "description": "Este contenido está restringido a los seguidores de Patreon del nivel <blue>{{tier}}</blue> o superior.",
-      "buttons": {
-        "become_a_patron": "Conviértete en patrocinador"
-      }
-    },
     "timer_stamp": {
       "years": "Hace {{years}} años",
       "months": "Hace {{months}} meses",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Apoyar el desarrollo de Quantframe",
-        "description": "Obtén acceso a funciones premium apoyándome en Patreon",
-        "premium_content": "Actividad del usuario | Búsqueda de precios de Riven | Exportar datos | Estadísticas de artículos",
-        "join_the_community": "Únase a la comunidad de seguidores y ayude a dar forma al futuro de Quantframe.",
-        "link_your_account": "2. Vincula tu cuenta de Patreon",
-        "buttons": {
-          "info": "Patreón",
-          "link": "Vincula tu cuenta"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "Café"
         },
-        "patreon": {
-          "title": "Apóyame en Patreon"
-        },
         "discord": {
           "title": "Discordia"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "Versión: <blue>{{version}}</blue> Hecho con ❤️ en 🇩🇰. © 2023-{{year}} Kenia-DK. Reservados todos los derechos",
-        "patreon_thanks": "Un agradecimiento especial a los seguidores de Patreon 'Quantframe Users' por hacer posible Quantframe: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe es una aplicación de terceros y no está afiliada a Digital Extremes."
       },
       "button_check_for_updates": "Buscar actualizaciones"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "Exportar elementos a JSON (Patreon T1+)",
+      "export_json_tooltip": "Exportar elementos a JSON",
       "update_multiple_tooltip": "Actualizar varios elementos",
       "delete_multiple_tooltip": "Eliminar varios elementos",
       "wts_multiple_tooltip": "Generar mensaje WTS",
@@ -2199,7 +2177,7 @@
             "update_title": "Actualizar transacción"
           },
           "buttons": {
-            "export_transactions_tooltip": "Exportar transacciones a JSON (Patreon T1+)",
+            "export_transactions_tooltip": "Exportar transacciones a JSON",
             "show_financial_report_tooltip": "Mostrar informe",
             "delete_all_tooltip": "Eliminar todas las transacciones {{count}}",
             "calculate_tax_tooltip": "Calcular el impuesto comercial para todas las transacciones"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "Artículo",
-          "export_json_tooltip": "Exportar elementos a JSON (Patreon T1+)",
+          "export_json_tooltip": "Exportar elementos a JSON",
           "open_table_options_tooltip": "Opciones de mesa abierta",
           "date_range_placeholder": "Seleccionar rango de fechas",
           "volume_label": "Volumen",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "Sindicato",
-          "export_json_tooltip": "Exportar distribución a JSON (Patreon T1+)",
+          "export_json_tooltip": "Exportar distribución a JSON",
           "volume_label": "Volumen",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "Hendido",
-          "export_json_tooltip": "Exportar Riven a JSON (Patreon T1+)",
+          "export_json_tooltip": "Exportar Riven a JSON",
           "open_table_options_tooltip": "Opciones de mesa abierta",
           "date_range_placeholder": "Seleccionar rango de fechas",
           "volume_label": "Volumen",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "Generar mensajes comerciales para {{count}} artículo(s)",
         "update_multiple_tooltip": "Actualizar múltiples mensajes comerciales",
-        "export_json_tooltip": "Exportar mensajes comerciales a JSON (Patreon T1+)",
+        "export_json_tooltip": "Exportar mensajes comerciales a JSON",
         "delete_multiple_tooltip": "Eliminar todas las operaciones {{count}}",
         "add_tooltip": "Agregar mensaje comercial",
-        "find_interesting_tooltip": "Encuentre mensajes comerciales interesantes (Patreon T2+)",
+        "find_interesting_tooltip": "Encuentre mensajes comerciales interesantes",
         "calibrate_prices_tooltip": "Calibrar precios"
       },
       "datatable": {

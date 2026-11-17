@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "품목 구성요소",
-    "patreon_overlay": {
-      "title": "제한된 콘텐츠",
-      "description": "이 콘텐츠는 <blue>{{tier}}</blue> 등급 이상의 Patreon 후원자에게만 제공됩니다.",
-      "buttons": {
-        "become_a_patron": "후원자가 되세요"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}}년 전",
       "months": "{{months}}개월 전",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Quantframe 개발 지원",
-        "description": "Patreon에서 저를 지원하여 프리미엄 기능에 액세스하세요",
-        "premium_content": "사용자 활동 | 리븐 가격 조회 | 데이터 내보내기 | 아이템 통계",
-        "join_the_community": "지지자 커뮤니티에 참여하여 Quantframe의 미래를 만들어가는 데 도움을 주세요.",
-        "link_your_account": "2. Patreon 계정을 연결하세요",
-        "buttons": {
-          "info": "패트리온",
-          "link": "계정 연결"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "커피"
         },
-        "patreon": {
-          "title": "Patreon에서 저를 후원해주세요"
-        },
         "discord": {
           "title": "불화"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "버전: <blue>{{version}}</blue> 🇩instagram에서 ❤️으로 제작되었습니다. © 2023-{{year}} 케냐-DK. 모든 권리 보유",
-        "patreon_thanks": "Quantframe을 가능하게 해준 Patreon 'Quantframe 사용자' 지지자들에게 특별히 감사드립니다: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe은 타사 앱이며 Digital Extremes와 관련이 없습니다."
       },
       "button_check_for_updates": "업데이트 확인"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "항목을 JSON으로 내보내기(Patreon T1+)",
+      "export_json_tooltip": "항목을 JSON으로 내보내기",
       "update_multiple_tooltip": "여러 항목 업데이트",
       "delete_multiple_tooltip": "여러 항목 삭제",
       "wts_multiple_tooltip": "WTS 메시지 생성",
@@ -2199,7 +2177,7 @@
             "update_title": "거래 업데이트"
           },
           "buttons": {
-            "export_transactions_tooltip": "거래를 JSON으로 내보내기(Patreon T1+)",
+            "export_transactions_tooltip": "거래를 JSON으로 내보내기",
             "show_financial_report_tooltip": "보고서 표시",
             "delete_all_tooltip": "모든 거래 삭제 {{count}}",
             "calculate_tax_tooltip": "모든 거래에 대한 거래세 계산"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "목",
-          "export_json_tooltip": "항목을 JSON으로 내보내기(Patreon T1+)",
+          "export_json_tooltip": "항목을 JSON으로 내보내기",
           "open_table_options_tooltip": "테이블 옵션 열기",
           "date_range_placeholder": "기간 선택",
           "volume_label": "용량",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "신디케이트",
-          "export_json_tooltip": "신디케이트를 JSON으로 내보내기(Patreon T1+)",
+          "export_json_tooltip": "신디케이트를 JSON으로 내보내기",
           "volume_label": "용량",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "리븐",
-          "export_json_tooltip": "Riven을 JSON으로 내보내기(Patreon T1+)",
+          "export_json_tooltip": "Riven을 JSON으로 내보내기",
           "open_table_options_tooltip": "테이블 옵션 열기",
           "date_range_placeholder": "기간 선택",
           "volume_label": "용량",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "{{count}} 품목에 대한 거래 메시지 생성",
         "update_multiple_tooltip": "여러 거래 메시지 업데이트",
-        "export_json_tooltip": "거래 메시지를 JSON으로 내보내기(Patreon T1+)",
+        "export_json_tooltip": "거래 메시지를 JSON으로 내보내기",
         "delete_multiple_tooltip": "모든 거래 삭제 {{count}}",
         "add_tooltip": "거래 메시지 추가",
-        "find_interesting_tooltip": "흥미로운 거래 메시지 찾기(Patreon T2+)",
+        "find_interesting_tooltip": "흥미로운 거래 메시지 찾기",
         "calibrate_prices_tooltip": "가격 보정"
       },
       "datatable": {

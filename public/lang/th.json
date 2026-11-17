@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "ส่วนประกอบรายการ",
-    "patreon_overlay": {
-      "title": "เนื้อหาที่ถูกจำกัด",
-      "description": "เนื้อหานี้จำกัดไว้สำหรับผู้สนับสนุน Patreon ระดับ <blue>{{tier}}</blue> หรือสูงกว่า",
-      "buttons": {
-        "become_a_patron": "มาเป็นผู้อุปถัมภ์"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}} ปีที่แล้ว",
       "months": "{{months}} เดือนที่แล้ว",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "สนับสนุนการพัฒนา Quantframe",
-        "description": "เข้าถึงฟีเจอร์พรีเมียมโดยสนับสนุนฉันบน Patreon",
-        "premium_content": "กิจกรรมของผู้ใช้ | การค้นหาราคา Riven | ส่งออกข้อมูล | สถิติรายการ",
-        "join_the_community": "เข้าร่วมชุมชนผู้สนับสนุนและช่วยกำหนดอนาคตของ Quantframe",
-        "link_your_account": "2. เชื่อมโยงบัญชี Patreon ของคุณ",
-        "buttons": {
-          "info": "แพทเรียน",
-          "link": "เชื่อมโยงบัญชีของคุณ"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "กาแฟ"
         },
-        "patreon": {
-          "title": "สนับสนุนฉันใน Patreon"
-        },
         "discord": {
           "title": "ความไม่ลงรอยกัน"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "เวอร์ชัน: <blue>{{version}}</blue> ทำด้วย ❤️ ใน 🇩🇰 © 2023-{{year}} เคนยา-DK สงวนลิขสิทธิ์",
-        "patreon_thanks": "ขอขอบคุณเป็นพิเศษสำหรับผู้สนับสนุน Patreon 'Quantframe Users' ที่ทำให้ Quantframe เป็นไปได้: <blue>{{users}}</blue>",
         "disclaimer": "Quantframe เป็นแอปของบุคคลที่สามและไม่มีส่วนเกี่ยวข้องกับ Digital Extremes"
       },
       "button_check_for_updates": "ตรวจสอบการอัปเดต"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "ส่งออกรายการไปยัง JSON (Patreon T1+)",
+      "export_json_tooltip": "ส่งออกรายการไปยัง JSON",
       "update_multiple_tooltip": "อัพเดตหลายรายการ",
       "delete_multiple_tooltip": "ลบหลายรายการ",
       "wts_multiple_tooltip": "สร้างข้อความ WTS",
@@ -2199,7 +2177,7 @@
             "update_title": "อัปเดตธุรกรรม"
           },
           "buttons": {
-            "export_transactions_tooltip": "ส่งออกธุรกรรมไปยัง JSON (Patreon T1+)",
+            "export_transactions_tooltip": "ส่งออกธุรกรรมไปยัง JSON",
             "show_financial_report_tooltip": "แสดงรายงาน",
             "delete_all_tooltip": "ลบธุรกรรมทั้งหมด {{count}}",
             "calculate_tax_tooltip": "คำนวณภาษีการซื้อขายสำหรับธุรกรรมทั้งหมด"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "รายการ",
-          "export_json_tooltip": "ส่งออกรายการไปยัง JSON (Patreon T1+)",
+          "export_json_tooltip": "ส่งออกรายการไปยัง JSON",
           "open_table_options_tooltip": "เปิดตัวเลือกตาราง",
           "date_range_placeholder": "เลือกช่วงวันที่",
           "volume_label": "ปริมาณ",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "ซินดิเคท",
-          "export_json_tooltip": "ส่งออกซินดิเคทเป็น JSON (Patreon T1+)",
+          "export_json_tooltip": "ส่งออกซินดิเคทเป็น JSON",
           "volume_label": "ปริมาณ",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "ริเว่น",
-          "export_json_tooltip": "ส่งออก Riven เป็น JSON (Patreon T1+)",
+          "export_json_tooltip": "ส่งออก Riven เป็น JSON",
           "open_table_options_tooltip": "เปิดตัวเลือกตาราง",
           "date_range_placeholder": "เลือกช่วงวันที่",
           "volume_label": "ปริมาณ",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "สร้างข้อความการค้าสำหรับรายการ {{count}}",
         "update_multiple_tooltip": "อัปเดตข้อความการค้าหลายรายการ",
-        "export_json_tooltip": "ส่งออกข้อความการค้าไปยัง JSON (Patreon T1+)",
+        "export_json_tooltip": "ส่งออกข้อความการค้าไปยัง JSON",
         "delete_multiple_tooltip": "ลบการซื้อขายทั้งหมด {{count}}",
         "add_tooltip": "เพิ่มข้อความการค้า",
-        "find_interesting_tooltip": "ค้นหาข้อความการค้าที่น่าสนใจ (Patreon T2+)",
+        "find_interesting_tooltip": "ค้นหาข้อความการค้าที่น่าสนใจ",
         "calibrate_prices_tooltip": "ปรับเทียบราคา"
       },
       "datatable": {

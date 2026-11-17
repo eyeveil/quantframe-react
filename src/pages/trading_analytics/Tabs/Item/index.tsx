@@ -1,6 +1,6 @@
 import { Box, Grid, Group, NumberFormatter, Paper, SimpleGrid } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { QuantframeApiTypes, TauriTypes } from "$types";
+import { QuantframeApiTypes } from "$types";
 import { useQueries } from "./queries";
 import { SearchField } from "@components/Forms/SearchField";
 import { useTranslateCommon, useTranslatePages } from "@hooks/useTranslate.hook";
@@ -14,7 +14,6 @@ import { useForm } from "@mantine/form";
 import { DatePickerInput } from "@mantine/dates";
 import { ActionWithTooltip } from "@components/Shared/ActionWithTooltip";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import { HasPermission } from "@api/index";
 import { useMutations } from "./mutations";
 import { Loading } from "@components/Shared/Loading";
 import { MinMax } from "@components/Forms/MinMax";
@@ -50,12 +49,7 @@ export const ItemPanel = ({ isActive }: ItemPanelProps = {}) => {
   // States
   const [filterOpened, setFilterOpened] = useState<boolean>(false);
   const [dates, setDates] = useState<[string | null, string | null]>([null, null]);
-  const [canExport, setCanExport] = useState<boolean>(false);
 
-  // Check permissions for export on mount
-  useEffect(() => {
-    HasPermission(TauriTypes.PermissionsFlags.EXPORT_DATA).then((res) => setCanExport(res));
-  }, []);
   // Queries
   const { paginationQuery, refetchQueries } = useQueries({ queryData: queryData.values, isActive });
 
@@ -99,7 +93,7 @@ export const ItemPanel = ({ isActive }: ItemPanelProps = {}) => {
               tooltip={useTranslateTabItem("export_json_tooltip")}
               icon={faDownload}
               iconProps={{ size: "xs" }}
-              actionProps={{ size: "sm", disabled: !canExport || IsLoading() }}
+              actionProps={{ size: "sm", disabled: IsLoading() }}
               onClick={() => exportMutation.mutate(queryData.values)}
             />
           </Group>

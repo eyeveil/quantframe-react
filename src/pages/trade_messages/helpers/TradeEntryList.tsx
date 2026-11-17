@@ -11,7 +11,6 @@ import { useHasAlert } from "@hooks/useHasAlert.hook";
 import { useForm } from "@mantine/form";
 import { ActionWithTooltip } from "@components/Shared/ActionWithTooltip";
 import { faCalculator, faDownload, faEdit, faMessage, faPlus, faSearch, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { HasPermission } from "@api/index";
 import { useMutations } from "./mutations";
 import { Loading } from "@components/Shared/Loading";
 import { ItemName } from "@components/DataDisplay/ItemName";
@@ -68,13 +67,8 @@ export const TradeEntryList = ({
   });
   const [filterOpened, setFilterOpened] = useState<boolean>(false);
   const [loadingRows, setLoadingRows] = useState<string[]>([]);
-  const [canExport, setCanExport] = useState<boolean>(false);
   const [selectedRecords, setSelectedRecords] = useState<TauriTypes.TradeEntry[]>([]);
 
-  // Check permissions for export on mount
-  useEffect(() => {
-    HasPermission(TauriTypes.PermissionsFlags.EXPORT_DATA).then((res) => setCanExport(res));
-  }, []);
   // Queries
   const { paginationQuery, refetchQueries } = useQueries({ queryData: queryData.values, isActive });
 
@@ -200,7 +194,7 @@ export const TradeEntryList = ({
               tooltip={useTranslateButtons("export_json_tooltip")}
               icon={faDownload}
               iconProps={{ size: "xs" }}
-              actionProps={{ size: "sm", disabled: !canExport || IsLoading() }}
+              actionProps={{ size: "sm", disabled: IsLoading() }}
               onClick={() => exportMutation.mutate(queryData.values)}
             />
             <ActionWithTooltip

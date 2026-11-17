@@ -1,5 +1,5 @@
 import { TauriTypes } from "$types";
-import api, { HasPermission } from "@api/index";
+import api from "@api/index";
 import { ItemName } from "@components/DataDisplay/ItemName";
 import { SearchField } from "@components/Forms/SearchField";
 import { ActionWithTooltip } from "@components/Shared/ActionWithTooltip";
@@ -39,13 +39,8 @@ export const SyndicatePanel = ({ isActive }: SyndicatePanelProps = {}) => {
   });
   // States
   const [loadingRows, setLoadingRows] = useState<string[]>([]);
-  const [canExport, setCanExport] = useState<boolean>(false);
   const [selectedRecords, setSelectedRecords] = useState<TauriTypes.SyndicateItem[]>([]);
 
-  // Check permissions for export on mount
-  useEffect(() => {
-    HasPermission(TauriTypes.PermissionsFlags.EXPORT_DATA).then((res) => setCanExport(res));
-  }, []);
 
   // Translate
   const useTranslate = (key: string, context?: { [key: string]: any }, i18Key?: boolean) =>
@@ -192,7 +187,7 @@ export const SyndicatePanel = ({ isActive }: SyndicatePanelProps = {}) => {
               tooltip={useTranslate("export_json_tooltip")}
               icon={faDownload}
               iconProps={{ size: "xs" }}
-              actionProps={{ size: "sm", disabled: !canExport }}
+              actionProps={{ size: "sm" }}
               onClick={() => exportMutation.mutate(queryData)}
             />
             <ActionWithTooltip

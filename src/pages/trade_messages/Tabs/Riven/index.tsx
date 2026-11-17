@@ -1,5 +1,5 @@
 import { TauriTypes } from "$types";
-import api, { HasPermission } from "@api/index";
+import api from "@api/index";
 import { SelectRivenWeapon } from "@components/Forms/SelectRivenWeapon";
 import { modals } from "@mantine/modals";
 import { default as dayjs, default as utc } from "dayjs";
@@ -36,9 +36,7 @@ export const RivenPanel = ({ isActive }: RivenPanelProps = {}) => {
       onFindInteresting={async ({ createMultipleMutation }) => {
         let date = dayjs().subtract(1, "hours").startOf("hour").utc().toISOString();
 
-        let items: any = [];
-        if (await HasPermission(TauriTypes.PermissionsFlags.FIND_INTERESTING_RIVENS))
-          items = await api.riven.getAll({ page: 1, limit: -1, from_date: date, to_date: date });
+        const items = await api.riven.getAll({ page: 1, limit: -1, from_date: date, to_date: date });
         modals.open({
           size: "100%",
           title: "",

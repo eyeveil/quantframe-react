@@ -720,13 +720,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "Item Components",
-    "patreon_overlay": {
-      "title": "Restricted Content",
-      "description": "This content is restricted to Patreon supporters of tier <blue>{{tier}}</blue> or higher.",
-      "buttons": {
-        "become_a_patron": "Become a Patron"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}} years ago",
       "months": "{{months}} months ago",
@@ -1848,17 +1841,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Support the development of Quantframe",
-        "description": "Get access to premium features by supporting me on Patreon",
-        "premium_content": "User activity | Riven Price Lookup | Export Data | Item Statistics",
-        "join_the_community": "Join the community of supporters and help shape the future of Quantframe.",
-        "link_your_account": "2. Link your Patreon account",
-        "buttons": {
-          "info": "Patreon",
-          "link": "Link your account"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -2208,9 +2190,6 @@
         "coffee": {
           "title": "Coffee"
         },
-        "patreon": {
-          "title": "Support me on Patreon"
-        },
         "discord": {
           "title": "Discord"
         },
@@ -2220,7 +2199,6 @@
       },
       "text": {
         "version": "Version: <blue>{{version}}</blue>  Made with ❤️ in 🇩🇰. © 2023-{{year}} Kenya-DK. All rights reserved ",
-        "patreon_thanks": " A special thanks to the Patreon 'Quantframe Users' supporters for making Quantframe possible: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe is a third-party app and is not affiliated with Digital Extremes."
       },
       "button_check_for_updates": "Check for Updates"
@@ -2339,7 +2317,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "Export Items to JSON (Patreon T1+)",
+      "export_json_tooltip": "Export Items to JSON",
       "update_multiple_tooltip": "Update Multiple Items",
       "delete_multiple_tooltip": "Delete Multiple Items",
       "wts_multiple_tooltip": "Generate WTS message",
@@ -2483,7 +2461,7 @@
             "update_title": "Update Transaction"
           },
           "buttons": {
-            "export_transactions_tooltip": "Export transactions to JSON  (Patreon T1+)",
+            "export_transactions_tooltip": "Export transactions to JSON",
             "show_financial_report_tooltip": "Show report",
             "delete_all_tooltip": "Delete all transactions {{count}}",
             "calculate_tax_tooltip": "Calculate Trading Tax for all transactions"
@@ -2514,7 +2492,7 @@
         },
         "item": {
           "title": "Item",
-          "export_json_tooltip": "Export Items to JSON (Patreon T1+)",
+          "export_json_tooltip": "Export Items to JSON",
           "open_table_options_tooltip": "Open table options",
           "date_range_placeholder": "Select date range",
           "volume_label": "Volume",
@@ -2543,7 +2521,7 @@
         },
         "syndicate": {
           "title": "Syndicate",
-          "export_json_tooltip": "Export Syndicate to JSON (Patreon T1+)",
+          "export_json_tooltip": "Export Syndicate to JSON",
           "volume_label": "Volume",
           "fields": {
             "syndicate": {
@@ -2563,7 +2541,7 @@
         },
         "riven": {
           "title": "Riven",
-          "export_json_tooltip": "Export Riven to JSON (Patreon T1+)",
+          "export_json_tooltip": "Export Riven to JSON",
           "open_table_options_tooltip": "Open table options",
           "date_range_placeholder": "Select date range",
           "volume_label": "Volume",
@@ -2715,10 +2693,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "Generate trade messages for {{count}} item(s)",
         "update_multiple_tooltip": "Update Multiple Trade Messages",
-        "export_json_tooltip": "Export trade messages to JSON  (Patreon T1+)",
+        "export_json_tooltip": "Export trade messages to JSON",
         "delete_multiple_tooltip": "Delete all trade {{count}}",
         "add_tooltip": "Add Trade Message",
-        "find_interesting_tooltip": "Find Interesting Trade Messages (Patreon T2+)",
+        "find_interesting_tooltip": "Find Interesting Trade Messages",
         "calibrate_prices_tooltip": "Calibrate Prices"
       },
       "datatable": {

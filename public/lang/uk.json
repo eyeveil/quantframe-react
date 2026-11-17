@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "Компоненти предмета",
-    "patreon_overlay": {
-      "title": "Обмежений вміст",
-      "description": "Цей вміст доступний лише для прихильників Patreon рівня <blue>{{tier}}</blue> або вище.",
-      "buttons": {
-        "become_a_patron": "Стати патроном"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}} років тому",
       "months": "{{months}} місяців тому",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Підтримка розробки Quantframe",
-        "description": "Отримайте доступ до преміум-функцій, підтримавши мене на Patreon",
-        "premium_content": "Активність користувача | Пошук цін Riven | Експорт даних | Статистика предметів",
-        "join_the_community": "Приєднуйтеся до спільноти прихильників і допоможіть сформувати майбутнє Quantframe.",
-        "link_your_account": "2. Прив’яжіть свій обліковий запис Patreon",
-        "buttons": {
-          "info": "Patreon",
-          "link": "Прив’яжіть свій обліковий запис"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "кава"
         },
-        "patreon": {
-          "title": "Підтримайте мене на Patreon"
-        },
         "discord": {
           "title": "Розбрат"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "Версія: <blue>{{version}}</blue> Зроблено за допомогою ❤️ у 🇩🇰. © 2023-{{year}} Kenya-DK. Всі права захищені",
-        "patreon_thanks": "Особлива подяка прихильникам Patreon «Користувачі Quantframe» за створення Quantframe: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe є сторонньою програмою, яка не пов’язана з Digital Extremes."
       },
       "button_check_for_updates": "Перевірте наявність оновлень"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "Експорт елементів у JSON (Patreon T1+)",
+      "export_json_tooltip": "Експорт елементів у JSON",
       "update_multiple_tooltip": "Оновити кілька елементів",
       "delete_multiple_tooltip": "Видалити кілька елементів",
       "wts_multiple_tooltip": "Створити повідомлення WTS",
@@ -2199,7 +2177,7 @@
             "update_title": "Оновити транзакцію"
           },
           "buttons": {
-            "export_transactions_tooltip": "Експорт транзакцій у JSON (Patreon T1+)",
+            "export_transactions_tooltip": "Експорт транзакцій у JSON",
             "show_financial_report_tooltip": "Показати звіт",
             "delete_all_tooltip": "Видалити всі транзакції {{count}}",
             "calculate_tax_tooltip": "Розрахуйте торговий податок для всіх операцій"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "Пункт",
-          "export_json_tooltip": "Експорт елементів у JSON (Patreon T1+)",
+          "export_json_tooltip": "Експорт елементів у JSON",
           "open_table_options_tooltip": "Опції відкритої таблиці",
           "date_range_placeholder": "Виберіть діапазон дат",
           "volume_label": "Обсяг",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "Синдикат",
-          "export_json_tooltip": "Експорт Syndicate до JSON (Patreon T1+)",
+          "export_json_tooltip": "Експорт Syndicate до JSON",
           "volume_label": "Обсяг",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "Рівен",
-          "export_json_tooltip": "Експорт Riven у JSON (Patreon T1+)",
+          "export_json_tooltip": "Експорт Riven у JSON",
           "open_table_options_tooltip": "Опції відкритої таблиці",
           "date_range_placeholder": "Виберіть діапазон дат",
           "volume_label": "Обсяг",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "Створити комерційні повідомлення для {{count}} позицій(ів)",
         "update_multiple_tooltip": "Оновіть кілька торгових повідомлень",
-        "export_json_tooltip": "Експорт торгових повідомлень у JSON (Patreon T1+)",
+        "export_json_tooltip": "Експорт торгових повідомлень у JSON",
         "delete_multiple_tooltip": "Видалити всю торгівлю {{count}}",
         "add_tooltip": "Додати торгове повідомлення",
-        "find_interesting_tooltip": "Знайдіть цікаві комерційні повідомлення (Patreon T2+)",
+        "find_interesting_tooltip": "Знайдіть цікаві комерційні повідомлення",
         "calibrate_prices_tooltip": "Відкалібрувати ціни"
       },
       "datatable": {

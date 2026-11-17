@@ -1,5 +1,4 @@
 import { AppRoutes } from "@components/Layouts/Routes";
-import { PatreonModal } from "@components/Modals/PatreonModal/indexx";
 import { PromptModal } from "@components/Modals/Prompt";
 import { AppContextProvider } from "@contexts/app.context";
 import { dom, library } from "@fortawesome/fontawesome-svg-core";
@@ -60,7 +59,6 @@ export const queryClient = new QueryClient({
 });
 const modals = {
   prompt: PromptModal,
-  patreon: PatreonModal,
   /* ...other modals */
 };
 export interface MantineModalsOverride {

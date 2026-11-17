@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "Компоненты предмета",
-    "patreon_overlay": {
-      "title": "Ограниченный контент",
-      "description": "Этот контент предназначен только для сторонников Patreon уровня <blue>{{tier}}</blue> или выше.",
-      "buttons": {
-        "become_a_patron": "Стать покровителем"
-      }
-    },
     "timer_stamp": {
       "years": "{{years}} лет назад",
       "months": "{{months}} месяцев назад",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Поддержите разработку Quantframe",
-        "description": "Получите доступ к премиум-функциям, поддержав меня на Patreon.",
-        "premium_content": "Активность пользователя | Поиск цен на Ривен | Экспорт данных | Статистика предмета",
-        "join_the_community": "Присоединяйтесь к сообществу сторонников и помогите сформировать будущее Quantframe.",
-        "link_your_account": "2. Привяжите свою учетную запись Patreon",
-        "buttons": {
-          "info": "Патреон",
-          "link": "Свяжите свой аккаунт"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "Кофе"
         },
-        "patreon": {
-          "title": "Поддержите меня на Patreon"
-        },
         "discord": {
           "title": "Раздор"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "Версия: <blue>{{version}}</blue> Сделано с ❤️ в 🇩🇰. © 2023-{{year}} Кения-ДК. Все права защищены",
-        "patreon_thanks": "Особая благодарность «Пользователям Quantframe» на Patreon за то, что они сделали возможным использование Quantframe: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe — стороннее приложение, не связанное с Digital Extremes."
       },
       "button_check_for_updates": "Проверьте наличие обновлений"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "Экспорт элементов в JSON (Patreon T1+)",
+      "export_json_tooltip": "Экспорт элементов в JSON",
       "update_multiple_tooltip": "Обновить несколько элементов",
       "delete_multiple_tooltip": "Удалить несколько элементов",
       "wts_multiple_tooltip": "Создать сообщение WTS",
@@ -2199,7 +2177,7 @@
             "update_title": "Обновить транзакцию"
           },
           "buttons": {
-            "export_transactions_tooltip": "Экспорт транзакций в JSON (Patreon T1+)",
+            "export_transactions_tooltip": "Экспорт транзакций в JSON",
             "show_financial_report_tooltip": "Показать отчет",
             "delete_all_tooltip": "Удалить все транзакции {{count}}",
             "calculate_tax_tooltip": "Рассчитать торговый налог для всех транзакций"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "Элемент",
-          "export_json_tooltip": "Экспорт элементов в JSON (Patreon T1+)",
+          "export_json_tooltip": "Экспорт элементов в JSON",
           "open_table_options_tooltip": "Варианты открытого стола",
           "date_range_placeholder": "Выберите диапазон дат",
           "volume_label": "Объем",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "Синдикат",
-          "export_json_tooltip": "Экспорт синдиката в JSON (Patreon T1+)",
+          "export_json_tooltip": "Экспорт синдиката в JSON",
           "volume_label": "Объем",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "Ривен",
-          "export_json_tooltip": "Экспортировать Riven в JSON (Patreon T1+)",
+          "export_json_tooltip": "Экспортировать Riven в JSON",
           "open_table_options_tooltip": "Варианты открытого стола",
           "date_range_placeholder": "Выберите диапазон дат",
           "volume_label": "Объем",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "Создать торговые сообщения для товаров {{count}}",
         "update_multiple_tooltip": "Обновить несколько торговых сообщений",
-        "export_json_tooltip": "Экспорт торговых сообщений в JSON (Patreon T1+)",
+        "export_json_tooltip": "Экспорт торговых сообщений в JSON",
         "delete_multiple_tooltip": "Удалить все сделки {{count}}",
         "add_tooltip": "Добавить торговое сообщение",
-        "find_interesting_tooltip": "Найдите интересные торговые сообщения (Patreon T2+)",
+        "find_interesting_tooltip": "Найдите интересные торговые сообщения",
         "calibrate_prices_tooltip": "Калибровка цен"
       },
       "datatable": {

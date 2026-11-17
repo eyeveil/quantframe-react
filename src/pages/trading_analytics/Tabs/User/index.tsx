@@ -1,5 +1,4 @@
-import { QuantframeApiTypes, TauriTypes } from "$types";
-import { PatreonOverlay } from "@components/Shared/PatreonOverlay";
+import { QuantframeApiTypes } from "$types";
 import { useTranslatePages } from "@hooks/useTranslate.hook";
 import { Box, Grid, Group, Paper, Select, useMantineTheme } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
@@ -46,7 +45,6 @@ export const UserPanel = ({ isActive }: UserPanelProps = {}) => {
   }, [dates]);
   return (
     <Box p={"md"} pos={"relative"}>
-      <PatreonOverlay permission={TauriTypes.PermissionsFlags.WFM_USER_ACTIVE_HISTORY} tier="T1+" />
       <Grid>
         <Grid.Col span={9} style={{ position: "relative", height: "100vh" }}>
           <Bar

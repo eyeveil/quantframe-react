@@ -647,13 +647,6 @@
   "components": {
     "item_component": "<blue>{{name}}</blue> x<blue>{{count}}</blue>",
     "item_components": "Artikelkomponenten",
-    "patreon_overlay": {
-      "title": "Eingeschränkter Inhalt",
-      "description": "Dieser Inhalt ist auf Patreon-Unterstützer der Stufe <blue>{{tier}}</blue> oder höher beschränkt.",
-      "buttons": {
-        "become_a_patron": "Werden Sie Gönner"
-      }
-    },
     "timer_stamp": {
       "years": "Vor {{years}} Jahren",
       "months": "Vor {{months}} Monaten",
@@ -1632,17 +1625,6 @@
           }
         }
       },
-      "patreon_modal": {
-        "title": "Unterstützen Sie die Entwicklung von Quantframe",
-        "description": "Erhalten Sie Zugang zu Premium-Funktionen, indem Sie mich auf Patreon unterstützen",
-        "premium_content": "Benutzeraktivität | Riven-Preissuche | Daten exportieren | Artikelstatistik",
-        "join_the_community": "Treten Sie der Unterstützergemeinschaft bei und gestalten Sie die Zukunft von Quantframe mit.",
-        "link_your_account": "2. Verknüpfen Sie Ihr Patreon-Konto",
-        "buttons": {
-          "info": "Patreon",
-          "link": "Verknüpfen Sie Ihr Konto"
-        }
-      },
       "item_details": {
         "tabs": {
           "overview": {
@@ -1949,9 +1931,6 @@
         "coffee": {
           "title": "Kaffee"
         },
-        "patreon": {
-          "title": "Unterstützen Sie mich auf Patreon"
-        },
         "discord": {
           "title": "Zwietracht"
         },
@@ -1961,7 +1940,6 @@
       },
       "text": {
         "version": "Version: <blue>{{version}}</blue> Hergestellt mit ❤️ in 🇩🇰. © 2023-{{year}} Kenia-DK. Alle Rechte vorbehalten",
-        "patreon_thanks": "Ein besonderer Dank geht an die „Quantframe-Benutzer“-Unterstützer von Patreon, die Quantframe ermöglicht haben: <blue>{{users}}</blue>.",
         "disclaimer": "Quantframe ist eine Drittanbieter-App und steht in keiner Verbindung zu Digital Extremes."
       },
       "button_check_for_updates": "Suchen Sie nach Updates"
@@ -2079,7 +2057,7 @@
       }
     },
     "live_scraper": {
-      "export_json_tooltip": "Artikel nach JSON exportieren (Patreon T1+)",
+      "export_json_tooltip": "Artikel nach JSON exportieren",
       "update_multiple_tooltip": "Mehrere Elemente aktualisieren",
       "delete_multiple_tooltip": "Mehrere Elemente löschen",
       "wts_multiple_tooltip": "WTS-Nachricht generieren",
@@ -2199,7 +2177,7 @@
             "update_title": "Transaktion aktualisieren"
           },
           "buttons": {
-            "export_transactions_tooltip": "Transaktionen nach JSON exportieren (Patreon T1+)",
+            "export_transactions_tooltip": "Transaktionen nach JSON exportieren",
             "show_financial_report_tooltip": "Bericht anzeigen",
             "delete_all_tooltip": "Alle Transaktionen löschen {{count}}",
             "calculate_tax_tooltip": "Berechnen Sie die Handelssteuer für alle Transaktionen"
@@ -2230,7 +2208,7 @@
         },
         "item": {
           "title": "Artikel",
-          "export_json_tooltip": "Artikel nach JSON exportieren (Patreon T1+)",
+          "export_json_tooltip": "Artikel nach JSON exportieren",
           "open_table_options_tooltip": "Offene Tischoptionen",
           "date_range_placeholder": "Wählen Sie den Datumsbereich aus",
           "volume_label": "Volumen",
@@ -2259,7 +2237,7 @@
         },
         "syndicate": {
           "title": "Syndikat",
-          "export_json_tooltip": "Syndicate nach JSON exportieren (Patreon T1+)",
+          "export_json_tooltip": "Syndicate nach JSON exportieren",
           "volume_label": "Volumen",
           "fields": {
             "syndicate": {
@@ -2279,7 +2257,7 @@
         },
         "riven": {
           "title": "Riven",
-          "export_json_tooltip": "Riven nach JSON exportieren (Patreon T1+)",
+          "export_json_tooltip": "Riven nach JSON exportieren",
           "open_table_options_tooltip": "Offene Tischoptionen",
           "date_range_placeholder": "Wählen Sie den Datumsbereich aus",
           "volume_label": "Volumen",
@@ -2431,10 +2409,10 @@
       "buttons": {
         "generate_trade_messages_tooltip": "Handelsnachrichten für {{count}} Artikel generieren",
         "update_multiple_tooltip": "Aktualisieren Sie mehrere Handelsnachrichten",
-        "export_json_tooltip": "Handelsnachrichten nach JSON exportieren (Patreon T1+)",
+        "export_json_tooltip": "Handelsnachrichten nach JSON exportieren",
         "delete_multiple_tooltip": "Alle Trades löschen {{count}}",
         "add_tooltip": "Handelsnachricht hinzufügen",
-        "find_interesting_tooltip": "Finden Sie interessante Handelsnachrichten (Patreon T2+)",
+        "find_interesting_tooltip": "Finden Sie interessante Handelsnachrichten",
         "calibrate_prices_tooltip": "Preise kalibrieren"
       },
       "datatable": {

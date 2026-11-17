@@ -912,15 +912,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -2319,27 +2310,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -2790,9 +2760,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -2801,9 +2768,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -2962,7 +2926,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -3124,7 +3088,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -3184,7 +3148,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -3253,7 +3217,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -3502,7 +3466,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -3511,7 +3475,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -3793,7 +3757,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -4865,15 +4829,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -6272,27 +6227,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -6743,9 +6677,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -6754,9 +6685,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -6915,7 +6843,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -7077,7 +7005,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -7137,7 +7065,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -7206,7 +7134,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -7455,7 +7383,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -7464,7 +7392,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -7746,7 +7674,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -8818,15 +8746,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -10225,27 +10144,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -10696,9 +10594,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -10707,9 +10602,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -10868,7 +10760,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -11030,7 +10922,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -11090,7 +10982,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -11159,7 +11051,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -11408,7 +11300,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -11417,7 +11309,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -11699,7 +11591,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -12771,15 +12663,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -14178,27 +14061,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -14649,9 +14511,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -14660,9 +14519,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -14821,7 +14677,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -14983,7 +14839,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -15043,7 +14899,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -15112,7 +14968,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -15361,7 +15217,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -15370,7 +15226,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -15652,7 +15508,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -16724,15 +16580,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -18131,27 +17978,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -18602,9 +18428,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -18613,9 +18436,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -18774,7 +18594,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -18936,7 +18756,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -18996,7 +18816,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -19065,7 +18885,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -19314,7 +19134,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -19323,7 +19143,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -19605,7 +19425,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -20677,15 +20497,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -22084,27 +21895,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -22555,9 +22345,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -22566,9 +22353,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -22727,7 +22511,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -22889,7 +22673,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -22949,7 +22733,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -23018,7 +22802,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -23267,7 +23051,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -23276,7 +23060,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -23558,7 +23342,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -24630,15 +24414,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -26037,27 +25812,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -26508,9 +26262,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -26519,9 +26270,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -26680,7 +26428,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -26842,7 +26590,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -26902,7 +26650,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -26971,7 +26719,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -27220,7 +26968,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -27229,7 +26977,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -27511,7 +27259,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -28583,15 +28331,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -29990,27 +29729,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -30461,9 +30179,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -30472,9 +30187,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -30633,7 +30345,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -30795,7 +30507,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -30855,7 +30567,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -30924,7 +30636,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -31173,7 +30885,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -31182,7 +30894,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -31464,7 +31176,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -32410,15 +32122,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -33817,27 +33520,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -34288,9 +33970,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -34299,9 +33978,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -34460,7 +34136,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -34622,7 +34298,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -34682,7 +34358,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -34751,7 +34427,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -35000,7 +34676,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -35009,7 +34685,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -35291,7 +34967,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -36363,15 +36039,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -37770,27 +37437,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -38241,9 +37887,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -38252,9 +37895,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -38413,7 +38053,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -38575,7 +38215,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -38635,7 +38275,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -38704,7 +38344,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -38953,7 +38593,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -38962,7 +38602,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -39244,7 +38884,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -40316,15 +39956,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -41723,27 +41354,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -42194,9 +41804,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -42205,9 +41812,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -42366,7 +41970,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -42528,7 +42132,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -42588,7 +42192,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -42657,7 +42261,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -42906,7 +42510,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -42915,7 +42519,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -43197,7 +42801,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -44269,15 +43873,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -45676,27 +45271,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -46147,9 +45721,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -46158,9 +45729,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -46319,7 +45887,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -46481,7 +46049,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -46541,7 +46109,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -46610,7 +46178,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -46859,7 +46427,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -46868,7 +46436,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -47150,7 +46718,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -48222,15 +47790,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -49629,27 +49188,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -50100,9 +49638,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -50111,9 +49646,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -50272,7 +49804,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -50434,7 +49966,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -50494,7 +50026,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -50563,7 +50095,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -50812,7 +50344,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -50821,7 +50353,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -51103,7 +50635,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"
@@ -52175,15 +51707,6 @@
     "components.item_components": {
       "hash": "bd7dfbe270d8f4204b70d039ad5cd04f88c834dca4902ca6cb81259778823e62"
     },
-    "components.patreon_overlay.title": {
-      "hash": "860c278674dba4cb8699040c1ca1b9e061c165a6935f75e6658347471b713d50"
-    },
-    "components.patreon_overlay.description": {
-      "hash": "6a4f3d886f2f03c60d87e95caa9f45f5ece26c32e75004fdf1a607777070e8b2"
-    },
-    "components.patreon_overlay.buttons.become_a_patron": {
-      "hash": "9c752a594c5bd28d6d496fb61be23f672bcad1ff31971bb31a2248f384cd90b5"
-    },
     "components.timer_stamp.years": {
       "hash": "d6f84afd29f2b5697c93e536c9ded7d4c5059757e1f86693b3bef3d4875a5c87"
     },
@@ -53582,27 +53105,6 @@
     "components.modals.generate_trade_message.datatable.columns.suffix": {
       "hash": "0407bcfea10ad9d4a1687ba94ac7aa6dd365a9ed6ee366627411abbbc80a32b4"
     },
-    "components.modals.patreon_modal.title": {
-      "hash": "38dc9f49a98a80d46d1a2d2314f1acf0adcf465c544816334e13bfff92ca1523"
-    },
-    "components.modals.patreon_modal.description": {
-      "hash": "5e422985c16a80afe3b3c0d6b145f336393fb7253cf51fb6dcbcb48143af2671"
-    },
-    "components.modals.patreon_modal.premium_content": {
-      "hash": "c1738edfba09ffd9c09ea04ecd980528e62589d1538ffff7312fd7eb672b4354"
-    },
-    "components.modals.patreon_modal.join_the_community": {
-      "hash": "63b3f74601bb3002dcf954103ec3f2bd83223fbcbc3cd746d0855db6d0fe1845"
-    },
-    "components.modals.patreon_modal.link_your_account": {
-      "hash": "73085160b2a7a36e1c5f74a8c0e62064f47c0a251a05899b44da315ebe52977c"
-    },
-    "components.modals.patreon_modal.buttons.info": {
-      "hash": "eec736f63bbbd1ec3e25cfa97f8b22687e706d4cc5b39ff29e9ab8261f01309a"
-    },
-    "components.modals.patreon_modal.buttons.link": {
-      "hash": "645783e4b85fd4958d96ebb7a7e4fb6db2bdaf93cd7157dd17d7ee37340b743b"
-    },
     "components.modals.item_details.tabs.overview.title": {
       "hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100"
     },
@@ -54053,9 +53555,6 @@
     "pages.about.cards.coffee.title": {
       "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
     },
-    "pages.about.cards.patreon.title": {
-      "hash": "73b243e75a4600d4b490f7d0e21ca9633f2e34bb4b583e6d6927f60f8511af14"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -54064,9 +53563,6 @@
     },
     "pages.about.text.version": {
       "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
-    },
-    "pages.about.text.patreon_thanks": {
-      "hash": "981f88f192d257f201885d36c9211f169ef90ad3dfc2df238d7230bda90d6c7c"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -54225,7 +53721,7 @@
       "hash": "1d37f161d8163e9e97df3e6aecfac0507a6ce81c6f6f53130992e84a252542b4"
     },
     "pages.live_scraper.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.live_scraper.update_multiple_tooltip": {
       "hash": "ab181221b4335d3e389b63858a80c0224acc371721af2de7dbf8b02bcbd54e45"
@@ -54387,7 +53883,7 @@
       "hash": "c09c1062f07d4df1e3ddadf6c18b445c82f3f3d47b9cba218c522b4b437ca8b3"
     },
     "pages.trading_analytics.tabs.transaction.buttons.export_transactions_tooltip": {
-      "hash": "79893703a4657f1fdc4d9477603a53f435f459daf345a512b1e7ecfc4ab684ca"
+      "hash": "1460863020072c7ea0b434068ba93d10bdc7700603c822e26dff8da44b9b0394"
     },
     "pages.trading_analytics.tabs.transaction.buttons.show_financial_report_tooltip": {
       "hash": "b3358cff3f218943b49d6d46738540dca9e5ca7f17046ef3aeb7fd1adb69b7cc"
@@ -54447,7 +53943,7 @@
       "hash": "652bcc3a478428893cc505ae19f847b49be52f861bedc64bb192ceed409fa733"
     },
     "pages.trading_analytics.tabs.item.export_json_tooltip": {
-      "hash": "78125738a6e7d60e9d606447c2d21932631caf1e3c364d21593efb95700af4f8"
+      "hash": "7997995732b7ba1026deaa4dd6056f7f1c227ea9c18294bcc066e8f302a2cb3e"
     },
     "pages.trading_analytics.tabs.item.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -54516,7 +54012,7 @@
       "hash": "373dd5fac91068a8e9b71a19945130b55df840e48d75d2c8e336144c3ea93382"
     },
     "pages.trading_analytics.tabs.riven.export_json_tooltip": {
-      "hash": "d82ec1d3231972ecf055e5fa0e75c1c06f0ff2e23eb74d38b30d048b7a0ea11a"
+      "hash": "ee546746522dbf23ea14d91dd523c7b3b469cff8e382966e353de93e535f4da3"
     },
     "pages.trading_analytics.tabs.riven.open_table_options_tooltip": {
       "hash": "bbf286b9b62637fe4bd9e8ac519e0c8ec983b5910d96fee2aa14de512b314f2e"
@@ -54765,7 +54261,7 @@
       "hash": "578c73c7a7e7aea91a79829f8da87597e41c9adbddf297a88d238f2d48bdf70f"
     },
     "pages.trade_messages.buttons.export_json_tooltip": {
-      "hash": "49a88fcafa566ee1f1e2480e431a174f1a8da9406f304c6e5aa3850d3170940b"
+      "hash": "142415dc70dd39d429ab546afa9bf227f71895a8c31738082c72703f50371d3e"
     },
     "pages.trade_messages.buttons.delete_multiple_tooltip": {
       "hash": "24ef4f1f9c12d12acf6eeb61aece90f453b841d5f4371549a9e9a594a8c38fb8"
@@ -54774,7 +54270,7 @@
       "hash": "166a509d05f33fc714733968b52c50a91325ba4bed73d90f362ff144ee391992"
     },
     "pages.trade_messages.buttons.find_interesting_tooltip": {
-      "hash": "d9da01bd6f4d2ba4e6381099939055ef0dfabd379577b11ce81c27a7f2ca8603"
+      "hash": "9b66e721ec71f8251ee353748ba33f95505bb99d3da4211bdd5f5da5f69f5cd4"
     },
     "pages.trade_messages.buttons.calibrate_prices_tooltip": {
       "hash": "f4f333197841b31a6a236878364014b1df40c16f21a1146f65f6e645cbc90a61"
@@ -55056,7 +54552,7 @@
       "hash": "bf27245ee74c300f0a67e11257683d198c880cad3ab167409fca5e9c60ac05d7"
     },
     "pages.trading_analytics.tabs.syndicate.export_json_tooltip": {
-      "hash": "42f1f5f7933f739be63667e3935ffdf793651f11a46316f9e2aaf06ad2448d95"
+      "hash": "4cf51faaedd432a73a0a73340a85eb7f1b149b3d4890b4e53188e51820d59957"
     },
     "pages.trading_analytics.tabs.syndicate.volume_label": {
       "hash": "b10fb966d72063f534774c7c6b404f4decca76ac283093ae65fef78d07c1b75e"

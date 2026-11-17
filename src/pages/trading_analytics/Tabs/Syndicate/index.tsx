@@ -1,11 +1,10 @@
-import { QuantframeApiTypes, TauriTypes } from "$types";
-import api, { HasPermission } from "@api/index";
+import { QuantframeApiTypes } from "$types";
+import api from "@api/index";
 import { ItemName } from "@components/DataDisplay/ItemName";
 import { MinMax } from "@components/Forms/MinMax";
 import { SearchField } from "@components/Forms/SearchField";
 import { ActionWithTooltip } from "@components/Shared/ActionWithTooltip";
 import { Loading } from "@components/Shared/Loading";
-import { PatreonOverlay } from "@components/Shared/PatreonOverlay";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { useHasAlert } from "@hooks/useHasAlert.hook";
 import { useTranslateCommon, useTranslatePages } from "@hooks/useTranslate.hook";
@@ -14,7 +13,7 @@ import { useForm } from "@mantine/form";
 import { useQuery } from "@tanstack/react-query";
 import { getSafePage } from "@utils/helper";
 import { DataTable } from "mantine-datatable";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import classes from "../../TradingAnalytics.module.css";
 import { useMutations } from "./mutations";
 import { useQueries } from "./queries";
@@ -40,8 +39,6 @@ export const SyndicatePanel = ({ isActive }: SyndicatePanelProps = {}) => {
 
   // States
   const [filterOpened, setFilterOpened] = useState<boolean>(false);
-  const [canExport, setCanExport] = useState<boolean>(false);
-  const [canUse, setCanUse] = useState<boolean>(false);
 
   // Fetch data from rust side
   const { data } = useQuery({
@@ -49,13 +46,8 @@ export const SyndicatePanel = ({ isActive }: SyndicatePanelProps = {}) => {
     queryFn: () => api.cache.getSyndicates(),
   });
 
-  // Check permissions for export on mount
-  useEffect(() => {
-    HasPermission(TauriTypes.PermissionsFlags.EXPORT_DATA).then((res) => setCanExport(res));
-    HasPermission(TauriTypes.PermissionsFlags.SYNDICATE_PRICES_SEARCH).then((res) => setCanUse(res));
-  }, []);
   // Queries
-  const { paginationQuery, refetchQueries } = useQueries({ queryData: queryData.values, isActive: canUse && isActive });
+  const { paginationQuery, refetchQueries } = useQueries({ queryData: queryData.values, isActive });
 
   // Mutations
   const { exportMutation } = useMutations({ refetchQueries });
@@ -64,7 +56,6 @@ export const SyndicatePanel = ({ isActive }: SyndicatePanelProps = {}) => {
 
   return (
     <Box p={"md"} pos={"relative"}>
-      <PatreonOverlay permission={TauriTypes.PermissionsFlags.SYNDICATE_PRICES_SEARCH} tier="T2+" />
       <SearchField
         value={queryData.values.query || ""}
         onSearch={() => {
@@ -80,7 +71,7 @@ export const SyndicatePanel = ({ isActive }: SyndicatePanelProps = {}) => {
               tooltip={useTranslateTabItem("export_json_tooltip")}
               icon={faDownload}
               iconProps={{ size: "xs" }}
-              actionProps={{ size: "sm", disabled: !canExport || IsLoading() }}
+              actionProps={{ size: "sm", disabled: IsLoading() }}
               onClick={() => exportMutation.mutate(queryData.values)}
             />
           </Group>

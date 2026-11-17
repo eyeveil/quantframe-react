@@ -88,4 +88,3 @@ This project uses:
 ## 💰 Support My work
 
 <p><a href="https://www.buymeacoffee.com/kenyadk"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="45" width="210" alt="kenyadk" /></a></p>
-<p><a href="https://patreon.com/kenya_dk"> <img align="left" src="https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white" height="45" width="210" alt="kenya_dk" /></a></p>

@@ -1,6 +1,6 @@
 import { Box, Group, NumberFormatter, Paper, SimpleGrid } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { QuantframeApiTypes, TauriTypes } from "$types";
+import { QuantframeApiTypes } from "$types";
 import { useQueries } from "./queries";
 import { SearchField } from "@components/Forms/SearchField";
 import { useTranslateCommon, useTranslatePages } from "@hooks/useTranslate.hook";
@@ -13,10 +13,8 @@ import { useForm } from "@mantine/form";
 import { DatePickerInput } from "@mantine/dates";
 import { ActionWithTooltip } from "@components/Shared/ActionWithTooltip";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import { HasPermission } from "@api/index";
 import { useMutations } from "./mutations";
 import { Loading } from "@components/Shared/Loading";
-import { PatreonOverlay } from "@components/Shared/PatreonOverlay";
 import { MinMax } from "@components/Forms/MinMax";
 interface RivenPanelProps {
   isActive?: boolean;
@@ -49,14 +47,7 @@ export const RivenPanel = ({ isActive }: RivenPanelProps = {}) => {
   // States
   const [filterOpened, setFilterOpened] = useState<boolean>(false);
   const [dates, setDates] = useState<[string | null, string | null]>([null, null]);
-  const [canExport, setCanExport] = useState<boolean>(false);
-  const [canUse, setCanUse] = useState<boolean>(false);
 
-  // Check permissions for export on mount
-  useEffect(() => {
-    HasPermission(TauriTypes.PermissionsFlags.EXPORT_DATA).then((res) => setCanExport(res));
-    HasPermission(TauriTypes.PermissionsFlags.RIVEN_PRICES_SEARCH).then((res) => setCanUse(res));
-  }, []);
 
   // Queries
   const { paginationQuery, refetchQueries } = useQueries({ queryData: queryData.values, isActive });
@@ -71,11 +62,10 @@ export const RivenPanel = ({ isActive }: RivenPanelProps = {}) => {
     if (dates[1]) queryData.setFieldValue("to_date", dates[1]);
   }, [dates]);
 
-  const IsLoading = () => (paginationQuery.isFetching || exportMutation.isPending) && isActive && canUse;
+  const IsLoading = () => (paginationQuery.isFetching || exportMutation.isPending) && isActive;
 
   return (
     <Box p={"md"} pos={"relative"}>
-      <PatreonOverlay permission={TauriTypes.PermissionsFlags.RIVEN_PRICES_SEARCH} tier="T2+" />
       <SearchField
         value={queryData.values.query || ""}
         onSearch={() => {
@@ -104,7 +94,7 @@ export const RivenPanel = ({ isActive }: RivenPanelProps = {}) => {
               tooltip={useTranslateTabItem("export_json_tooltip")}
               icon={faDownload}
               iconProps={{ size: "xs" }}
-              actionProps={{ size: "sm", disabled: !canExport || IsLoading() }}
+              actionProps={{ size: "sm", disabled: IsLoading() }}
               onClick={() => exportMutation.mutate(queryData.values)}
             />
           </Group>
