@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::{Arc, Mutex};
 
 use serde_json::{json, Value};
@@ -10,27 +11,26 @@ use crate::{
     log_parser::LogParserState,
     track_event,
     utils::modules::states::get_app_error,
-    APP, SENSITIVE_FIELDS,
+    host::{PACKAGE_NAME, PACKAGE_VERSION},
+    SENSITIVE_FIELDS,
 };
 
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn log_export(
-    app: tauri::State<'_, Mutex<AppState>>,
-    log_parser: tauri::State<'_, Mutex<Arc<LogParserState>>>,
-    live_scraper: tauri::State<'_, Arc<LiveScraperState>>,
+    app: State<'_, Mutex<AppState>>,
+    log_parser: State<'_, Mutex<Arc<LogParserState>>>,
+    live_scraper: State<'_, Arc<LiveScraperState>>,
 ) -> Result<String, Error> {
     let app = app.lock()?.clone();
     let log_parser = log_parser.lock()?;
-    let app_info = APP.get().expect("App handle not found");
-    let info = app_info.package_info().clone();
     let date = chrono::Local::now()
         .naive_utc()
         .format("%Y-%m-%d")
         .to_string();
 
-    let version = info.version.to_string();
+    let version = PACKAGE_VERSION;
     let app_path = helper::get_app_storage_path();
 
     utils::export_cached_logs(&app_path).map_err(|e| {
@@ -45,7 +45,7 @@ pub async fn log_export(
     })?;
 
     let zip_path =
-        helper::get_desktop_path().join(format!("{} v{} {} Logs.zip", info.name, version, date));
+        helper::get_desktop_path().join(format!("{} v{} {} Logs.zip", PACKAGE_NAME, version, date));
 
     let mut zip = ZipOptions::new();
     zip.exclude_patterns(&["EBWebView/"]);
@@ -132,7 +132,7 @@ pub async fn log_export(
     result
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn log(
     cause: String,
     component: String,

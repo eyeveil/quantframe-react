@@ -1,3 +1,4 @@
+use crate::State;
 use std::{collections::HashMap, sync::Mutex};
 
 use entity::{dto::*, syndicate_item::*};
@@ -7,7 +8,6 @@ use qf_api::{
     types::{SyndicateItemPrice, SyndicateItemPricePaginationQueryDto},
 };
 use service::{SyndicateItemMutation, SyndicateItemQuery};
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, group_by, info, Error, LoggerOptions, OperationSet, SubType};
 use wf_market::enums::OrderType;
 
@@ -18,13 +18,12 @@ use crate::{
     helper::{self},
     live_scraper::is_disabled,
     track_event,
-    utils::ErrorFromExt,
-    APP, DATABASE,
+    utils::ErrorFromExt, DATABASE,
 };
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_import_items(
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<i64, Error> {
     let app = app.lock()?.clone();
     let settings = &app.settings.live_scraper.syndicate.wts;
@@ -115,7 +114,7 @@ pub async fn syndicate_item_import_items(
     Ok(filtered_items.len() as i64)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_syndicate_item_pagination(
     query: SyndicateItemPaginationQueryDto,
 ) -> Result<PaginatedResult<syndicate_item::Model>, Error> {
@@ -126,7 +125,7 @@ pub async fn get_syndicate_item_pagination(
     };
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_syndicate_item_financial_report(
     query: SyndicateItemPaginationQueryDto,
 ) -> Result<FinancialReport, Error> {
@@ -134,7 +133,7 @@ pub async fn get_syndicate_item_financial_report(
     Ok(FinancialReport::from(&items.results))
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_syndicate_item_status_counts(
     query: SyndicateItemPaginationQueryDto,
 ) -> Result<HashMap<String, usize>, Error> {
@@ -144,7 +143,7 @@ pub async fn get_syndicate_item_status_counts(
         .map(|(status, items)| (status.clone(), items.len()))
         .collect::<HashMap<_, _>>())
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_syndicate_item_syndicate_counts(
     query: SyndicateItemPaginationQueryDto,
 ) -> Result<HashMap<String, usize>, Error> {
@@ -157,7 +156,7 @@ pub async fn get_syndicate_item_syndicate_counts(
     )
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_create(
     input: CreateSyndicateItem,
 ) -> Result<syndicate_item::Model, Error> {
@@ -185,7 +184,7 @@ pub async fn syndicate_item_create(
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_sell(
     wfm_url: String,
     sub_type: Option<SubType>,
@@ -225,7 +224,7 @@ pub async fn syndicate_item_sell(
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_delete(id: i64) -> Result<syndicate_item::Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -298,7 +297,7 @@ pub async fn syndicate_item_delete(id: i64) -> Result<syndicate_item::Model, Err
     Ok(item)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
     let mut deleted_count = 0;
@@ -328,7 +327,7 @@ pub async fn syndicate_item_delete_multiple(ids: Vec<i64>) -> Result<i64, Error>
     Ok(deleted_count)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_update(
     input: UpdateSyndicateItem,
 ) -> Result<syndicate_item::Model, Error> {
@@ -354,7 +353,7 @@ pub async fn syndicate_item_update(
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_update_multiple(
     ids: Vec<i64>,
     input: UpdateSyndicateItem,
@@ -389,12 +388,12 @@ pub async fn syndicate_item_update_multiple(
     Ok(updated_items)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn syndicate_item_get_by_id(
     id: i64,
     operations: Option<Vec<String>>,
-    cache: tauri::State<'_, Mutex<CacheState>>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    cache: State<'_, Mutex<CacheState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<syndicate_item::Model, Error> {
     let cache = cache.lock()?.clone();
     let app = app.lock()?.clone();
@@ -437,21 +436,16 @@ pub async fn syndicate_item_get_by_id(
     Ok(item)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_syndicate_item_json(
     mut query: SyndicateItemPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app = APP.get().unwrap();
 
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match SyndicateItemQuery::get_all(conn, query).await {
         Ok(syndicate_items) => {
-            let file_path = app
-                .dialog()
-                .file()
-                .add_filter("Quantframe_Syndicate_Item", &["json"])
-                .blocking_save_file();
+            let file_path = crate::host::save_file("Quantframe_Syndicate_Item", &["json"], None);
             if let Some(file_path) = file_path {
                 let json = serde_json::to_string_pretty(&syndicate_items.results).map_err(|e| {
                     let err = Error::new(
@@ -468,7 +462,7 @@ pub async fn export_syndicate_item_json(
                     );
                     err
                 })?;
-                std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+                std::fs::write(&file_path, json).map_err(|e| {
                     let err = Error::new(
                         "Command::ExportSyndicateItemJson",
                         format!("Failed to write syndicate item to file: {}", e),
@@ -485,7 +479,7 @@ pub async fn export_syndicate_item_json(
                 })?;
                 info(
                     "Command::ExportSyndicateItemJson",
-                    format!("Exported syndicate item to JSON file: {}", file_path),
+                    format!("Exported syndicate item to JSON file: {}", file_path.display()),
                     &LoggerOptions::default(),
                 );
                 track_event!(
@@ -495,7 +489,7 @@ pub async fn export_syndicate_item_json(
                         ("count", syndicate_items.results.len().to_string()),
                     ]
                 );
-                return Ok(file_path.to_string());
+                return Ok(file_path.display().to_string());
             }
             track_event!(
                 EventType::SyndicateItemExport,

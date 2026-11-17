@@ -4,7 +4,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use utils::{get_location, info, Error, LoggerOptions};
 
-use crate::{APP, HTTP_CLIENT};
+use crate::{
+    host::{PACKAGE_AUTHORS, PACKAGE_NAME, PACKAGE_VERSION},
+    HTTP_CLIENT,
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DiscordNotify {
@@ -47,9 +50,7 @@ impl DiscordNotify {
             content = content.replace(&format!("{}", k), v);
         }
         let webhook = self.webhook.clone();
-        let tauri_app = APP.get().expect("App handle not found");
-        let app_info = tauri_app.package_info().clone();
-        tauri::async_runtime::spawn(async move {
+        crate::host::spawn(async move {
             let client = HTTP_CLIENT.get_or_init(reqwest::Client::new);
             let timestamp = chrono::Local::now()
                 .to_utc()
@@ -62,7 +63,7 @@ impl DiscordNotify {
                         "description": "",
                         "color": 5814783,
                         "footer": {
-                            "text": format!("{} v{} ({})",app_info.name, app_info.version, app_info.authors),
+                            "text": format!("{} v{} ({})", PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_AUTHORS),
                             "icon_url": "https://raw.githubusercontent.com/Kenya-DK/quantframe-react/refs/heads/main/app-icon.png"
                         },
                         "timestamp": timestamp

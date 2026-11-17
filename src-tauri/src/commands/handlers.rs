@@ -3,7 +3,7 @@ use qf_api::enums::app_events::ApplicationEvent as EventType;
 use utils::{get_location, Error};
 use wf_market::enums::OrderType;
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn handles_handle_items(items: Vec<ItemEntity>) -> Result<i32, Error> {
     let mut total = 0;
     let mut processed_items = Vec::new();

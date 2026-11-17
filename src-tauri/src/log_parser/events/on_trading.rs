@@ -9,7 +9,6 @@ use crate::{
     handlers::{
         handle_item, handle_riven_by_name, handle_transaction, handle_wish_list, is_wish_list_item,
     },
-    helper::get_or_create_window,
     log_parser::*,
     notify_gui, send_event, track_event,
     types::*,
@@ -18,7 +17,6 @@ use crate::{
 use entity::enums::TransactionType;
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 use serde_json::json;
-use tauri::{Emitter, Listener};
 use utils::*;
 use wf_market::enums::OrderType;
 //----------------------------
@@ -241,7 +239,7 @@ impl OnTradeEvent {
         let trade = self.current_trade.clone();
         let logger = self.logger.clone();
 
-        tauri::async_runtime::spawn(async move {
+        crate::host::spawn(async move {
             let mut events = HashMap::new();
             logger.add_log("Trade processor started");
 
@@ -388,14 +386,6 @@ async fn process_mutable_items(
 ) -> Result<OperationSet, Error> {
     let mut operations = OperationSet::new();
     // log("Processing mutable trade items".to_string(), None);
-    let (is_open, window) = get_or_create_window(
-        "processing-trades",
-        "clean?type=process_trade",
-        "Processing Trades",
-        Some((800.0, 600.0)),
-        true,
-    )?;
-
     let app = states::app_state()?.clone();
 
     let mut items = match trade_type {
@@ -449,16 +439,7 @@ async fn process_mutable_items(
     items.retain(|i| i.is_valid());
     payload["items"] = json!(items);
 
-    let window_clone = window.clone();
-    let payload_clone = payload.clone();
-
-    window.once("initialize", move |_| {
-        let _ = window_clone.emit("add_trade", payload_clone);
-    });
-
-    if is_open {
-        let _ = window.emit("add_trade", payload);
-    }
+    crate::host::show_trade(payload);
     operations.add(format!("Items:{}", items.len()));
     Ok(operations)
 }

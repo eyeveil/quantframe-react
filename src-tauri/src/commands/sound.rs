@@ -1,3 +1,4 @@
+use crate::State;
 use crate::{
     app::{AppState, CustomSound},
     helper, track_event,
@@ -99,19 +100,19 @@ fn validate_file_name(file_name: &str) -> Result<(), Error> {
     }
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn sound_get_custom_sounds(
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Vec<CustomSound>, Error> {
     let app = app.lock()?;
     Ok(app.settings.notifications.custom_sounds.clone())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn sound_add_custom_sound(
     name: String,
     file_path: String,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Vec<CustomSound>, Error> {
     let mut app = app.lock()?;
 
@@ -178,10 +179,10 @@ pub async fn sound_add_custom_sound(
     Ok(app.settings.notifications.custom_sounds.clone())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn sound_delete_custom_sound(
     file_name: String,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Vec<CustomSound>, Error> {
     let mut app = app.lock()?;
 
@@ -241,7 +242,7 @@ pub async fn sound_delete_custom_sound(
     Ok(app.settings.notifications.custom_sounds.clone())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn sound_get_custom_sounds_path() -> Result<String, Error> {
     let sounds_path = helper::get_sounds_path();
     let path = sounds_path.to_str().ok_or_else(|| {

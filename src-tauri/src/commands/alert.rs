@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::Mutex;
 
 use qf_api::types::*;
@@ -5,10 +6,8 @@ use utils::{get_location, Error};
 
 use crate::{app::AppState, utils::ErrorFromExt};
 
-#[tauri::command]
-pub async fn alert_get_alerts(
-    app: tauri::State<'_, Mutex<AppState>>,
-) -> Result<Paginated<Alert>, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn alert_get_alerts(app: State<'_, Mutex<AppState>>) -> Result<Paginated<Alert>, Error> {
     let app = app.lock()?.clone();
     let query = AlertPaginationQueryDto::new(1, 25).set_enabled(true);
     match app.qf_client.alert().get_alerts(query).await {

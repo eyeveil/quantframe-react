@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::Mutex;
 
 use qf_api::types::*;
@@ -5,10 +6,10 @@ use utils::{get_location, Error};
 
 use crate::{app::AppState, utils::ErrorFromExt};
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_user_activity(
     query: UserActiveHistoryQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<UserActivityDto, Error> {
     let app_state = app.lock().unwrap().clone();
     match app_state.qf_client.market().get_user_activity(query).await {

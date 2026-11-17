@@ -9,6 +9,7 @@ dependencies = [
  "aes",
  "cbc",
  "chrono",
+ "dirs",
  "entity",
  "migration",
  "qf_api",

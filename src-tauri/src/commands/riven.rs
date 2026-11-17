@@ -1,14 +1,14 @@
+use crate::State;
 use qf_api::{enums::app_events::ApplicationEvent as EventType, types::*};
 use std::sync::Mutex;
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, info, Error, LoggerOptions};
 
-use crate::{app::AppState, track_event, utils::ErrorFromExt, APP};
+use crate::{app::AppState, track_event, utils::ErrorFromExt};
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn riven_prices_lookup(
     query: RivenPricePaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Paginated<RivenPrice>, Error> {
     let app_state = app.lock().unwrap().clone();
     match app_state.qf_client.riven().get_prices(query).await {
@@ -42,13 +42,12 @@ pub async fn riven_prices_lookup(
         }
     };
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_riven_price_data(
     mut query: RivenPricePaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<String, Error> {
     let app_state = app.lock().unwrap().clone();
-    let app = APP.get().unwrap();
     query.pagination.limit = -1;
     let trace_event_error = |error_type: &str| {
         track_event!(
@@ -82,11 +81,7 @@ pub async fn export_riven_price_data(
         }
     };
 
-    let Some(file_path) = app
-        .dialog()
-        .file()
-        .add_filter("Quantframe_RivenPrices", &["json"])
-        .blocking_save_file()
+    let Some(file_path) = crate::host::save_file("Quantframe_RivenPrices", &["json"], None)
     else {
         trace_event_error("cancelled");
         return Ok(String::new());
@@ -101,7 +96,7 @@ pub async fn export_riven_price_data(
         )
     })?;
 
-    std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+    std::fs::write(&file_path, json).map_err(|e| {
         trace_event_error("file_write_error");
         Error::new(
             "Command::ExportRivenPriceData",
@@ -112,7 +107,7 @@ pub async fn export_riven_price_data(
 
     info(
         "Command::ExportRivenPriceData",
-        format!("Exported riven prices to JSON file: {}", file_path),
+        format!("Exported riven prices to JSON file: {}", file_path.display()),
         &LoggerOptions::default(),
     );
 
@@ -124,5 +119,5 @@ pub async fn export_riven_price_data(
         ]
     );
 
-    Ok(file_path.to_string())
+    Ok(file_path.display().to_string())
 }

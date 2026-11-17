@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::{atomic::Ordering, Arc, Mutex};
 
 use serde_json::{json, Value};
@@ -11,9 +12,9 @@ use crate::{
     types::*,
 };
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn live_scraper_toggle(
-    live_scraper: tauri::State<'_, Arc<LiveScraperState>>,
+    live_scraper: State<'_, Arc<LiveScraperState>>,
 ) -> Result<(), Error> {
     if live_scraper.is_running.load(Ordering::SeqCst) {
         live_scraper.stop();
@@ -26,18 +27,18 @@ pub async fn live_scraper_toggle(
     );
     Ok(())
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn live_scraper_get_state(
-    live_scraper: tauri::State<'_, Arc<LiveScraperState>>,
+    live_scraper: State<'_, Arc<LiveScraperState>>,
 ) -> Result<Value, Error> {
     Ok(json!({
         "is_running": live_scraper.is_running.load(Ordering::SeqCst)
     }))
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn live_scraper_get_interesting_wtb_items(
     settings: ItemSettings,
-    cache: tauri::State<'_, Mutex<CacheState>>,
+    cache: State<'_, Mutex<CacheState>>,
 ) -> Result<Vec<ItemPriceInfo>, Error> {
     let mut items = live_scraper::helpers::get_interesting_items(&settings);
     let cache = cache.lock()?;

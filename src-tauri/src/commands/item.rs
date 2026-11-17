@@ -1,14 +1,14 @@
+use crate::State;
 use qf_api::{enums::ApplicationEvent, types::*};
 use std::sync::Mutex;
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, info, Error, LoggerOptions};
 
-use crate::{app::AppState, track_event, utils::ErrorFromExt, APP};
+use crate::{app::AppState, track_event, utils::ErrorFromExt};
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn item_prices_lookup(
     query: ItemPricePaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<Paginated<ItemPrice>, Error> {
     let app = app.lock()?.clone();
 
@@ -42,10 +42,10 @@ pub async fn item_prices_lookup(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn item_price_lookup(
     id: String,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<ItemPriceDetails, Error> {
     let app = app.lock()?.clone();
 
@@ -76,13 +76,12 @@ pub async fn item_price_lookup(
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_item_price_data(
     mut query: ItemPricePaginationQueryDto,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<String, Error> {
     let app_state = app.lock()?.clone();
-    let app = APP.get().unwrap();
 
     query.pagination.limit = -1;
 
@@ -111,12 +110,7 @@ pub async fn export_item_price_data(
         }
     };
 
-    let Some(file_path) = app
-        .dialog()
-        .file()
-        .add_filter("Quantframe_ItemPrices", &["json"])
-        .blocking_save_file()
-    else {
+    let Some(file_path) = crate::host::save_file("Quantframe_ItemPrices", &["json"], None) else {
         trace_event_error("cancelled");
 
         return Ok(String::new());
@@ -131,7 +125,7 @@ pub async fn export_item_price_data(
         )
     })?;
 
-    std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+    std::fs::write(&file_path, json).map_err(|e| {
         trace_event_error("file_write_error");
         Error::new(
             "Command::ExportItemPriceData",
@@ -142,7 +136,7 @@ pub async fn export_item_price_data(
 
     info(
         "Command::ExportItemPriceData",
-        format!("Exported item prices to JSON file: {file_path}"),
+        format!("Exported item prices to JSON file: {}", file_path.display()),
         &LoggerOptions::default(),
     );
 
@@ -154,5 +148,5 @@ pub async fn export_item_price_data(
         ]
     );
 
-    Ok(file_path.to_string())
+    Ok(file_path.display().to_string())
 }

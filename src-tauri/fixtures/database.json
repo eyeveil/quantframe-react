@@ -1,0 +1,2934 @@
+{
+ "stock_items": [
+  {
+   "wfm_id": "56c3bbea5d2f0202da32e93f",
+   "wfm_url": "saryn_prime_set",
+   "item_name": "Saryn Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Saryn/SarynPrime",
+   "bought": 60,
+   "list_price": null,
+   "owned": 3,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-09-18T18:00:00.000Z",
+   "updated_at": "2026-10-18T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89ab",
+   "wfm_url": "rhino_prime_set",
+   "item_name": "Rhino Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Rhino/RhinoPrime",
+   "bought": 19,
+   "list_price": 24,
+   "owned": 2,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 36
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 41
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 39
+    }
+   ],
+   "created_at": "2026-09-19T18:00:00.000Z",
+   "updated_at": "2026-10-18T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "5c182b739603780081b09a53",
+   "wfm_url": "mesa_prime_set",
+   "item_name": "Mesa Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Cowgirl/MesaPrime",
+   "bought": 50,
+   "list_price": 67,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-11T18:00:00.000Z",
+     "price": 57
+    },
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 64
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 58
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 68
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 57
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 63
+    }
+   ],
+   "created_at": "2026-09-20T18:00:00.000Z",
+   "updated_at": "2026-10-19T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89a5",
+   "wfm_url": "nova_prime_set",
+   "item_name": "Nova Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/AntiMatter/NovaPrime",
+   "bought": 78,
+   "list_price": 104,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "pending",
+   "price_history": [],
+   "created_at": "2026-09-21T18:00:00.000Z",
+   "updated_at": "2026-10-19T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89b2",
+   "wfm_url": "volt_prime_set",
+   "item_name": "Volt Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Volt/VoltPrime",
+   "bought": 140,
+   "list_price": 157,
+   "owned": 4,
+   "is_hidden": false,
+   "status": "to_low_profit",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 153
+    }
+   ],
+   "created_at": "2026-09-22T18:00:00.000Z",
+   "updated_at": "2026-10-20T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "5d21ce48f4604c012d1e0c18",
+   "wfm_url": "wukong_prime_set",
+   "item_name": "Wukong Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/MonkeyKing/WukongPrime",
+   "bought": 67,
+   "list_price": null,
+   "owned": 1,
+   "is_hidden": false,
+   "status": "no_buyers",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 87
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 80
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 75
+    }
+   ],
+   "created_at": "2026-09-23T18:00:00.000Z",
+   "updated_at": "2026-10-20T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "62d3494075156700ce450df4",
+   "wfm_url": "khora_prime_set",
+   "item_name": "Khora Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Khora/KhoraPrime",
+   "bought": 127,
+   "list_price": 142,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "inactive",
+   "price_history": [
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 138
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 146
+    }
+   ],
+   "created_at": "2026-09-24T18:00:00.000Z",
+   "updated_at": "2026-10-21T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "65a7fc5aed5b0d2e3eb462b2",
+   "wfm_url": "gauss_prime_set",
+   "item_name": "Gauss Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Runner/GaussPrime",
+   "bought": 104,
+   "list_price": 130,
+   "owned": 1,
+   "is_hidden": false,
+   "status": "overpriced",
+   "price_history": [],
+   "created_at": "2026-09-25T18:00:00.000Z",
+   "updated_at": "2026-10-21T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "5baa8bbe4567de01ac283491",
+   "wfm_url": "rubico_prime_set",
+   "item_name": "Rubico Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/RubicoPrime/RubicoPrimeWeapon",
+   "bought": 83,
+   "list_price": 108,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 102
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 94
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 102
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 98
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 100
+    }
+   ],
+   "created_at": "2026-09-26T18:00:00.000Z",
+   "updated_at": "2026-10-22T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89ae",
+   "wfm_url": "soma_prime_set",
+   "item_name": "Soma Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/PrimeSoma/PrimeSomaRifle",
+   "bought": 36,
+   "list_price": 52,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 56
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 58
+    }
+   ],
+   "created_at": "2026-09-27T18:00:00.000Z",
+   "updated_at": "2026-10-22T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "56c3bbfc5d2f0202da32e943",
+   "wfm_url": "nikana_prime_set",
+   "item_name": "Nikana Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/Melee/Swords/PrimeKatana/PrimeNikana",
+   "bought": 45,
+   "list_price": null,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 54
+    }
+   ],
+   "created_at": "2026-09-28T18:00:00.000Z",
+   "updated_at": "2026-10-23T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd899d",
+   "wfm_url": "glaive_prime_set",
+   "item_name": "Glaive Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/Melee/Glaives/PrimeGlaive/PrimeGlaiveWeapon",
+   "bought": 69,
+   "list_price": 97,
+   "owned": 4,
+   "is_hidden": false,
+   "status": "pending",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 76
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 84
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 88
+    }
+   ],
+   "created_at": "2026-09-29T18:00:00.000Z",
+   "updated_at": "2026-10-23T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "5ab167b7b2b6a80475780fb3",
+   "wfm_url": "kronen_prime_set",
+   "item_name": "Kronen Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/Melee/Tonfa/TonfaContestWinnerPrime/TonfaContestWinnerPrimeWeapon",
+   "bought": 31,
+   "list_price": 67,
+   "owned": 2,
+   "is_hidden": true,
+   "status": "to_low_profit",
+   "price_history": [
+    {
+     "created_at": "2026-11-11T18:00:00.000Z",
+     "price": 39
+    },
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 49
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 39
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 41
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 53
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 46
+    }
+   ],
+   "created_at": "2026-09-30T18:00:00.000Z",
+   "updated_at": "2026-10-24T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "65a7fcc4ed5b0d2e3eb462ce",
+   "wfm_url": "acceltra_prime_set",
+   "item_name": "Acceltra Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/PrimeAcceltra/PrimeAcceltraWeapon",
+   "bought": 108,
+   "list_price": 136,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "no_buyers",
+   "price_history": [
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 121
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 118
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 129
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 120
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 115
+    }
+   ],
+   "created_at": "2026-10-01T18:00:00.000Z",
+   "updated_at": "2026-10-24T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "57bc9c84e506eb45ea251455",
+   "wfm_url": "tigris_prime_set",
+   "item_name": "Tigris Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/PrimeTigris/PrimeTigris",
+   "bought": 18,
+   "list_price": 52,
+   "owned": 1,
+   "is_hidden": false,
+   "status": "inactive",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 29
+    }
+   ],
+   "created_at": "2026-10-02T18:00:00.000Z",
+   "updated_at": "2026-10-25T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "54c6855ee779891362942572",
+   "wfm_url": "primed_continuity",
+   "item_name": "Primed Continuity",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/Expert/AvatarAbilityDurationModExpert",
+   "bought": 53,
+   "list_price": null,
+   "owned": 4,
+   "is_hidden": false,
+   "status": "overpriced",
+   "price_history": [
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 64
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 70
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 72
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 69
+    }
+   ],
+   "created_at": "2026-10-03T18:00:00.000Z",
+   "updated_at": "2026-10-25T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "54c68672e7798913ba044082",
+   "wfm_url": "primed_flow",
+   "item_name": "Primed Flow",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/Expert/AvatarPowerMaxModExpert",
+   "bought": 76,
+   "list_price": 91,
+   "owned": 3,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 96
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 83
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 93
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 97
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 89
+    }
+   ],
+   "created_at": "2026-10-04T18:00:00.000Z",
+   "updated_at": "2026-10-26T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 10
+   }
+  },
+  {
+   "wfm_id": "5765ab4947837cf09eec1f02",
+   "wfm_url": "primed_pressure_point",
+   "item_name": "Primed Pressure Point",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Melee/Expert/WeaponMeleeDamageModExpert",
+   "bought": 97,
+   "list_price": 110,
+   "owned": 2,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 108
+    }
+   ],
+   "created_at": "2026-10-05T18:00:00.000Z",
+   "updated_at": "2026-10-26T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "54dd265ce7798934d026f6fc",
+   "wfm_url": "primed_reach",
+   "item_name": "Primed Reach",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Melee/Expert/WeaponMeleeRangeIncModExpert",
+   "bought": 113,
+   "list_price": 134,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 136
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 133
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 135
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 120
+    }
+   ],
+   "created_at": "2026-10-06T18:00:00.000Z",
+   "updated_at": "2026-10-27T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 10
+   }
+  },
+  {
+   "wfm_id": "563893fcb66f83093e823472",
+   "wfm_url": "primed_target_cracker",
+   "item_name": "Primed Target Cracker",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Pistol/Expert/PrimedWeaponCritDamageMod",
+   "bought": 45,
+   "list_price": 72,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "pending",
+   "price_history": [
+    {
+     "created_at": "2026-11-11T18:00:00.000Z",
+     "price": 57
+    },
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 65
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 60
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 60
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 58
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 64
+    }
+   ],
+   "created_at": "2026-10-07T18:00:00.000Z",
+   "updated_at": "2026-10-27T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "54a74454e779892d5e5155cc",
+   "wfm_url": "blind_rage",
+   "item_name": "Blind Rage",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/DualStat/CorruptedPowerEfficiencyWarframe",
+   "bought": 87,
+   "list_price": null,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "to_low_profit",
+   "price_history": [
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 104
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 94
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 97
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 109
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 101
+    }
+   ],
+   "created_at": "2026-10-08T18:00:00.000Z",
+   "updated_at": "2026-10-28T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 10
+   }
+  },
+  {
+   "wfm_id": "54a74454e779892d5e51559a",
+   "wfm_url": "narrow_minded",
+   "item_name": "Narrow Minded",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/DualStat/CorruptedDurationRangeWarframe",
+   "bought": 48,
+   "list_price": 80,
+   "owned": 2,
+   "is_hidden": false,
+   "status": "no_buyers",
+   "price_history": [
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 62
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 71
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 62
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 58
+    }
+   ],
+   "created_at": "2026-10-09T18:00:00.000Z",
+   "updated_at": "2026-10-28T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "54a74454e779892d5e5155b7",
+   "wfm_url": "transient_fortitude",
+   "item_name": "Transient Fortitude",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/DualStat/CorruptedPowerStrengthPowerDurationWarframe",
+   "bought": 109,
+   "list_price": 151,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "inactive",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 129
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 123
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 131
+    }
+   ],
+   "created_at": "2026-10-10T18:00:00.000Z",
+   "updated_at": "2026-10-29T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 10
+   }
+  },
+  {
+   "wfm_id": "54a74454e779892d5e5155d6",
+   "wfm_url": "overextended",
+   "item_name": "Overextended",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/DualStat/CorruptedRangePowerWarframe",
+   "bought": 131,
+   "list_price": 153,
+   "owned": 5,
+   "is_hidden": false,
+   "status": "overpriced",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 143
+    }
+   ],
+   "created_at": "2026-10-11T18:00:00.000Z",
+   "updated_at": "2026-10-29T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "58446f192c2ada003b4d4ffc",
+   "wfm_url": "condition_overload",
+   "item_name": "Condition Overload",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Melee/WeaponDamageIfVictimProcActive",
+   "bought": 83,
+   "list_price": 98,
+   "owned": 4,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-11T18:00:00.000Z",
+     "price": 100
+    },
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 100
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 93
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 100
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 100
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 95
+    }
+   ],
+   "created_at": "2026-10-12T18:00:00.000Z",
+   "updated_at": "2026-10-30T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 5
+   }
+  },
+  {
+   "wfm_id": "60e5b9014794450053e99961",
+   "wfm_url": "galvanized_chamber",
+   "item_name": "Galvanized Chamber",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Rifle/WeaponFireIterationsSPMod",
+   "bought": 104,
+   "list_price": null,
+   "owned": 1,
+   "is_hidden": true,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 123
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 116
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 114
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 121
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 123
+    }
+   ],
+   "created_at": "2026-10-13T18:00:00.000Z",
+   "updated_at": "2026-10-30T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "60e5b8fd4794450053e99944",
+   "wfm_url": "galvanized_aptitude",
+   "item_name": "Galvanized Aptitude",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Rifle/WeaponStatusChanceSPMod",
+   "bought": 26,
+   "list_price": 40,
+   "owned": 2,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-10-14T18:00:00.000Z",
+   "updated_at": "2026-10-31T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 10
+   }
+  },
+  {
+   "wfm_id": "60e5b8fd4794450053e99947",
+   "wfm_url": "galvanized_scope",
+   "item_name": "Galvanized Scope",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Rifle/Event/CritChanceWhileAimingRifleSPMod",
+   "bought": 125,
+   "list_price": 160,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "pending",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 139
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 134
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 132
+    }
+   ],
+   "created_at": "2026-10-15T18:00:00.000Z",
+   "updated_at": "2026-10-31T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "566751295dcbc186f0536bd1",
+   "wfm_url": "arcane_energize",
+   "item_name": "Arcane Energize",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Utility/GolemArcaneRadialEnergyOnEnergyPickup",
+   "bought": 12,
+   "list_price": 50,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "to_low_profit",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 20
+    }
+   ],
+   "created_at": "2026-10-16T18:00:00.000Z",
+   "updated_at": "2026-11-01T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 5
+   }
+  },
+  {
+   "wfm_id": "55a46a58e77989027c23b89c",
+   "wfm_url": "arcane_grace",
+   "item_name": "Arcane Grace",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Defensive/HealthRegenOnDamage",
+   "bought": 29,
+   "list_price": 67,
+   "owned": 3,
+   "is_hidden": false,
+   "status": "no_buyers",
+   "price_history": [],
+   "created_at": "2026-10-17T18:00:00.000Z",
+   "updated_at": "2026-11-01T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "5510859ce779897292ba1efc",
+   "wfm_url": "arcane_avenger",
+   "item_name": "Arcane Avenger",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Defensive/CritChanceOnDamage",
+   "bought": 16,
+   "list_price": null,
+   "owned": 2,
+   "is_hidden": false,
+   "status": "inactive",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 25
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 23
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 27
+    }
+   ],
+   "created_at": "2026-10-18T18:00:00.000Z",
+   "updated_at": "2026-11-02T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 5
+   }
+  },
+  {
+   "wfm_id": "62a2baebfbd62c00450b71d9",
+   "wfm_url": "molt_augmented",
+   "item_name": "Molt Augmented",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/PowerStrengthOnKill",
+   "bought": 118,
+   "list_price": 140,
+   "owned": 1,
+   "is_hidden": false,
+   "status": "overpriced",
+   "price_history": [
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 137
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 129
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 131
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 129
+    }
+   ],
+   "created_at": "2026-10-19T18:00:00.000Z",
+   "updated_at": "2026-11-02T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "62af145d5d2dab005422903c",
+   "wfm_url": "cascadia_flare",
+   "item_name": "Cascadia Flare",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/SecondaryDamageOnHeatProc",
+   "bought": 99,
+   "list_price": 135,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 117
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 120
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 108
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 111
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 108
+    }
+   ],
+   "created_at": "2026-10-20T18:00:00.000Z",
+   "updated_at": "2026-11-03T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 5
+   }
+  },
+  {
+   "wfm_id": "60e70f79479445008f272573",
+   "wfm_url": "primary_merciless",
+   "item_name": "Primary Merciless",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/PrimaryDamageOnKill",
+   "bought": 94,
+   "list_price": 103,
+   "owned": 2,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-10-21T18:00:00.000Z",
+   "updated_at": "2026-11-03T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "60e70f7f479445008f27259d",
+   "wfm_url": "secondary_deadhead",
+   "item_name": "Secondary Deadhead",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/SecondaryDamageOnNoMelee",
+   "bought": 127,
+   "list_price": 150,
+   "owned": 3,
+   "is_hidden": false,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-10-22T18:00:00.000Z",
+   "updated_at": "2026-11-04T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "rank": 5
+   }
+  },
+  {
+   "wfm_id": "588a789c3cf52c408a2f88dd",
+   "wfm_url": "ayatan_anasa_sculpture",
+   "item_name": "Ayatan Anasa Sculpture",
+   "item_unique_name": "/Lotus/Types/Items/FusionTreasures/OroFusexF",
+   "bought": 69,
+   "list_price": null,
+   "owned": 3,
+   "is_hidden": false,
+   "status": "pending",
+   "price_history": [
+    {
+     "created_at": "2026-11-11T18:00:00.000Z",
+     "price": 79
+    },
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 78
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 90
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 92
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 81
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 88
+    }
+   ],
+   "created_at": "2026-10-23T18:00:00.000Z",
+   "updated_at": "2026-11-04T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "amber_stars": 2,
+    "cyan_stars": 2
+   }
+  },
+  {
+   "wfm_id": "5dbe9b087ea27b0ffe3ca269",
+   "wfm_url": "ayatan_zambuka_sculpture",
+   "item_name": "Ayatan Zambuka Sculpture",
+   "item_unique_name": "/Lotus/Types/Items/FusionTreasures/OroFusexH",
+   "bought": 18,
+   "list_price": 27,
+   "owned": 2,
+   "is_hidden": false,
+   "status": "to_low_profit",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 40
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 38
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 29
+    }
+   ],
+   "created_at": "2026-10-24T18:00:00.000Z",
+   "updated_at": "2026-11-05T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "amber_stars": 1,
+    "cyan_stars": 2
+   }
+  },
+  {
+   "wfm_id": "6054de275221e3005750102b",
+   "wfm_url": "lith_g1_relic",
+   "item_name": "Lith G1 Relic",
+   "item_unique_name": "/Lotus/Types/Game/Projections/T1VoidProjectionQ",
+   "bought": 115,
+   "list_price": 123,
+   "owned": 4,
+   "is_hidden": false,
+   "status": "no_buyers",
+   "price_history": [],
+   "created_at": "2026-10-25T18:00:00.000Z",
+   "updated_at": "2026-11-05T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "variant": "intact"
+   }
+  },
+  {
+   "wfm_id": "667ec83e59acb6bf03ebc335",
+   "wfm_url": "meso_n16_relic",
+   "item_name": "Meso N16 Relic",
+   "item_unique_name": "/Lotus/Types/Game/Projections/T2VoidProjectionHarrowNekrosVaultA",
+   "bought": 9,
+   "list_price": 26,
+   "owned": 3,
+   "is_hidden": true,
+   "status": "inactive",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 17
+    }
+   ],
+   "created_at": "2026-10-26T18:00:00.000Z",
+   "updated_at": "2026-11-06T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "variant": "intact"
+   }
+  },
+  {
+   "wfm_id": "6054dd475221e30057500f48",
+   "wfm_url": "axi_l4_relic",
+   "item_name": "Axi L4 Relic",
+   "item_unique_name": "/Lotus/Types/Game/Projections/T4VoidProjectionLokiVoltVaultA",
+   "bought": 68,
+   "list_price": 104,
+   "owned": 6,
+   "is_hidden": false,
+   "status": "overpriced",
+   "price_history": [
+    {
+     "created_at": "2026-11-12T18:00:00.000Z",
+     "price": 91
+    },
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 80
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 84
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 85
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 90
+    }
+   ],
+   "created_at": "2026-10-27T18:00:00.000Z",
+   "updated_at": "2026-11-06T18:00:00.000Z",
+   "changes": [],
+   "sub_type": {
+    "variant": "intact"
+   }
+  }
+ ],
+ "stock_rivens": [
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fd90",
+   "wfm_weapon_url": "rubico",
+   "weapon_name": "Rubico",
+   "weapon_type": "rifle",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/LongGuns/FiveShotSniper/FiveShotSniper",
+   "sub_type": {
+    "rank": 0
+   },
+   "mod_name": "Hexa-critatis",
+   "attributes": [
+    {
+     "wfmUrl": "ammo_efficiency",
+     "positive": true,
+     "value": 136.2,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "status_chance",
+     "positive": true,
+     "value": 145.0,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 15,
+   "re_rolls": 33,
+   "polarity": "madurai",
+   "bought": 222,
+   "list_price": null,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "live",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 264
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 273
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 274
+    }
+   ],
+   "created_at": "2026-09-28T18:00:00.000Z",
+   "updated_at": "2026-10-28T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5e41458f7b0275011bc5b7cc",
+   "wfm_weapon_url": "kuva_bramma",
+   "weapon_name": "Kuva Bramma",
+   "weapon_type": "rifle",
+   "weapon_unique_name": "/Lotus/Weapons/Grineer/Bows/GrnBow/GrnBowWeapon",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Igni-toxidex",
+   "attributes": [
+    {
+     "wfmUrl": "status_duration",
+     "positive": true,
+     "value": 98.7,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "punch_through",
+     "positive": true,
+     "value": 75.7,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 16,
+   "re_rolls": 34,
+   "polarity": "vazarin",
+   "bought": 200,
+   "list_price": 368,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "live",
+   "uuid": "",
+   "price_history": [],
+   "created_at": "2026-09-29T18:00:00.000Z",
+   "updated_at": "2026-10-29T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5d6e947e7ea27b048cbea8cc",
+   "wfm_weapon_url": "acceltra",
+   "weapon_name": "Acceltra",
+   "weapon_type": "rifle",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/LongGuns/SapientPrimary/SapientPrimaryWeapon",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Igni-critadex",
+   "attributes": [
+    {
+     "wfmUrl": "multishot",
+     "positive": true,
+     "value": 135.5,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "critical_chance",
+     "positive": true,
+     "value": 48.5,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "slash_damage",
+     "positive": false,
+     "value": -43.7,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 13,
+   "re_rolls": 23,
+   "polarity": "naramon",
+   "bought": 335,
+   "list_price": 545,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "live",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 379
+    }
+   ],
+   "created_at": "2026-09-30T18:00:00.000Z",
+   "updated_at": "2026-10-30T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fda0",
+   "wfm_weapon_url": "torid",
+   "weapon_name": "Torid",
+   "weapon_type": "rifle",
+   "weapon_unique_name": "/Lotus/Weapons/ClanTech/Bio/BioWeapon",
+   "sub_type": {
+    "rank": 0
+   },
+   "mod_name": "Toxi-satidex",
+   "attributes": [
+    {
+     "wfmUrl": "recoil",
+     "positive": true,
+     "value": 74.4,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "projectile_speed",
+     "positive": true,
+     "value": 99.7,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "damage_vs_corpus",
+     "positive": false,
+     "value": -31.2,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 16,
+   "re_rolls": 14,
+   "polarity": "madurai",
+   "bought": 88,
+   "list_price": 191,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "pending",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 146
+    }
+   ],
+   "created_at": "2026-10-01T18:00:00.000Z",
+   "updated_at": "2026-10-31T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fe34",
+   "wfm_weapon_url": "nikana",
+   "weapon_name": "Nikana",
+   "weapon_type": "melee",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Melee/Swords/KatanaAndWakizashi/Katana",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Acri-satican",
+   "attributes": [
+    {
+     "wfmUrl": "cold_damage",
+     "positive": true,
+     "value": 79.4,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "damage_vs_corpus",
+     "positive": true,
+     "value": 90.3,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 12,
+   "re_rolls": 13,
+   "polarity": "vazarin",
+   "bought": 163,
+   "list_price": null,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "to_low_profit",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 209
+    }
+   ],
+   "created_at": "2026-10-02T18:00:00.000Z",
+   "updated_at": "2026-11-01T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fe15",
+   "wfm_weapon_url": "glaive",
+   "weapon_name": "Glaive",
+   "weapon_type": "melee",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Melee/Glaives/LightGlaive/LightGlaiveWeapon",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Igni-critadex",
+   "attributes": [
+    {
+     "wfmUrl": "base_damage_/_melee_damage",
+     "positive": true,
+     "value": 82.4,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "damage_to_techrot",
+     "positive": true,
+     "value": 155.7,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 14,
+   "re_rolls": 11,
+   "polarity": "naramon",
+   "bought": 288,
+   "list_price": 552,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "no_buyers",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 340
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 336
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 331
+    }
+   ],
+   "created_at": "2026-10-03T18:00:00.000Z",
+   "updated_at": "2026-11-02T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fe28",
+   "wfm_weapon_url": "kronen",
+   "weapon_name": "Kronen",
+   "weapon_type": "melee",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Melee/Tonfa/TonfaContestWinner/TennoTonfa",
+   "sub_type": {
+    "rank": 0
+   },
+   "mod_name": "Hexa-hexatis",
+   "attributes": [
+    {
+     "wfmUrl": "melee_damage_on_heavy_attack",
+     "positive": true,
+     "value": 169.2,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "radiation",
+     "positive": true,
+     "value": 148.8,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "damage_to_scaldra",
+     "positive": false,
+     "value": -53.6,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 9,
+   "re_rolls": 6,
+   "polarity": "madurai",
+   "bought": 31,
+   "list_price": 210,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "inactive",
+   "uuid": "",
+   "price_history": [],
+   "created_at": "2026-10-04T18:00:00.000Z",
+   "updated_at": "2026-11-03T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "626a197ef40db600660a1d93",
+   "wfm_weapon_url": "phenmor",
+   "weapon_name": "Phenmor",
+   "weapon_type": "rifle",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Zariman/LongGuns/SemiAutoRifle/ZarimanSemiAutoRifle",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Hexa-satiata",
+   "attributes": [
+    {
+     "wfmUrl": "magnetic",
+     "positive": true,
+     "value": 143.8,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "corrosive",
+     "positive": true,
+     "value": 165.5,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 12,
+   "re_rolls": 18,
+   "polarity": "vazarin",
+   "bought": 272,
+   "list_price": 492,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "overpriced",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 321
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 322
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 319
+    }
+   ],
+   "created_at": "2026-10-05T18:00:00.000Z",
+   "updated_at": "2026-11-04T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "626a197ef40db600660a1d94",
+   "wfm_weapon_url": "laetum",
+   "weapon_name": "Laetum",
+   "weapon_type": "pistol",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Zariman/Pistols/HeavyPistol/ZarimanHeavyPistol",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Crita-acripha",
+   "attributes": [
+    {
+     "wfmUrl": "ammo_maximum",
+     "positive": true,
+     "value": 128.9,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "weak_point_damage",
+     "positive": true,
+     "value": 52.2,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 16,
+   "re_rolls": 0,
+   "polarity": "naramon",
+   "bought": 28,
+   "list_price": null,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "live",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 76
+    }
+   ],
+   "created_at": "2026-10-06T18:00:00.000Z",
+   "updated_at": "2026-11-05T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fd9e",
+   "wfm_weapon_url": "tigris",
+   "weapon_name": "Tigris",
+   "weapon_type": "shotgun",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/LongGuns/DoubleBarrelShotgun/TennoDoubleBarrelShotgun",
+   "sub_type": {
+    "rank": 0
+   },
+   "mod_name": "Hexa-ignipha",
+   "attributes": [
+    {
+     "wfmUrl": "fire_rate_/_attack_speed",
+     "positive": true,
+     "value": 86.2,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "ammo_maximum",
+     "positive": true,
+     "value": 67.6,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "critical_damage",
+     "positive": true,
+     "value": 109.7,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 8,
+   "re_rolls": 15,
+   "polarity": "madurai",
+   "bought": 284,
+   "list_price": 572,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "live",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 342
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 339
+    }
+   ],
+   "created_at": "2026-10-07T18:00:00.000Z",
+   "updated_at": "2026-11-06T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fdcf",
+   "wfm_weapon_url": "lex",
+   "weapon_name": "Lex",
+   "weapon_type": "pistol",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Pistol/HeavyPistol",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Crita-igniata",
+   "attributes": [
+    {
+     "wfmUrl": "multishot",
+     "positive": true,
+     "value": 153.9,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "damage_to_orokin",
+     "positive": true,
+     "value": 48.5,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "gas",
+     "positive": true,
+     "value": 108.8,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 15,
+   "re_rolls": 1,
+   "polarity": "vazarin",
+   "bought": 215,
+   "list_price": 407,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "live",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 270
+    }
+   ],
+   "created_at": "2026-10-08T18:00:00.000Z",
+   "updated_at": "2026-11-07T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5ee7dea904d55c0b2614f571",
+   "wfm_weapon_url": "stropha",
+   "weapon_name": "Stropha",
+   "weapon_type": "melee",
+   "weapon_unique_name": "/Lotus/Weapons/Corpus/Melee/Gunblade/CrpGunBlade/CrpGunbladeWeapon",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Sati-satican",
+   "attributes": [
+    {
+     "wfmUrl": "toxin_damage",
+     "positive": true,
+     "value": 112.1,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "base_damage_/_melee_damage",
+     "positive": true,
+     "value": 120.3,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "heat_damage",
+     "positive": true,
+     "value": 81.1,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 8,
+   "re_rolls": 6,
+   "polarity": "naramon",
+   "bought": 67,
+   "list_price": 238,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "pending",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 124
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 112
+    }
+   ],
+   "created_at": "2026-10-09T18:00:00.000Z",
+   "updated_at": "2026-11-08T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fe16",
+   "wfm_weapon_url": "gram",
+   "weapon_name": "Gram",
+   "weapon_type": "melee",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Melee/GreatSword/GreatSword",
+   "sub_type": {
+    "rank": 0
+   },
+   "mod_name": "Igni-lexitis",
+   "attributes": [
+    {
+     "wfmUrl": "status_damage",
+     "positive": true,
+     "value": 77.6,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "status_duration",
+     "positive": true,
+     "value": 63.2,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "viral",
+     "positive": true,
+     "value": 150.3,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "damage_vs_infested",
+     "positive": false,
+     "value": -55.4,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 16,
+   "re_rolls": 26,
+   "polarity": "madurai",
+   "bought": 74,
+   "list_price": null,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "to_low_profit",
+   "uuid": "",
+   "price_history": [],
+   "created_at": "2026-10-10T18:00:00.000Z",
+   "updated_at": "2026-11-09T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5c5ca81696e8d2003834fe2e",
+   "wfm_weapon_url": "magistar",
+   "weapon_name": "Magistar",
+   "weapon_type": "melee",
+   "weapon_unique_name": "/Lotus/Weapons/Tenno/Melee/Maces/PaladinMace/PaladinMaceWeapon",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Acri-critanok",
+   "attributes": [
+    {
+     "wfmUrl": "damage_vs_grineer",
+     "positive": true,
+     "value": 149.8,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "critical_chance",
+     "positive": true,
+     "value": 106.0,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "fire_rate_/_attack_speed",
+     "positive": false,
+     "value": -27.1,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 10,
+   "re_rolls": 17,
+   "polarity": "vazarin",
+   "bought": 241,
+   "list_price": 446,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "no_buyers",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 294
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 297
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 294
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 283
+    }
+   ],
+   "created_at": "2026-10-11T18:00:00.000Z",
+   "updated_at": "2026-11-10T18:00:00.000Z"
+  },
+  {
+   "wfm_weapon_id": "5f498a379426ed005af5ecae",
+   "wfm_weapon_url": "trumna",
+   "weapon_name": "Trumna",
+   "weapon_type": "rifle",
+   "weapon_unique_name": "/Lotus/Weapons/Thanotech/ThanoRifle/ThanotechRifle",
+   "sub_type": {
+    "rank": 8
+   },
+   "mod_name": "Lexi-acritis",
+   "attributes": [
+    {
+     "wfmUrl": "base_damage_/_melee_damage",
+     "positive": true,
+     "value": 158.7,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "recoil",
+     "positive": true,
+     "value": 56.9,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "viral",
+     "positive": true,
+     "value": 55.7,
+     "formattedValue": ""
+    },
+    {
+     "wfmUrl": "projectile_speed",
+     "positive": false,
+     "value": -12.7,
+     "formattedValue": ""
+    }
+   ],
+   "mastery_rank": 15,
+   "re_rolls": 16,
+   "polarity": "naramon",
+   "bought": 71,
+   "list_price": 331,
+   "filter": {
+    "enabled": false
+   },
+   "is_hidden": false,
+   "comment": "",
+   "status": "inactive",
+   "uuid": "",
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 116
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 127
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 126
+    }
+   ],
+   "created_at": "2026-10-12T18:00:00.000Z",
+   "updated_at": "2026-11-11T18:00:00.000Z"
+  }
+ ],
+ "wish_list": [
+  {
+   "wfm_id": "61bb64fc3132ff00482b5fbb",
+   "wfm_url": "harrow_prime_set",
+   "item_name": "Harrow Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Priest/HarrowPrime",
+   "quantity": 1,
+   "list_price": 104,
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 105
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 103
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 96
+    }
+   ],
+   "status": "live",
+   "created_at": "2026-10-08T18:00:00.000Z",
+   "updated_at": "2026-11-07T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": []
+  },
+  {
+   "wfm_id": "639a8d9474b02f003889eb84",
+   "wfm_url": "baruuk_prime_set",
+   "item_name": "Baruuk Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Pacifist/BaruukPrime",
+   "quantity": 2,
+   "list_price": 120,
+   "price_history": [
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 117
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 119
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 124
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 120
+    }
+   ],
+   "status": "pending",
+   "created_at": "2026-10-09T18:00:00.000Z",
+   "updated_at": "2026-11-07T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": []
+  },
+  {
+   "wfm_id": "5e839496267539077b0dd6d3",
+   "wfm_url": "titania_prime_set",
+   "item_name": "Titania Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Fairy/TitaniaPrime",
+   "quantity": 1,
+   "list_price": 98,
+   "price_history": [],
+   "status": "inactive",
+   "created_at": "2026-10-10T18:00:00.000Z",
+   "updated_at": "2026-11-08T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": []
+  },
+  {
+   "wfm_id": "56463c24b66f8358acce4451",
+   "wfm_url": "arcane_fury",
+   "item_name": "Arcane Fury",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/GolemArcaneMeleeDamageOnCrit",
+   "quantity": 2,
+   "list_price": 40,
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 39
+    }
+   ],
+   "status": "live",
+   "created_at": "2026-10-11T18:00:00.000Z",
+   "updated_at": "2026-11-08T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "6242037766a58f0108c3d490",
+   "wfm_url": "garuda_prime_set",
+   "item_name": "Garuda Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Garuda/GarudaPrime",
+   "quantity": 1,
+   "list_price": 76,
+   "price_history": [],
+   "status": "pending",
+   "created_at": "2026-10-12T18:00:00.000Z",
+   "updated_at": "2026-11-09T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": []
+  },
+  {
+   "wfm_id": "54a74454e779892d5e515648",
+   "wfm_url": "primed_chamber",
+   "item_name": "Primed Chamber",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Rifle/EventSniperReloadDamageMod",
+   "quantity": 3,
+   "list_price": 110,
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 105
+    }
+   ],
+   "status": "inactive",
+   "created_at": "2026-10-13T18:00:00.000Z",
+   "updated_at": "2026-11-09T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "64c2aa1466456704eba6ba35",
+   "wfm_url": "wisp_prime_set",
+   "item_name": "Wisp Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Wisp/WispPrime",
+   "quantity": 3,
+   "list_price": 94,
+   "price_history": [
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 88
+    }
+   ],
+   "status": "live",
+   "created_at": "2026-10-14T18:00:00.000Z",
+   "updated_at": "2026-11-10T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": []
+  },
+  {
+   "wfm_id": "566751d35dcbc186f0536bd6",
+   "wfm_url": "arcane_velocity",
+   "item_name": "Arcane Velocity",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/GolemArcanePistolSpeedOnCrit",
+   "quantity": 1,
+   "list_price": 34,
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 37
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 34
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 35
+    }
+   ],
+   "status": "pending",
+   "created_at": "2026-10-15T18:00:00.000Z",
+   "updated_at": "2026-11-10T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "5adf8729931bcf00574adc0f",
+   "wfm_url": "lato_vandal_set",
+   "item_name": "Lato Vandal Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/Pistol/LatoVandal",
+   "quantity": 2,
+   "list_price": 71,
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 68
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 71
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 72
+    }
+   ],
+   "status": "inactive",
+   "created_at": "2026-10-16T18:00:00.000Z",
+   "updated_at": "2026-11-11T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": []
+  },
+  {
+   "wfm_id": "60e5b8fe4794450053e9994d",
+   "wfm_url": "galvanized_crosshairs",
+   "item_name": "Galvanized Crosshairs",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Pistol/Event/CritChanceWhileAimingPistolSPMod",
+   "quantity": 1,
+   "list_price": 55,
+   "price_history": [
+    {
+     "created_at": "2026-11-13T18:00:00.000Z",
+     "price": 51
+    },
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 58
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 55
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 53
+    }
+   ],
+   "status": "live",
+   "created_at": "2026-10-17T18:00:00.000Z",
+   "updated_at": "2026-11-11T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": [],
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "66c6080266bbb2aedca6957b",
+   "wfm_url": "sevagoth_prime_set",
+   "item_name": "Sevagoth Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Wraith/SevagothPrime",
+   "quantity": 1,
+   "list_price": 98,
+   "price_history": [
+    {
+     "created_at": "2026-11-14T18:00:00.000Z",
+     "price": 97
+    },
+    {
+     "created_at": "2026-11-15T18:00:00.000Z",
+     "price": 92
+    },
+    {
+     "created_at": "2026-11-16T18:00:00.000Z",
+     "price": 96
+    }
+   ],
+   "status": "pending",
+   "created_at": "2026-10-18T18:00:00.000Z",
+   "updated_at": "2026-11-12T18:00:00.000Z",
+   "is_hidden": false,
+   "changes": []
+  }
+ ],
+ "transactions": [
+  {
+   "wfm_id": "56c3bbea5d2f0202da32e93f",
+   "wfm_url": "saryn_prime_set",
+   "item_name": "Saryn Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Saryn/SarynPrime",
+   "item_type": "item",
+   "tags": "set,prime,warframe",
+   "transaction_type": "purchase",
+   "quantity": 2,
+   "user_name": "Kiyomi_Tenno",
+   "price": 101,
+   "profit": null,
+   "credits": 12000,
+   "created_at": "2026-10-03T05:00:00.000Z",
+   "updated_at": "2026-10-03T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "65a7fc5aed5b0d2e3eb462b2",
+   "wfm_url": "gauss_prime_set",
+   "item_name": "Gauss Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Runner/GaussPrime",
+   "item_type": "item",
+   "tags": "prime,warframe,set",
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "VoidRelay77",
+   "price": 125,
+   "profit": 46,
+   "credits": 2000,
+   "created_at": "2026-10-04T07:00:00.000Z",
+   "updated_at": "2026-10-04T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "57bc9c84e506eb45ea251455",
+   "wfm_url": "tigris_prime_set",
+   "item_name": "Tigris Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/PrimeTigris/PrimeTigris",
+   "item_type": "item",
+   "tags": "primary,prime,weapon,set",
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "LotusEater",
+   "price": 47,
+   "profit": -3,
+   "credits": 2000,
+   "created_at": "2026-10-04T22:00:00.000Z",
+   "updated_at": "2026-10-05T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "54a74454e779892d5e51559a",
+   "wfm_url": "narrow_minded",
+   "item_name": "Narrow Minded",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/DualStat/CorruptedDurationRangeWarframe",
+   "item_type": "item",
+   "tags": "mod,warframe,rare",
+   "sub_type": {
+    "rank": 10
+   },
+   "transaction_type": "purchase",
+   "quantity": 1,
+   "user_name": "NightwaveFan",
+   "price": 22,
+   "profit": null,
+   "credits": 2000,
+   "created_at": "2026-10-06T16:00:00.000Z",
+   "updated_at": "2026-10-06T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fe34",
+   "wfm_url": "nikana",
+   "item_name": "Nikana",
+   "item_type": "riven",
+   "item_unique_name": "/Lotus/Weapons/Tenno/Melee/Swords/KatanaAndWakizashi/Katana",
+   "sub_type": {
+    "rank": 8
+   },
+   "tags": "riven,melee",
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "TennoTrader42",
+   "price": 789,
+   "profit": 16,
+   "credits": 2000,
+   "created_at": "2026-10-07T00:00:00.000Z",
+   "updated_at": "2026-10-07T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "588a789c3cf52c408a2f88dd",
+   "wfm_url": "ayatan_anasa_sculpture",
+   "item_name": "Ayatan Anasa Sculpture",
+   "item_unique_name": "/Lotus/Types/Items/FusionTreasures/OroFusexF",
+   "item_type": "item",
+   "tags": "ayatan_sculpture",
+   "sub_type": {
+    "amber_stars": 2,
+    "cyan_stars": 2
+   },
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "Kiyomi_Tenno",
+   "price": 147,
+   "profit": 34,
+   "credits": 8000,
+   "created_at": "2026-10-08T09:00:00.000Z",
+   "updated_at": "2026-10-08T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5c182b739603780081b09a53",
+   "wfm_url": "mesa_prime_set",
+   "item_name": "Mesa Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Cowgirl/MesaPrime",
+   "item_type": "item",
+   "tags": "set,prime,warframe",
+   "transaction_type": "purchase",
+   "quantity": 1,
+   "user_name": "LotusEater",
+   "price": 75,
+   "profit": null,
+   "credits": 8000,
+   "created_at": "2026-10-09T10:00:00.000Z",
+   "updated_at": "2026-10-09T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89ae",
+   "wfm_url": "soma_prime_set",
+   "item_name": "Soma Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/PrimeSoma/PrimeSomaRifle",
+   "item_type": "item",
+   "tags": "weapon,prime,set,primary",
+   "transaction_type": "sale",
+   "quantity": 3,
+   "user_name": "PlatinumPilgrim",
+   "price": 61,
+   "profit": 12,
+   "credits": 2000,
+   "created_at": "2026-10-10T01:00:00.000Z",
+   "updated_at": "2026-10-10T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "54c68672e7798913ba044082",
+   "wfm_url": "primed_flow",
+   "item_name": "Primed Flow",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/Expert/AvatarPowerMaxModExpert",
+   "item_type": "item",
+   "tags": "mod,legendary,warframe",
+   "sub_type": {
+    "rank": 10
+   },
+   "transaction_type": "sale",
+   "quantity": 2,
+   "user_name": "OrokinVault",
+   "price": 104,
+   "profit": 57,
+   "credits": 8000,
+   "created_at": "2026-10-11T12:00:00.000Z",
+   "updated_at": "2026-10-11T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fd9e",
+   "wfm_url": "tigris",
+   "item_name": "Tigris",
+   "item_type": "riven",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/DoubleBarrelShotgun/TennoDoubleBarrelShotgun",
+   "sub_type": {
+    "rank": 8
+   },
+   "tags": "riven,shotgun",
+   "transaction_type": "purchase",
+   "quantity": 1,
+   "user_name": "PlatinumPilgrim",
+   "price": 802,
+   "profit": null,
+   "credits": 12000,
+   "created_at": "2026-10-12T08:00:00.000Z",
+   "updated_at": "2026-10-12T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5510859ce779897292ba1efc",
+   "wfm_url": "arcane_avenger",
+   "item_name": "Arcane Avenger",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Defensive/CritChanceOnDamage",
+   "item_type": "item",
+   "tags": "arcane_enhancement,rare",
+   "sub_type": {
+    "rank": 5
+   },
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "OrokinVault",
+   "price": 54,
+   "profit": 49,
+   "credits": 12000,
+   "created_at": "2026-10-13T02:00:00.000Z",
+   "updated_at": "2026-10-13T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "6054de275221e3005750102b",
+   "wfm_url": "lith_g1_relic",
+   "item_name": "Lith G1 Relic",
+   "item_unique_name": "/Lotus/Types/Game/Projections/T1VoidProjectionQ",
+   "item_type": "item",
+   "tags": "relic,lith",
+   "sub_type": {
+    "variant": "intact"
+   },
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "CephalonGrey",
+   "price": 45,
+   "profit": 38,
+   "credits": 0,
+   "created_at": "2026-10-14T01:00:00.000Z",
+   "updated_at": "2026-10-14T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89b2",
+   "wfm_url": "volt_prime_set",
+   "item_name": "Volt Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Volt/VoltPrime",
+   "item_type": "item",
+   "tags": "set,prime,warframe",
+   "transaction_type": "purchase",
+   "quantity": 2,
+   "user_name": "TennoTrader42",
+   "price": 14,
+   "profit": null,
+   "credits": 8000,
+   "created_at": "2026-10-15T09:00:00.000Z",
+   "updated_at": "2026-10-15T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd899d",
+   "wfm_url": "glaive_prime_set",
+   "item_name": "Glaive Prime Set",
+   "item_unique_name": "/Lotus/Weapons/Tenno/Melee/Glaives/PrimeGlaive/PrimeGlaiveWeapon",
+   "item_type": "item",
+   "tags": "weapon,prime,set,melee",
+   "transaction_type": "sale",
+   "quantity": 2,
+   "user_name": "PlatinumPilgrim",
+   "price": 114,
+   "profit": 35,
+   "credits": 2000,
+   "created_at": "2026-10-15T23:00:00.000Z",
+   "updated_at": "2026-10-16T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5f498a379426ed005af5ecae",
+   "wfm_url": "trumna",
+   "item_name": "Trumna",
+   "item_type": "riven",
+   "item_unique_name": "/Lotus/Weapons/Thanotech/ThanoRifle/ThanotechRifle",
+   "sub_type": {
+    "rank": 8
+   },
+   "tags": "riven,rifle",
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "OrokinVault",
+   "price": 258,
+   "profit": 52,
+   "credits": 0,
+   "created_at": "2026-10-17T17:00:00.000Z",
+   "updated_at": "2026-10-17T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "60e5b9014794450053e99961",
+   "wfm_url": "galvanized_chamber",
+   "item_name": "Galvanized Chamber",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Rifle/WeaponFireIterationsSPMod",
+   "item_type": "item",
+   "tags": "mod,rare,primary,rifle",
+   "sub_type": {
+    "rank": 10
+   },
+   "transaction_type": "purchase",
+   "quantity": 3,
+   "user_name": "LotusEater",
+   "price": 130,
+   "profit": null,
+   "credits": 2000,
+   "created_at": "2026-10-18T00:00:00.000Z",
+   "updated_at": "2026-10-18T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "62af145d5d2dab005422903c",
+   "wfm_url": "cascadia_flare",
+   "item_name": "Cascadia Flare",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/SecondaryDamageOnHeatProc",
+   "item_type": "item",
+   "tags": "rare,arcane_enhancement",
+   "sub_type": {
+    "rank": 5
+   },
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "DuviriDrifter",
+   "price": 48,
+   "profit": 58,
+   "credits": 0,
+   "created_at": "2026-10-19T18:00:00.000Z",
+   "updated_at": "2026-10-19T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "6054dd475221e30057500f48",
+   "wfm_url": "axi_l4_relic",
+   "item_name": "Axi L4 Relic",
+   "item_unique_name": "/Lotus/Types/Game/Projections/T4VoidProjectionLokiVoltVaultA",
+   "item_type": "item",
+   "tags": "relic,axi",
+   "sub_type": {
+    "variant": "intact"
+   },
+   "transaction_type": "sale",
+   "quantity": 2,
+   "user_name": "NightwaveFan",
+   "price": 124,
+   "profit": 38,
+   "credits": 8000,
+   "created_at": "2026-10-20T09:00:00.000Z",
+   "updated_at": "2026-10-20T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "62d3494075156700ce450df4",
+   "wfm_url": "khora_prime_set",
+   "item_name": "Khora Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Khora/KhoraPrime",
+   "item_type": "item",
+   "tags": "prime,warframe,set",
+   "transaction_type": "purchase",
+   "quantity": 2,
+   "user_name": "VoidRelay77",
+   "price": 130,
+   "profit": null,
+   "credits": 2000,
+   "created_at": "2026-10-21T10:00:00.000Z",
+   "updated_at": "2026-10-21T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fe34",
+   "wfm_url": "nikana",
+   "item_name": "Nikana",
+   "item_type": "riven",
+   "item_unique_name": "/Lotus/Weapons/Tenno/Melee/Swords/KatanaAndWakizashi/Katana",
+   "sub_type": {
+    "rank": 8
+   },
+   "tags": "riven,melee",
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "TennoTrader42",
+   "price": 685,
+   "profit": 32,
+   "credits": 2000,
+   "created_at": "2026-10-22T14:00:00.000Z",
+   "updated_at": "2026-10-22T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "54a74454e779892d5e5155cc",
+   "wfm_url": "blind_rage",
+   "item_name": "Blind Rage",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/DualStat/CorruptedPowerEfficiencyWarframe",
+   "item_type": "item",
+   "tags": "mod,warframe,rare",
+   "sub_type": {
+    "rank": 10
+   },
+   "transaction_type": "sale",
+   "quantity": 2,
+   "user_name": "Kiyomi_Tenno",
+   "price": 11,
+   "profit": 28,
+   "credits": 8000,
+   "created_at": "2026-10-23T15:00:00.000Z",
+   "updated_at": "2026-10-23T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "60e5b8fd4794450053e99947",
+   "wfm_url": "galvanized_scope",
+   "item_name": "Galvanized Scope",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Rifle/Event/CritChanceWhileAimingRifleSPMod",
+   "item_type": "item",
+   "tags": "mod,rare,primary,rifle",
+   "sub_type": {
+    "rank": 10
+   },
+   "transaction_type": "purchase",
+   "quantity": 3,
+   "user_name": "DuviriDrifter",
+   "price": 142,
+   "profit": null,
+   "credits": 8000,
+   "created_at": "2026-10-23T23:00:00.000Z",
+   "updated_at": "2026-10-24T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "60e70f7f479445008f27259d",
+   "wfm_url": "secondary_deadhead",
+   "item_name": "Secondary Deadhead",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Offensive/SecondaryDamageOnNoMelee",
+   "item_type": "item",
+   "tags": "arcane_enhancement,rare",
+   "sub_type": {
+    "rank": 5
+   },
+   "transaction_type": "sale",
+   "quantity": 3,
+   "user_name": "TennoTrader42",
+   "price": 25,
+   "profit": -3,
+   "credits": 0,
+   "created_at": "2026-10-25T03:00:00.000Z",
+   "updated_at": "2026-10-25T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89ab",
+   "wfm_url": "rhino_prime_set",
+   "item_name": "Rhino Prime Set",
+   "item_unique_name": "/Lotus/Powersuits/Rhino/RhinoPrime",
+   "item_type": "item",
+   "tags": "set,prime,warframe",
+   "transaction_type": "sale",
+   "quantity": 3,
+   "user_name": "CephalonGrey",
+   "price": 151,
+   "profit": 17,
+   "credits": 2000,
+   "created_at": "2026-10-26T08:00:00.000Z",
+   "updated_at": "2026-10-26T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fd9e",
+   "wfm_url": "tigris",
+   "item_name": "Tigris",
+   "item_type": "riven",
+   "item_unique_name": "/Lotus/Weapons/Tenno/LongGuns/DoubleBarrelShotgun/TennoDoubleBarrelShotgun",
+   "sub_type": {
+    "rank": 8
+   },
+   "tags": "riven,shotgun",
+   "transaction_type": "purchase",
+   "quantity": 1,
+   "user_name": "PlatinumPilgrim",
+   "price": 516,
+   "profit": null,
+   "credits": 0,
+   "created_at": "2026-10-27T10:00:00.000Z",
+   "updated_at": "2026-10-27T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "54c6855ee779891362942572",
+   "wfm_url": "primed_continuity",
+   "item_name": "Primed Continuity",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/Expert/AvatarAbilityDurationModExpert",
+   "item_type": "item",
+   "tags": "mod,legendary,warframe",
+   "sub_type": {
+    "rank": 10
+   },
+   "transaction_type": "sale",
+   "quantity": 3,
+   "user_name": "VoidRelay77",
+   "price": 134,
+   "profit": 58,
+   "credits": 2000,
+   "created_at": "2026-10-28T00:00:00.000Z",
+   "updated_at": "2026-10-28T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "54a74454e779892d5e5155b7",
+   "wfm_url": "transient_fortitude",
+   "item_name": "Transient Fortitude",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Warframe/DualStat/CorruptedPowerStrengthPowerDurationWarframe",
+   "item_type": "item",
+   "tags": "mod,warframe,rare",
+   "sub_type": {
+    "rank": 10
+   },
+   "transaction_type": "sale",
+   "quantity": 3,
+   "user_name": "LotusEater",
+   "price": 8,
+   "profit": 23,
+   "credits": 12000,
+   "created_at": "2026-10-29T17:00:00.000Z",
+   "updated_at": "2026-10-29T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "55a46a58e77989027c23b89c",
+   "wfm_url": "arcane_grace",
+   "item_name": "Arcane Grace",
+   "item_unique_name": "/Lotus/Upgrades/CosmeticEnhancers/Defensive/HealthRegenOnDamage",
+   "item_type": "item",
+   "tags": "legendary,arcane_enhancement",
+   "sub_type": {
+    "rank": 5
+   },
+   "transaction_type": "purchase",
+   "quantity": 3,
+   "user_name": "TennoTrader42",
+   "price": 150,
+   "profit": null,
+   "credits": 2000,
+   "created_at": "2026-10-30T07:00:00.000Z",
+   "updated_at": "2026-10-30T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5dbe9b087ea27b0ffe3ca269",
+   "wfm_url": "ayatan_zambuka_sculpture",
+   "item_name": "Ayatan Zambuka Sculpture",
+   "item_unique_name": "/Lotus/Types/Items/FusionTreasures/OroFusexH",
+   "item_type": "item",
+   "tags": "ayatan_sculpture",
+   "sub_type": {
+    "amber_stars": 1,
+    "cyan_stars": 2
+   },
+   "transaction_type": "sale",
+   "quantity": 3,
+   "user_name": "VoidRelay77",
+   "price": 19,
+   "profit": 5,
+   "credits": 12000,
+   "created_at": "2026-10-30T23:00:00.000Z",
+   "updated_at": "2026-10-31T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5f498a379426ed005af5ecae",
+   "wfm_url": "trumna",
+   "item_name": "Trumna",
+   "item_type": "riven",
+   "item_unique_name": "/Lotus/Weapons/Thanotech/ThanoRifle/ThanotechRifle",
+   "sub_type": {
+    "rank": 8
+   },
+   "tags": "riven,rifle",
+   "transaction_type": "sale",
+   "quantity": 1,
+   "user_name": "LotusEater",
+   "price": 538,
+   "profit": 14,
+   "credits": 0,
+   "created_at": "2026-11-01T05:00:00.000Z",
+   "updated_at": "2026-11-01T18:00:00.000Z",
+   "properties": null
+  }
+ ],
+ "trade_entries": [
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89ab",
+   "name": "Rhino Prime Set",
+   "price": 113,
+   "group": "item",
+   "tags": "set,prime,warframe",
+   "created_at": "2026-10-23T18:00:00.000Z",
+   "updated_at": "2026-10-23T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "56783f24cbfa8f0432dd89b2",
+   "name": "Volt Prime Set",
+   "price": 138,
+   "group": "set",
+   "tags": "set,prime,warframe",
+   "created_at": "2026-10-24T18:00:00.000Z",
+   "updated_at": "2026-10-24T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "65a7fc5aed5b0d2e3eb462b2",
+   "name": "Gauss Prime Set",
+   "price": 138,
+   "group": "mod",
+   "tags": "prime,warframe,set",
+   "created_at": "2026-10-25T18:00:00.000Z",
+   "updated_at": "2026-10-25T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "56c3bbfc5d2f0202da32e943",
+   "name": "Nikana Prime Set",
+   "price": 35,
+   "group": "item",
+   "tags": "weapon,prime,set,melee",
+   "created_at": "2026-10-26T18:00:00.000Z",
+   "updated_at": "2026-10-26T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "65a7fcc4ed5b0d2e3eb462ce",
+   "name": "Acceltra Prime Set",
+   "price": 126,
+   "group": "set",
+   "tags": "prime,primary,weapon,set",
+   "created_at": "2026-10-27T18:00:00.000Z",
+   "updated_at": "2026-10-27T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "54c68672e7798913ba044082",
+   "name": "Primed Flow",
+   "price": 25,
+   "group": "mod",
+   "tags": "mod,legendary,warframe",
+   "created_at": "2026-10-28T18:00:00.000Z",
+   "updated_at": "2026-10-28T18:00:00.000Z",
+   "properties": null,
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "563893fcb66f83093e823472",
+   "name": "Primed Target Cracker",
+   "price": 111,
+   "group": "item",
+   "tags": "mod,legendary,secondary,pistol",
+   "created_at": "2026-10-29T18:00:00.000Z",
+   "updated_at": "2026-10-29T18:00:00.000Z",
+   "properties": null,
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "54a74454e779892d5e5155b7",
+   "name": "Transient Fortitude",
+   "price": 79,
+   "group": "set",
+   "tags": "mod,warframe,rare",
+   "created_at": "2026-10-30T18:00:00.000Z",
+   "updated_at": "2026-10-30T18:00:00.000Z",
+   "properties": null,
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "60e5b9014794450053e99961",
+   "name": "Galvanized Chamber",
+   "price": 12,
+   "group": "mod",
+   "tags": "mod,rare,primary,rifle",
+   "created_at": "2026-10-31T18:00:00.000Z",
+   "updated_at": "2026-10-31T18:00:00.000Z",
+   "properties": null,
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "566751295dcbc186f0536bd1",
+   "name": "Arcane Energize",
+   "price": 30,
+   "group": "item",
+   "tags": "legendary,arcane_enhancement",
+   "created_at": "2026-11-01T18:00:00.000Z",
+   "updated_at": "2026-11-01T18:00:00.000Z",
+   "properties": null,
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "62a2baebfbd62c00450b71d9",
+   "name": "Molt Augmented",
+   "price": 68,
+   "group": "set",
+   "tags": "rare,arcane_enhancement",
+   "created_at": "2026-11-02T18:00:00.000Z",
+   "updated_at": "2026-11-02T18:00:00.000Z",
+   "properties": null,
+   "sub_type": {
+    "rank": 0
+   }
+  },
+  {
+   "wfm_id": "60e70f7f479445008f27259d",
+   "name": "Secondary Deadhead",
+   "price": 28,
+   "group": "mod",
+   "tags": "arcane_enhancement,rare",
+   "created_at": "2026-11-03T18:00:00.000Z",
+   "updated_at": "2026-11-03T18:00:00.000Z",
+   "properties": null,
+   "sub_type": {
+    "rank": 0
+   }
+  }
+ ]
+}

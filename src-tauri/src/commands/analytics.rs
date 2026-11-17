@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::Mutex;
 
 use qf_api::enums::app_events::ApplicationEvent as EventType;
@@ -7,11 +8,11 @@ use utils::{get_location, Error};
 
 use crate::app::AppState;
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub fn track_event(
     key: String,
     value: HashMap<String, String>,
-    app: tauri::State<'_, Mutex<AppState>>,
+    app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
     let event_type: EventType =
         serde_json::from_value(Value::String(key.clone())).map_err(|_| {

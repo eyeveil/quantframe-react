@@ -2,11 +2,11 @@
 #[macro_export]
 macro_rules! emit_event {
     ($event_name:expr, $payload:expr, $log_context:expr) => {{
-        use crate::APP;
         use ::utils::*;
-        use tauri::Emitter; // Bring the trait with `emit` into scope
-        let app = APP.get().expect("App not initialized");
-        match app.emit($event_name, $payload) {
+        match crate::host::emit(
+            $event_name,
+            serde_json::to_value(&$payload).unwrap_or_default(),
+        ) {
             Ok(_) => {
                 info(
                     &format!("Emit:{}", $log_context),
@@ -107,23 +107,6 @@ macro_rules! notify_gui {
 }
 
 #[macro_export]
-macro_rules! send_system_notification {
-    ($title:expr, $body:expr, $icon:expr, $sound:expr) => {{
-        use crate::APP;
-        use tauri_plugin_notification::NotificationExt;
-        let app = APP.get().expect("App not initialized");
-        app.notification()
-            .builder()
-            .title($title)
-            .body($body)
-            .icon($icon.unwrap_or("assets/icons/icon.png"))
-            .sound($sound.unwrap_or("Ping"))
-            .show()
-            .expect("Failed to show notification");
-    }};
-}
-
-#[macro_export]
 macro_rules! track_event {
     ($event_type:expr, $properties:expr) => {{
         use crate::utils::modules::states;
@@ -137,11 +120,6 @@ macro_rules! track_event {
 #[macro_export]
 macro_rules! play_sound {
     ($file_name:expr, $volume:expr) => {{
-        use crate::emit_event;
-        emit_event!(
-            "play_sound",
-            serde_json::json!({"file_name": $file_name, "volume": $volume}),
-            "PlaySound"
-        );
+        crate::host::play_sound(&$file_name, $volume);
     }};
 }

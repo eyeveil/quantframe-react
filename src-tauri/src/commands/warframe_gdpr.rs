@@ -1,3 +1,4 @@
+use crate::State;
 use std::sync::{Arc, Mutex};
 
 use qf_api::enums::app_events::ApplicationEvent as EventType;
@@ -6,9 +7,9 @@ use utils::{get_location, Error};
 
 use crate::{log_parser::LogParserState, track_event};
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wfgdpr_get_state(
-    log_parser: tauri::State<'_, Mutex<Arc<LogParserState>>>,
+    log_parser: State<'_, Mutex<Arc<LogParserState>>>,
 ) -> Result<Value, Error> {
     // Read the file content
     let log_parser = log_parser.lock()?;
@@ -17,10 +18,10 @@ pub async fn wfgdpr_get_state(
     }))
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wfgdpr_load(
     file_path: String,
-    log_parser: tauri::State<'_, Mutex<Arc<LogParserState>>>,
+    log_parser: State<'_, Mutex<Arc<LogParserState>>>,
 ) -> Result<(), Error> {
     // Read the file content
     let log_parser = log_parser.lock()?;
@@ -41,9 +42,9 @@ pub async fn wfgdpr_load(
     Ok(())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wfgdpr_get_accounts(
-    log_parser: tauri::State<'_, Mutex<Arc<LogParserState>>>,
+    log_parser: State<'_, Mutex<Arc<LogParserState>>>,
 ) -> Result<Value, Error> {
     let log_parser = log_parser.lock()?;
     Ok(json!(log_parser.warframe_gdpr().accounts()))

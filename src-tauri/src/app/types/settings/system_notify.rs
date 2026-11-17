@@ -38,9 +38,6 @@ impl SystemNotify {
             play_sound!(self.sound_file.clone(), self.volume);
         }
         #[cfg(target_os = "windows")]
-        {
-            use crate::send_system_notification;
-            send_system_notification!(&title, &content, None, None);
-        }
+        crate::host::notify(&title, &content);
     }
 }

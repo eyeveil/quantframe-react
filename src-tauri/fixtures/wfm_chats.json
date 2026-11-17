@@ -1,0 +1,212 @@
+{
+ "chats": [
+  {
+   "chat_with": [
+    {
+     "id": "c011f31e05739a26a57d187b",
+     "ingame_name": "Kiyomi_Tenno",
+     "reputation": 287.0,
+     "status": "online"
+    }
+   ],
+   "unread_count": 2,
+   "last_update": "2026-11-17T14:00:00.000Z",
+   "messages": [
+    {
+     "id": "5557981f90b15daa39ba1352",
+     "chat_id": "3debe04d2192508ac6016e74",
+     "message": "WTB Saryn Prime Set for 108p",
+     "raw_message": "WTB Saryn Prime Set for 108p",
+     "send_date": "2026-11-17T12:00:00.000Z",
+     "message_from": "c011f31e05739a26a57d187b"
+    },
+    {
+     "id": "9e2fd0f534e611197950af39",
+     "chat_id": "3debe04d2192508ac6016e74",
+     "message": "Sure, inviting now",
+     "raw_message": "Sure, inviting now",
+     "send_date": "2026-11-17T13:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    },
+    {
+     "id": "3a578da5289081198c3b8c9f",
+     "chat_id": "3debe04d2192508ac6016e74",
+     "message": "Can you do 98p?",
+     "raw_message": "Can you do 98p?",
+     "send_date": "2026-11-17T14:00:00.000Z",
+     "message_from": "c011f31e05739a26a57d187b"
+    }
+   ],
+   "id": "3debe04d2192508ac6016e74",
+   "chat_name": "Kiyomi_Tenno"
+  },
+  {
+   "chat_with": [
+    {
+     "id": "3d8bff28d8bc99af12491f34",
+     "ingame_name": "VoidRelay77",
+     "reputation": 196.0,
+     "status": "in_game"
+    }
+   ],
+   "unread_count": 0,
+   "last_update": "2026-11-16T15:00:00.000Z",
+   "messages": [
+    {
+     "id": "f819ec442161e9fae5050dd8",
+     "chat_id": "5420945627d9d49dc8c3f6f2",
+     "message": "WTB Wukong Prime Set for 31p",
+     "raw_message": "WTB Wukong Prime Set for 31p",
+     "send_date": "2026-11-16T12:00:00.000Z",
+     "message_from": "3d8bff28d8bc99af12491f34"
+    },
+    {
+     "id": "5d19ae42d8edbff307ccbea5",
+     "chat_id": "5420945627d9d49dc8c3f6f2",
+     "message": "Sure, inviting now",
+     "raw_message": "Sure, inviting now",
+     "send_date": "2026-11-16T13:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    },
+    {
+     "id": "64abef5cba0e1ecc6e9cebb1",
+     "chat_id": "5420945627d9d49dc8c3f6f2",
+     "message": "Can you do 21p?",
+     "raw_message": "Can you do 21p?",
+     "send_date": "2026-11-16T14:00:00.000Z",
+     "message_from": "3d8bff28d8bc99af12491f34"
+    },
+    {
+     "id": "c838117600b6e41465e1e89e",
+     "chat_id": "5420945627d9d49dc8c3f6f2",
+     "message": "31p is already below the market price, sorry",
+     "raw_message": "31p is already below the market price, sorry",
+     "send_date": "2026-11-16T15:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    }
+   ],
+   "id": "5420945627d9d49dc8c3f6f2",
+   "chat_name": "VoidRelay77"
+  },
+  {
+   "chat_with": [
+    {
+     "id": "765aad04336cebe5dd453322",
+     "ingame_name": "CephalonGrey",
+     "reputation": 44.0,
+     "status": "offline"
+    }
+   ],
+   "unread_count": 1,
+   "last_update": "2026-11-15T16:00:00.000Z",
+   "messages": [
+    {
+     "id": "7ce5ec3b30f1a21f594f5266",
+     "chat_id": "858a35eb44b0273213d1802b",
+     "message": "WTB Nikana Prime Set for 65p",
+     "raw_message": "WTB Nikana Prime Set for 65p",
+     "send_date": "2026-11-15T12:00:00.000Z",
+     "message_from": "765aad04336cebe5dd453322"
+    },
+    {
+     "id": "0903c5231513f3aaacf99c17",
+     "chat_id": "858a35eb44b0273213d1802b",
+     "message": "Sure, inviting now",
+     "raw_message": "Sure, inviting now",
+     "send_date": "2026-11-15T13:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    },
+    {
+     "id": "eaa7bbd0d13bf690631a29ba",
+     "chat_id": "858a35eb44b0273213d1802b",
+     "message": "Can you do 55p?",
+     "raw_message": "Can you do 55p?",
+     "send_date": "2026-11-15T14:00:00.000Z",
+     "message_from": "765aad04336cebe5dd453322"
+    },
+    {
+     "id": "52dffef3fb2d64a2ee6ce053",
+     "chat_id": "858a35eb44b0273213d1802b",
+     "message": "65p is already below the market price, sorry",
+     "raw_message": "65p is already below the market price, sorry",
+     "send_date": "2026-11-15T15:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    },
+    {
+     "id": "a57bd2e41c950a486d0353d7",
+     "chat_id": "858a35eb44b0273213d1802b",
+     "message": "ok deal, inv me",
+     "raw_message": "ok deal, inv me",
+     "send_date": "2026-11-15T16:00:00.000Z",
+     "message_from": "765aad04336cebe5dd453322"
+    }
+   ],
+   "id": "858a35eb44b0273213d1802b",
+   "chat_name": "CephalonGrey"
+  },
+  {
+   "chat_with": [
+    {
+     "id": "625e0dc59367c4e3a4e30612",
+     "ingame_name": "ArbiterOfHex",
+     "reputation": 173.0,
+     "status": "online"
+    }
+   ],
+   "unread_count": 0,
+   "last_update": "2026-11-14T17:00:00.000Z",
+   "messages": [
+    {
+     "id": "ddb70e8376797b8a2e267fe1",
+     "chat_id": "b096034f9476f674aa43f467",
+     "message": "WTB Primed Continuity for 99p",
+     "raw_message": "WTB Primed Continuity for 99p",
+     "send_date": "2026-11-14T12:00:00.000Z",
+     "message_from": "625e0dc59367c4e3a4e30612"
+    },
+    {
+     "id": "d2f4bbf5181126311c279125",
+     "chat_id": "b096034f9476f674aa43f467",
+     "message": "Sure, inviting now",
+     "raw_message": "Sure, inviting now",
+     "send_date": "2026-11-14T13:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    },
+    {
+     "id": "d9f719fdc106a6149fb5cfea",
+     "chat_id": "b096034f9476f674aa43f467",
+     "message": "Can you do 89p?",
+     "raw_message": "Can you do 89p?",
+     "send_date": "2026-11-14T14:00:00.000Z",
+     "message_from": "625e0dc59367c4e3a4e30612"
+    },
+    {
+     "id": "8f02390ab66999f702b64c8f",
+     "chat_id": "b096034f9476f674aa43f467",
+     "message": "99p is already below the market price, sorry",
+     "raw_message": "99p is already below the market price, sorry",
+     "send_date": "2026-11-14T15:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    },
+    {
+     "id": "250aaa7b3f5534a48adadd94",
+     "chat_id": "b096034f9476f674aa43f467",
+     "message": "ok deal, inv me",
+     "raw_message": "ok deal, inv me",
+     "send_date": "2026-11-14T16:00:00.000Z",
+     "message_from": "625e0dc59367c4e3a4e30612"
+    },
+    {
+     "id": "a3413a6e7e17807ad5858bc6",
+     "chat_id": "b096034f9476f674aa43f467",
+     "message": "Invited, thanks for the trade",
+     "raw_message": "Invited, thanks for the trade",
+     "send_date": "2026-11-14T17:00:00.000Z",
+     "message_from": "64f0c0ffee0000000000f1a7"
+    }
+   ],
+   "id": "b096034f9476f674aa43f467",
+   "chat_name": "ArbiterOfHex"
+  }
+ ]
+}

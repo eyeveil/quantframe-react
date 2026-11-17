@@ -3,7 +3,6 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 
 use serde_json::json;
-use tauri::Manager;
 use utils::{
     get_location, info, Error, LogLevel, LoggerOptions, OperationSet,
 };
@@ -17,7 +16,7 @@ use crate::app::AppState;
 use crate::app::types::app_state::get_active_chat_id;
 use crate::utils::modules::states;
 use crate::utils::ErrorFromExt;
-use crate::{clear_error, emit_error, emit_update_user, send_event, types::UIEvent, APP, HAS_STARTED};
+use crate::{clear_error, emit_error, emit_update_user, send_event, types::UIEvent, host, HAS_STARTED};
 
 fn send_ws_state(key: impl Into<String>, data: &WsMessage) {
     let key = key.into();
@@ -59,8 +58,7 @@ fn send_ws_state(key: impl Into<String>, data: &WsMessage) {
 
 fn update_user_status(states: impl Into<String>) {
     let states = states.into();
-    let app = APP.get().expect("APP not initialized");
-    let state = app.state::<Mutex<AppState>>();
+    let state = host::managed::<Mutex<AppState>>().expect("AppState not initialized");
     let mut guard = state.lock().expect("Failed to lock notification state");
     guard.user.wfm_status = states;
     guard.user.save().expect("Failed to save user status");
@@ -142,7 +140,7 @@ fn handle_new_message(wfm_client: &WFClient<WFAuthenticated>, msg: &WsMessage) {
         .cache_chats_mut()
         .handle_chat_message(&chat_message, &active_chat_id);
     if chat.is_none() {
-        tauri::async_runtime::spawn(async move {
+        crate::host::spawn(async move {
             match binding.get_chats().await {
                 Ok(mut messages) => {
                     let chat = messages.get_by_id(&chat_message.chat_id, true);

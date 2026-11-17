@@ -2,14 +2,13 @@
 use entity::{dto::*, trade_entry::*};
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 use service::{TradeEntryMutation, TradeEntryQuery};
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, info, Error, LoggerOptions};
 
 use crate::{
-    track_event, utils::CreateTradeEntryExt, APP, DATABASE,
+    track_event, utils::CreateTradeEntryExt, DATABASE,
 };
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_trade_entry_pagination(
     query: TradeEntryPaginationQueryDto,
 ) -> Result<PaginatedResult<Model>, Error> {
@@ -20,7 +19,7 @@ pub async fn get_trade_entry_pagination(
     };
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_create(mut input: CreateTradeEntry) -> Result<Model, Error> {
     let conn = DATABASE.get().unwrap();
     input.validate().map_err(|e| {
@@ -58,7 +57,7 @@ pub async fn trade_entry_create(mut input: CreateTradeEntry) -> Result<Model, Er
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_create_multiple(mut inputs: Vec<CreateTradeEntry>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
     let mut total = 0;
@@ -101,7 +100,7 @@ pub async fn trade_entry_create_multiple(mut inputs: Vec<CreateTradeEntry>) -> R
     Ok(total)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_delete(id: i64) -> Result<Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -154,7 +153,7 @@ pub async fn trade_entry_delete(id: i64) -> Result<Model, Error> {
     );
     Ok(item)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
     let mut deleted_count = 0;
@@ -183,7 +182,7 @@ pub async fn trade_entry_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     );
     Ok(deleted_count)
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_update(input: UpdateTradeEntry) -> Result<Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -207,7 +206,7 @@ pub async fn trade_entry_update(input: UpdateTradeEntry) -> Result<Model, Error>
         }
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_get_by_id(id: i64) -> Result<Model, Error> {
     let conn = DATABASE.get().unwrap();
 
@@ -226,7 +225,7 @@ pub async fn trade_entry_get_by_id(id: i64) -> Result<Model, Error> {
         Err(e) => return Err(e.with_location(get_location!())),
     }
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_update_multiple(
     ids: Vec<i64>,
     input: UpdateTradeEntry,
@@ -261,20 +260,15 @@ pub async fn trade_entry_update_multiple(
     Ok(updated_items)
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn export_trade_entry_json(
     mut query: TradeEntryPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app = APP.get().unwrap();
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match TradeEntryQuery::get_all(conn, query).await {
         Ok(trade_entry) => {
-            let file_path = app
-                .dialog()
-                .file()
-                .add_filter("quantframe_trade_entry", &["json"])
-                .blocking_save_file();
+            let file_path = crate::host::save_file("quantframe_trade_entry", &["json"], None);
             if let Some(file_path) = file_path {
                 let json = serde_json::to_string_pretty(&trade_entry.results).map_err(|e| {
                     let err = Error::new(
@@ -291,7 +285,7 @@ pub async fn export_trade_entry_json(
                     );
                     err
                 })?;
-                std::fs::write(file_path.as_path().unwrap(), json).map_err(|e| {
+                std::fs::write(&file_path, json).map_err(|e| {
                     let err = Error::new(
                         "Command::ExportTradeEntryJson",
                         format!("Failed to write trade entry to file: {}", e),
@@ -308,7 +302,7 @@ pub async fn export_trade_entry_json(
                 })?;
                 info(
                     "Command::ExportTradeEntryJson",
-                    format!("Exported trade entry to JSON file: {}", file_path),
+                    format!("Exported trade entry to JSON file: {}", file_path.display()),
                     &LoggerOptions::default(),
                 );
                 track_event!(
@@ -318,7 +312,7 @@ pub async fn export_trade_entry_json(
                         ("count", trade_entry.results.len().to_string()),
                     ]
                 );
-                return Ok(file_path.to_string());
+                return Ok(file_path.display().to_string());
             }
             // do something with the optional file path here
             // the file path is `None` if the user closed the dialog

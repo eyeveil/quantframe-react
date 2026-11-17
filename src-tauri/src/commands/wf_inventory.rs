@@ -1,3 +1,4 @@
+use crate::State;
 use entity::stock_riven::StockRivenPaginationQueryDto;
 use qf_api::enums::app_events::ApplicationEvent as EventType;
 use serde_json::{json, Value};
@@ -9,10 +10,10 @@ use crate::wf_inventory::WFInventoryState;
 use crate::wf_inventory::WFItemPaginationDto;
 use crate::{track_event, DATABASE};
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wf_inventory_get_rivens(
     query: WFItemPaginationDto,
-    wf_inventory: tauri::State<'_, Mutex<Arc<WFInventoryState>>>,
+    wf_inventory: State<'_, Mutex<Arc<WFInventoryState>>>,
 ) -> Result<Value, Error> {
     let wf_inventory = wf_inventory.lock()?.clone();
     let conn = DATABASE.get().unwrap();
@@ -27,18 +28,18 @@ pub async fn wf_inventory_get_rivens(
 
     Ok(json!(veiled))
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wf_inventory_get_syndicates(
     query: WFItemPaginationDto,
-    wf_inventory: tauri::State<'_, Mutex<Arc<WFInventoryState>>>,
+    wf_inventory: State<'_, Mutex<Arc<WFInventoryState>>>,
 ) -> Result<Value, Error> {
     let wf_inventory = wf_inventory.lock()?.clone();
     Ok(json!(&wf_inventory.syndicate().get_syndicates(query)?))
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn wf_inventory_update(
-    wf_inventory: tauri::State<'_, Mutex<Arc<WFInventoryState>>>,
+    wf_inventory: State<'_, Mutex<Arc<WFInventoryState>>>,
 ) -> Result<(), Error> {
     let wf_inventory = wf_inventory.lock()?.clone();
     wf_inventory.update().map_err(|e| {

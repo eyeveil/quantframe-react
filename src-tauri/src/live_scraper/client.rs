@@ -76,7 +76,7 @@ impl LiveScraperState {
         let is_running = Arc::clone(&self.is_running);
         let just_started = Arc::clone(&self.just_started);
         let this = self.clone();
-        tauri::async_runtime::spawn({
+        crate::host::spawn({
             async move {
                 // Start Riven last update timer
                 let riven_interval = settings.live_scraper.rivens.general.update_interval as u64;

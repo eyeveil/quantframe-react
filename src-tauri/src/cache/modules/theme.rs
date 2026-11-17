@@ -4,12 +4,11 @@ use std::{
     path::PathBuf,
     sync::{Arc, Mutex},
 };
-use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, info, read_json_file_optional, Error, LoggerOptions};
 
 use crate::{
     cache::{client::CacheState, types::CacheTheme},
-    helper, APP,
+    helper, host,
 };
 
 const BASE64_CHARS: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -116,13 +115,7 @@ impl ThemeModule {
         encoded
     }
     pub fn pick_icon() -> Result<(PathBuf, String), Error> {
-        let app = APP.get().expect("App handle not found");
-        let image_path = app
-            .dialog()
-            .file()
-            .set_title("Select Theme Icon max 15KB")
-            .add_filter("PNG Image", &["png"])
-            .blocking_pick_file();
+        let image_path = host::pick_file("Select Theme Icon max 15KB", "PNG Image", &["png"]);
 
         if image_path.is_none() {
             return Err(Error::new(
@@ -131,7 +124,7 @@ impl ThemeModule {
                 get_location!(),
             ));
         }
-        let image_path = image_path.unwrap().into_path().unwrap();
+        let image_path = image_path.unwrap();
         let metadata = std::fs::metadata(&image_path).map_err(|e| {
             Error::new(
                 "Command:SaveTheme",
@@ -167,7 +160,6 @@ impl ThemeModule {
         author: impl Into<String>,
         properties: impl Into<serde_json::Value>,
     ) -> Result<(), Error> {
-        let app = APP.get().expect("App handle not found");
         let (_, image_base64) = Self::pick_icon()?;
         let name = name.into();
         let author = author.into();
@@ -179,17 +171,16 @@ impl ThemeModule {
             "properties": properties,
         });
 
-        let file_path = app
-            .dialog()
-            .file()
-            .set_file_name(name.clone())
-            .add_filter(name.clone(), &["json"])
-            .set_directory(
-                helper::get_app_storage_path()
+        let file_path = host::save_file(
+            &name,
+            &["json"],
+            Some(
+                &helper::get_app_storage_path()
                     .join("cache")
-                    .join("themePresets"),
-            )
-            .blocking_save_file();
+                    .join("themePresets")
+                    .join(&name),
+            ),
+        );
         if file_path.is_none() {
             return Err(Error::new(
                 "Cache:Theme:save",
@@ -197,7 +188,7 @@ impl ThemeModule {
                 get_location!(),
             ));
         }
-        let file_path = file_path.unwrap().into_path().unwrap();
+        let file_path = file_path.unwrap();
         std::fs::write(
             &file_path,
             serde_json::to_string_pretty(&theme_data).unwrap(),

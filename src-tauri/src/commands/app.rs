@@ -1,29 +1,29 @@
+use crate::State;
 use std::sync::{Arc, Mutex};
 
 use crate::{
     app::{AppState, Settings},
+    host::{self, PACKAGE_AUTHORS, PACKAGE_DESCRIPTION, PACKAGE_NAME, PACKAGE_VERSION},
     log_parser::LogParserState,
     wf_inventory::{InventorySource, WFInventoryState},
-    APP, HAS_STARTED,
+    HAS_STARTED,
 };
 use serde_json::{json, Value};
 use utils::Error;
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn initialized() -> Result<bool, Error> {
     let started = HAS_STARTED.get().cloned().unwrap_or(false);
     return Ok(started);
 }
-#[tauri::command]
-pub async fn app_get_app_info(app: tauri::State<'_, Mutex<AppState>>) -> Result<Value, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn app_get_app_info(app: State<'_, Mutex<AppState>>) -> Result<Value, Error> {
     let app = app.lock()?;
-    let tauri_app = APP.get().expect("App handle not found");
-    let info = tauri_app.package_info().clone();
     Ok(json!({
-        "version": info.version,
-        "name": info.name,
-        "description": info.description,
-        "authors": info.authors,
+        "version": PACKAGE_VERSION,
+        "name": PACKAGE_NAME,
+        "description": PACKAGE_DESCRIPTION,
+        "authors": PACKAGE_AUTHORS,
         "is_dev": app.is_development,
         "use_temp_db": app.use_temp_db,
         "tos_uuid": app.settings.tos_uuid.clone(),
@@ -31,23 +31,23 @@ pub async fn app_get_app_info(app: tauri::State<'_, Mutex<AppState>>) -> Result<
     }))
 }
 
-#[tauri::command]
-pub async fn app_get_settings(app: tauri::State<'_, Mutex<AppState>>) -> Result<Settings, Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn app_get_settings(app: State<'_, Mutex<AppState>>) -> Result<Settings, Error> {
     let app = app.lock()?;
     Ok(app.settings.clone())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn app_get_default_settings() -> Result<Settings, Error> {
     Ok(Settings::default())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn app_update_settings(
     mut settings: Settings,
-    app: tauri::State<'_, Mutex<AppState>>,
-    log_parser: tauri::State<'_, Mutex<Arc<LogParserState>>>,
-    wf_inventory: tauri::State<'_, Mutex<Arc<WFInventoryState>>>,
+    app: State<'_, Mutex<AppState>>,
+    log_parser: State<'_, Mutex<Arc<LogParserState>>>,
+    wf_inventory: State<'_, Mutex<Arc<WFInventoryState>>>,
 ) -> Result<Settings, Error> {
     let mut app = app.lock()?;
     settings.notifications.custom_sounds = app.settings.notifications.custom_sounds.clone();
@@ -82,24 +82,20 @@ pub async fn app_update_settings(
     Ok(settings.clone())
 }
 
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn app_exit() -> Result<(), Error> {
-    let handle = APP.get().expect("App not initialized");
-    handle.exit(0);
+    host::exit(0);
     Ok(())
 }
-#[tauri::command]
-pub async fn app_accept_tos(
-    id: String,
-    app: tauri::State<'_, Mutex<AppState>>,
-) -> Result<(), Error> {
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn app_accept_tos(id: String, app: State<'_, Mutex<AppState>>) -> Result<(), Error> {
     let mut app = app.lock()?;
     let mut settings = app.settings.clone();
     settings.tos_uuid = id.clone();
     app.update_settings(settings)?;
     Ok(())
 }
-#[tauri::command]
+#[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn app_notify_reset(id: String) -> Result<Value, Error> {
     let value = json!(crate::app::NotificationsSetting::default());
     if value[id.clone()].is_object() {
