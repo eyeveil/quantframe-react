@@ -11,7 +11,7 @@ use service::{TransactionMutation, TransactionQuery};
 use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, group_by, info, warning, Error, LoggerOptions};
 
-use crate::{app::AppState, track_event, types::PermissionsFlags, APP, DATABASE};
+use crate::{track_event, APP, DATABASE};
 
 #[tauri::command]
 pub async fn get_transaction_pagination(
@@ -172,22 +172,9 @@ pub async fn transaction_update(input: UpdateTransaction) -> Result<transaction:
 }
 #[tauri::command]
 pub async fn export_transaction_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: TransactionPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
     let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::TransactionExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_transaction_json.log");
-        return Err(e);
-    }
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match TransactionQuery::get_all(conn, query).await {

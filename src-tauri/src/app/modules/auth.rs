@@ -18,8 +18,6 @@ pub fn update_user(mut cu_user: User, user: &WFUserPrivate, qf_user: &QFUserPriv
     cu_user.qf_banned = qf_user.banned;
     cu_user.qf_banned_reason = qf_user.banned_reason.clone();
     cu_user.qf_banned_until = qf_user.banned_until.clone();
-    cu_user.patreon_tier = qf_user.patreon_tier.clone();
-    cu_user.permissions = qf_user.permissions.clone();
     cu_user.wfm_id = user.id.to_string();
     cu_user.wfm_username = user.ingame_name.clone();
     cu_user.check_code = user.check_code.clone();

@@ -1,14 +1,14 @@
 use std::sync::{Arc, Mutex};
 
 use qf_api::enums::ApplicationEvent;
-use utils::{get_location, info, warning, Error, LoggerOptions};
+use utils::{get_location, info, Error, LoggerOptions};
 
 use crate::{
     app::{AppState, User},
     cache::client::CacheState,
     live_scraper::LiveScraperState,
     send_event, track_event,
-    types::{PermissionsFlags, UIEvent},
+    types::UIEvent,
     utils::{AuctionListExt, OrderListExt},
 };
 
@@ -170,24 +170,3 @@ pub async fn auth_logout(
     result
 }
 
-#[tauri::command]
-pub async fn auth_has_permission(
-    flag: String,
-    app: tauri::State<'_, Mutex<AppState>>,
-) -> Result<bool, Error> {
-    let app_state = app.lock().unwrap().clone();
-
-    if let Err(_) = app_state
-        .user
-        .has_permission(PermissionsFlags::from_str(&flag))
-    {
-        warning(
-            "Commands:AuthHasPermission",
-            &format!("User does not have permission for flag: {}", flag),
-            &LoggerOptions::default(),
-        );
-
-        return Ok(false);
-    }
-    Ok(true)
-}

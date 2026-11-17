@@ -1,4 +1,3 @@
-use std::sync::Mutex;
 
 use entity::{dto::*, trade_entry::*};
 use qf_api::enums::app_events::ApplicationEvent as EventType;
@@ -7,7 +6,7 @@ use tauri_plugin_dialog::DialogExt;
 use utils::{get_location, info, Error, LoggerOptions};
 
 use crate::{
-    app::AppState, track_event, types::PermissionsFlags, utils::CreateTradeEntryExt, APP, DATABASE,
+    track_event, utils::CreateTradeEntryExt, APP, DATABASE,
 };
 
 #[tauri::command]
@@ -264,22 +263,9 @@ pub async fn trade_entry_update_multiple(
 
 #[tauri::command]
 pub async fn export_trade_entry_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: TradeEntryPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
     let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::TradeEntryExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_trade_entry_json.log");
-        return Err(e);
-    }
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
     match TradeEntryQuery::get_all(conn, query).await {

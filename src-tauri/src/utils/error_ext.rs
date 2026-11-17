@@ -22,7 +22,6 @@ pub trait ErrorFromExt {
         error: QFRequestError,
         location: impl Into<String>,
     ) -> Self;
-    fn new_permission_denied(flag: impl Into<String>) -> Self;
 }
 
 impl ErrorFromExt for Error {
@@ -57,17 +56,6 @@ impl ErrorFromExt for Error {
             log_level: LogLevel::Critical,
             properties: Properties::from(json!(error.to_string())),
             location: Some(location.into()),
-        }
-    }
-    fn new_permission_denied(flag: impl Into<String>) -> Self {
-        let flag = flag.into();
-        Error {
-            component: "AuthModule".into(),
-            cause: "Permission Denied".to_string(),
-            message: format!("User does not have permission: {}", flag),
-            log_level: LogLevel::Warning,
-            properties: Properties::from(json!({ "flag": flag })),
-            location: None,
         }
     }
 }

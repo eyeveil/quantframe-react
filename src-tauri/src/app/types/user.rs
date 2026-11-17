@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use utils::{get_location, validate_json, Error};
 
-use crate::{helper, types::PermissionsFlags, utils::ErrorFromExt};
+use crate::helper;
 
 fn get_path() -> PathBuf {
     helper::get_app_storage_path().join("auth.json")
@@ -35,10 +35,6 @@ pub struct User {
     pub platform: String,
     pub wfm_status: String,
     pub unread_messages: i64,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub permissions: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub patreon_tier: Option<String>,
 }
 impl Default for User {
     fn default() -> Self {
@@ -61,8 +57,6 @@ impl Default for User {
             locale: "en".to_string(),
             platform: String::new(),
             unread_messages: 0,
-            permissions: None,
-            patreon_tier: None,
         }
     }
 }
@@ -153,24 +147,5 @@ impl User {
 
     pub fn is_banned(&self) -> bool {
         self.wfm_banned || self.qf_banned
-    }
-    pub fn has_permission(&self, flag: PermissionsFlags) -> Result<bool, Error> {
-        if flag == PermissionsFlags::None {
-            return Err(Error::new_permission_denied(flag.as_str()));
-        }
-        if self.anonymous
-            || self.permissions.is_none()
-            || self.permissions.as_ref().unwrap().is_empty()
-        {
-            return Err(Error::new_permission_denied(flag.as_str()));
-        }
-        let permissions = self.permissions.as_ref().unwrap();
-        let has_permission = permissions
-            .split(',')
-            .any(|perm| perm == flag.as_str() || perm == "all");
-        if !has_permission {
-            return Err(Error::new_permission_denied(flag.as_str()));
-        }
-        Ok(has_permission)
     }
 }

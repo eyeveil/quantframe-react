@@ -18,7 +18,6 @@ use crate::{
     helper::{self},
     live_scraper::is_disabled,
     track_event,
-    types::PermissionsFlags,
     utils::ErrorFromExt,
     APP, DATABASE,
 };
@@ -28,24 +27,6 @@ pub async fn syndicate_item_import_items(
     app: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<i64, Error> {
     let app = app.lock()?.clone();
-    if !app
-        .user
-        .has_permission(PermissionsFlags::SyndicatePricesSearch)?
-    {
-        let err = Error::new(
-            "Command::SyndicateItemImportItems",
-            "User does not have permission to search syndicate prices",
-            get_location!(),
-        );
-        track_event!(
-            EventType::SyndicateItemImport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        return Err(err);
-    }
     let settings = &app.settings.live_scraper.syndicate.wts;
     let mut query = SyndicateItemPricePaginationQueryDto::new(1, -1);
     query.syndicates = FieldChange::Value(settings.get_syndicate_ids());
@@ -458,22 +439,9 @@ pub async fn syndicate_item_get_by_id(
 
 #[tauri::command]
 pub async fn export_syndicate_item_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: SyndicateItemPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
     let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::SyndicateItemExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_syndicate_item_json.log");
-        return Err(e);
-    }
 
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all

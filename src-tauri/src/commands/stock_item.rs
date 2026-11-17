@@ -13,7 +13,6 @@ use crate::{
     handlers::{handle_item_by_entity, handle_wfm_item, stock_item::handle_item},
     helper::{self},
     track_event,
-    types::PermissionsFlags,
     APP, DATABASE,
 };
 
@@ -321,22 +320,9 @@ pub async fn stock_item_get_by_id(
 }
 #[tauri::command]
 pub async fn export_stock_item_json(
-    app_state: tauri::State<'_, Mutex<AppState>>,
     mut query: StockItemPaginationQueryDto,
 ) -> Result<String, Error> {
-    let app_state = app_state.lock()?.clone();
     let app = APP.get().unwrap();
-    if let Err(e) = app_state.user.has_permission(PermissionsFlags::ExportData) {
-        track_event!(
-            EventType::StockItemExport,
-            [
-                ("success", "false".to_string()),
-                ("error_type", "permission_denied".to_string()),
-            ]
-        );
-        e.log("export_stock_item_json.log");
-        return Err(e);
-    }
 
     let conn = DATABASE.get().unwrap();
     query.pagination.limit = -1; // fetch all
