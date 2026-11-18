@@ -19,6 +19,31 @@ pub enum StockStatus {
 }
 
 impl StockStatus {
+    pub const ALL: [Self; 14] = [
+        Self::Error,
+        Self::Unknown,
+        Self::Pending,
+        Self::Live,
+        Self::ToLowProfit,
+        Self::NoSellers,
+        Self::NoBuyers,
+        Self::InActive,
+        Self::SMALimit,
+        Self::OrderLimit,
+        Self::Overpriced,
+        Self::Underpriced,
+        Self::MaxPriceDrop,
+        Self::InsufficientStanding,
+    ];
+
+    /// Reads the backend's serialized name. Names this app doesn't know map to `Unknown`.
+    pub fn parse(name: &str) -> Self {
+        Self::ALL
+            .into_iter()
+            .find(|status| status.as_str() == name)
+            .unwrap_or(Self::Unknown)
+    }
+
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::Error => "error",

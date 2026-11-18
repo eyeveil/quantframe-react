@@ -54,6 +54,10 @@ pub async fn handle_wfm_item(
     let delete = operations.has("ShouldDelete");
     let wf_sub_type: wf_market::types::SubType = SubTypeExt::from_entity(sub_type.to_owned());
 
+    if crate::host::is_offline() {
+        return Ok("SkippedOffline".to_string());
+    }
+
     // Skip buy if reporting disabled
     if order_type == OrderType::Buy
         && !app.settings.live_scraper.general.report_to_wfm

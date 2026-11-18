@@ -32,6 +32,7 @@ pub async fn auction_refresh(
     app: State<'_, Mutex<AppState>>,
     cache: State<'_, Mutex<CacheState>>,
 ) -> Result<(), Error> {
+    crate::host::ensure_online("Command::AuctionRefresh")?;
     let app = app.lock()?.clone();
     let cache = cache.lock()?.clone();
 
@@ -273,6 +274,7 @@ pub async fn auction_delete_all(
     live_scraper: State<'_, Arc<LiveScraperState>>,
     app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
+    crate::host::ensure_online("Command::AuctionDeleteAll")?;
     let app = app.lock()?.clone();
 
     live_scraper.stop();
@@ -353,6 +355,7 @@ pub async fn auction_delete_by_id(
     id: String,
     app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
+    crate::host::ensure_online("Command::AuctionDeleteById")?;
     let app = app.lock()?.clone();
 
     let auction = app
@@ -418,6 +421,7 @@ pub async fn auction_import_by_id(
     bought: i64,
     app: State<'_, Mutex<AppState>>,
 ) -> Result<stock_riven::Model, Error> {
+    crate::host::ensure_online("Command::AuctionImportById")?;
     let app = app.lock()?.clone();
 
     let result = async {

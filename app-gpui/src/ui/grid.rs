@@ -2,7 +2,10 @@
 //! [`Catalog`], and [`Grid`] draws them with the shared row states, selection
 //! boxes, sorting, row menu and empty, loading and error states.
 
-use std::{cmp::Ordering, collections::HashSet, marker::PhantomData, rc::Rc};
+use std::{
+    cmp::Ordering, collections::HashSet, future::Future, marker::PhantomData, path::PathBuf,
+    pin::Pin, rc::Rc,
+};
 
 use gpui::{
     AnyElement, App, ClickEvent, Context, Div, Edges, IntoElement, ParentElement, Pixels,
@@ -19,7 +22,10 @@ use gpui_component::{
 use gpui_kit_assets::IconName;
 
 use super::{IconButton, form::FormSpec, form::FormValues, panel::PanelModel, placeholder, text_button};
-use crate::theme::Theme;
+use crate::{
+    data::{DataKind, DataResult, DataSource},
+    theme::Theme,
+};
 
 /// What a table sends back to the screen that owns it.
 #[derive(Clone)]
@@ -221,6 +227,12 @@ impl Query {
             .map(|(_, key)| key.as_str())
     }
 
+    /// True when `haystack` contains the search text, ignoring case.
+    pub fn matches(&self, haystack: &str) -> bool {
+        let needle = self.text.trim().to_lowercase();
+        needle.is_empty() || haystack.to_lowercase().contains(&needle)
+    }
+
     pub fn is_empty(&self) -> bool {
         self.text.trim().is_empty() && self.filters.is_empty()
     }
@@ -229,12 +241,29 @@ impl Query {
 /// Turns a submitted form into the action that applies it.
 pub type FormMap<A> = Rc<dyn Fn(&FormValues) -> Option<A>>;
 
+/// A backend call in flight. It resolves to the notice to show, or to an
+/// empty string when the reloaded list says enough.
+pub type Command = Pin<Box<dyn Future<Output = DataResult<String>> + Send>>;
+
+/// An export in flight. It resolves to the file it wrote.
+pub type Export = Pin<Box<dyn Future<Output = DataResult<PathBuf>> + Send>>;
+
+/// A load of everything a catalog shows.
+pub type Load<D> = Pin<Box<dyn Future<Output = DataResult<D>> + Send>>;
+
 /// What the screen does after a catalog has handled an action.
 pub enum Outcome<A> {
-    /// The catalog changed its rows, or nothing is left to do.
+    /// Nothing is left to do.
     Done,
     /// Ask the user for values, then perform the mapped action.
     Ask(FormSpec, FormMap<A>),
+    /// Wait for the backend, then load the list again.
+    Run(Command),
+    /// Ask where to save a file, then run the export to that path.
+    Export {
+        file_name: String,
+        run: Box<dyn FnOnce(PathBuf) -> Command>,
+    },
     /// Select the row and open the item panel on it.
     ShowPanel(u64),
     /// Copy the text and say so.
@@ -248,12 +277,45 @@ impl<A> Outcome<A> {
     pub fn ask(spec: FormSpec, map: impl Fn(&FormValues) -> Option<A> + 'static) -> Self {
         Self::Ask(spec, Rc::new(map))
     }
+
+    /// Runs a backend call and shows `notice` when it succeeds.
+    pub fn run<T>(
+        call: impl Future<Output = DataResult<T>> + Send + 'static,
+        notice: impl Into<String>,
+    ) -> Self {
+        let notice = notice.into();
+        Self::Run(Box::pin(async move { call.await.map(|_| notice) }))
+    }
+
+    /// Runs a backend call whose result needs no notice.
+    pub fn run_quietly<T>(call: impl Future<Output = DataResult<T>> + Send + 'static) -> Self {
+        Self::run(call, String::new())
+    }
+
+    /// Asks for a file to save to, then runs the export `call` builds.
+    pub fn export(file_name: &str, call: impl FnOnce(PathBuf) -> Export + 'static) -> Self {
+        Self::Export {
+            file_name: file_name.to_owned(),
+            run: Box::new(move |path| {
+                let export = call(path);
+                Box::pin(async move {
+                    export
+                        .await
+                        .map(|path| format!("Exported the list to {}.", path.display()))
+                })
+            }),
+        }
+    }
 }
 
 /// The rows of one list screen and everything a trader can do with them.
+/// The catalog keeps what the backend last sent and filters it for the
+/// table, so a search needs no round trip.
 pub trait Catalog: Sized + 'static {
     type Row: Clone + 'static;
     type Action: Clone + 'static;
+    /// Everything one load fetches. The default is the empty list.
+    type Data: Default + Send + 'static;
 
     /// The plural noun for the rows, such as "stock items".
     const NOUN: &'static str;
@@ -262,6 +324,11 @@ pub trait Catalog: Sized + 'static {
     const EMPTY_HINT: &'static str;
     /// Whether rows carry a selection box for bulk actions.
     const CHECKABLE: bool = true;
+    /// The backend lists whose change loads this catalog again.
+    const WATCH: &'static [DataKind];
+
+    fn load(&self, source: &DataSource) -> Load<Self::Data>;
+    fn apply(&mut self, data: Self::Data);
 
     fn columns(&self) -> Vec<ColumnSpec>;
     fn rows(&self, query: &Query) -> Vec<Self::Row>;
@@ -269,7 +336,7 @@ pub trait Catalog: Sized + 'static {
     fn summary(&self) -> Vec<Stat>;
     fn toolbar(&self, checked: &[u64]) -> Vec<ToolbarItem<Self::Action>>;
     fn primary(&self) -> Option<PrimaryAction<Self::Action>>;
-    fn perform(&mut self, action: Self::Action) -> Outcome<Self::Action>;
+    fn perform(&mut self, action: Self::Action, source: &DataSource) -> Outcome<Self::Action>;
 
     fn row_id(row: &Self::Row) -> u64;
     fn compare(key: &str, a: &Self::Row, b: &Self::Row) -> Ordering;

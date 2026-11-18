@@ -80,6 +80,7 @@ pub struct Client {
     wfm_username: String,
     wfm_id: String,
     is_pre_release: bool,
+    offline: bool,
     user_agent: String,
     limiter: Arc<RateLimiter<NotKeyed, InMemoryState, DefaultClock>>,
     callbacks: Arc<Mutex<HashMap<String, Vec<ClientCallback>>>>,
@@ -112,6 +113,7 @@ impl Client {
                     wfm_username: self.wfm_username.clone(),
                     wfm_id: self.wfm_id.clone(),
                     is_pre_release: self.is_pre_release.clone(),
+                    offline: self.offline,
                     user_agent: self.user_agent.clone(),
                     limiter: self.limiter.clone(),
                     callbacks: self.callbacks.clone(),
@@ -175,6 +177,7 @@ impl Client {
             wfm_username: wfm_username.to_string(),
             wfm_id: wfm_id.to_string(),
             is_pre_release,
+            offline: false,
             user_agent: format!(
                 "QF API Client/{} ({}, {}, {}, {})",
                 env!("CARGO_PKG_VERSION"),
@@ -204,6 +207,12 @@ impl Client {
         self
     }
 
+    /// An offline client refuses every request without opening a connection.
+    pub fn with_offline(mut self, offline: bool) -> Self {
+        self.offline = offline;
+        self
+    }
+
     pub async fn call_api<T: serde::de::DeserializeOwned>(
         &self,
         method: Method,
@@ -212,6 +221,11 @@ impl Client {
         headers: Option<HashMap<String, String>>,
         response_format: ResponseFormat,
     ) -> Result<(ApiResponse<T>, HeaderMap, RequestError), ApiError> {
+        if self.offline {
+            return Err(ApiError::Unknown(format!(
+                "Fixture mode makes no network requests, refused {method} {path} to the Quantframe API"
+            )));
+        }
         let url = if self.is_development {
             format!("{}{}", DEVELOPMENT_URL, path)
         } else {

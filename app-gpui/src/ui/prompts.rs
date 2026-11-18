@@ -1,5 +1,5 @@
-//! The prompts several screens open: sold, bought, a price limit, delete and
-//! the trade chat message.
+//! The prompts several screens open: sold, bought, delete and the trade chat
+//! message.
 
 use super::form::{Field, FormSpec, FormValues, Preview};
 
@@ -30,6 +30,7 @@ fn traded(
             .field(
                 Field::number("quantity", "Quantity", Some(quantity))
                     .min(1)
+                    .max(quantity)
                     .half(),
             )
             .field(
@@ -39,15 +40,6 @@ fn traded(
             ),
         None => spec.field(Field::platinum("price", "Price", total)),
     }
-}
-
-/// Asks for a price limit. An empty field removes the limit.
-pub fn price_limit(title: &str, label: &str, hint: &str, value: Option<i64>) -> FormSpec {
-    FormSpec::new(title, "Save").field(
-        Field::platinum("price", label, value)
-            .optional()
-            .hint(hint),
-    )
 }
 
 /// Asks before deleting `count` rows. `singular` and `plural` name the rows.

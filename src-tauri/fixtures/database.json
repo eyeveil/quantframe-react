@@ -2930,5 +2930,151 @@
     "rank": 0
    }
   }
+ ],
+ "syndicate_items": [
+  {
+   "wfm_id": "54a74454e779892d5e5155f5",
+   "wfm_url": "scattered_justice",
+   "item_name": "Scattered Justice",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/HekMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": 18,
+   "syndicate_name": "Steel Meridian",
+   "syndicate_unique_name": "SteelMeridianSyndicate",
+   "standing_cost": 25000,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-11-10T18:00:00.000Z",
+   "updated_at": "2026-11-10T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "54a74455e779892d5e5156b9",
+   "wfm_url": "justice_blades",
+   "item_name": "Justice Blades",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/DualCleaversMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": null,
+   "syndicate_name": "Steel Meridian",
+   "syndicate_unique_name": "SteelMeridianSyndicate",
+   "standing_cost": 25000,
+   "status": "pending",
+   "price_history": [],
+   "created_at": "2026-11-11T18:00:00.000Z",
+   "updated_at": "2026-11-11T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "5911f11d97a0add8e9d5da4d",
+   "wfm_url": "neutralizing_justice",
+   "item_name": "Neutralizing Justice",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/MiterMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": null,
+   "syndicate_name": "Steel Meridian",
+   "syndicate_unique_name": "SteelMeridianSyndicate",
+   "standing_cost": 25000,
+   "status": "to_low_profit",
+   "price_history": [],
+   "created_at": "2026-11-12T18:00:00.000Z",
+   "updated_at": "2026-11-12T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "54a74454e779892d5e515664",
+   "wfm_url": "gilded_truth",
+   "item_name": "Gilded Truth",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/BurstonPrimeMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": 30,
+   "syndicate_name": "Arbiters of Hexis",
+   "syndicate_unique_name": "ArbitersSyndicate",
+   "standing_cost": 25000,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-11-13T18:00:00.000Z",
+   "updated_at": "2026-11-13T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "54a74454e779892d5e515645",
+   "wfm_url": "blade_of_truth",
+   "item_name": "Blade Of Truth",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/JawSwordMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": null,
+   "syndicate_name": "Arbiters of Hexis",
+   "syndicate_unique_name": "ArbitersSyndicate",
+   "standing_cost": 25000,
+   "status": "no_buyers",
+   "price_history": [],
+   "created_at": "2026-11-14T18:00:00.000Z",
+   "updated_at": "2026-11-14T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "54a74455e779892d5e51569a",
+   "wfm_url": "winds_of_purity",
+   "item_name": "Winds Of Purity",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/FurisMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": 25,
+   "syndicate_name": "New Loka",
+   "syndicate_unique_name": "NewLokaSyndicate",
+   "standing_cost": 25000,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-11-15T18:00:00.000Z",
+   "updated_at": "2026-11-15T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "54a74454e779892d5e51568a",
+   "wfm_url": "bright_purity",
+   "item_name": "Bright Purity",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/SkanaMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": null,
+   "syndicate_name": "New Loka",
+   "syndicate_unique_name": "NewLokaSyndicate",
+   "standing_cost": 25000,
+   "status": "pending",
+   "price_history": [],
+   "created_at": "2026-11-16T18:00:00.000Z",
+   "updated_at": "2026-11-16T18:00:00.000Z",
+   "changes": []
+  },
+  {
+   "wfm_id": "54a74455e779892d5e515699",
+   "wfm_url": "sequence_burn",
+   "item_name": "Sequence Burn",
+   "item_unique_name": "/Lotus/Upgrades/Mods/Syndicate/SpectraMod",
+   "sub_type": {
+    "rank": 0
+   },
+   "list_price": 16,
+   "syndicate_name": "Cephalon Suda",
+   "syndicate_unique_name": "CephalonSudaSyndicate",
+   "standing_cost": 25000,
+   "status": "live",
+   "price_history": [],
+   "created_at": "2026-11-17T18:00:00.000Z",
+   "updated_at": "2026-11-17T18:00:00.000Z",
+   "changes": []
+  }
  ]
 }

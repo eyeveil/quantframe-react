@@ -2,6 +2,8 @@
 //! panel, all driven by a [`Catalog`]. The screen that owns the page draws
 //! [`PageHandle::toolbar`] beside its tabs and [`PageHandle::body`] below.
 
+use std::path::PathBuf;
+
 use gpui::{
     AnyElement, App, ClipboardItem, Context, Div, Entity, Focusable, Global, IntoElement,
     KeyBinding, ParentElement, Pixels, Stateful, Styled, Subscription, Window, actions, div,
@@ -11,6 +13,7 @@ use gpui_component::{
     FocusableExt, Icon, Selectable, Sizable, Size, WindowExt,
     button::ButtonVariants,
     input::{InputEvent, InputState},
+    notification::Notification,
     skeleton::Skeleton,
     table::{DataTable, TableEvent, TableState},
     tooltip::Tooltip,
@@ -19,13 +22,23 @@ use gpui_kit_assets::IconName;
 
 use super::{
     IconButton, chip, divider, dot, form,
-    grid::{Catalog, ChipGroup, Emit, Grid, LoadState, Outcome, Query, Signal, Stat},
+    grid::{Catalog, ChipGroup, Command, Emit, Grid, LoadState, Outcome, Query, Signal, Stat},
     number, panel, search_field, text_button,
 };
 use crate::{
+    data::{Backend, BackendEvent, DataError, DataSource},
     prefs,
     theme::{Theme, tabular_figures},
 };
+
+/// A backend error as one sentence for a notification or the table.
+fn describe(error: &DataError) -> String {
+    if error.cause.is_empty() {
+        error.message.clone()
+    } else {
+        format!("{} ({})", error.message, error.cause)
+    }
+}
 
 actions!(
     quantframe,
@@ -80,43 +93,22 @@ fn set_panel_open(open: bool, cx: &mut App) {
     }
 }
 
-/// How the tables start. `QF_STATE` (`loading`, `error` or `empty`) picks a
-/// state other than loaded, so each one can be rendered and checked.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub enum PreviewState {
-    #[default]
-    Loaded,
+/// A table state forced from the environment, so each one can be rendered
+/// and checked: `QF_STATE` is `loading`, `error` or `empty`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ForcedState {
     Loading,
     Failed,
     Empty,
 }
 
-impl PreviewState {
-    pub fn from_env() -> Self {
+impl ForcedState {
+    fn from_env() -> Option<Self> {
         match std::env::var("QF_STATE").as_deref() {
-            Ok("loading") => Self::Loading,
-            Ok("error") => Self::Failed,
-            Ok("empty") => Self::Empty,
-            _ => Self::Loaded,
-        }
-    }
-
-    pub fn load_state(self) -> LoadState {
-        match self {
-            Self::Loaded | Self::Empty => LoadState::Ready,
-            Self::Loading => LoadState::Loading,
-            Self::Failed => LoadState::Failed(
-                "The backend didn't answer in time. Check the connection, then try again."
-                    .to_owned(),
-            ),
-        }
-    }
-
-    /// The rows a table starts with: none in the empty state.
-    pub fn rows<T>(self, rows: Vec<T>) -> Vec<T> {
-        match self {
-            Self::Empty => Vec::new(),
-            Self::Loaded | Self::Loading | Self::Failed => rows,
+            Ok("loading") => Some(Self::Loading),
+            Ok("error") => Some(Self::Failed),
+            Ok("empty") => Some(Self::Empty),
+            _ => None,
         }
     }
 }
@@ -130,17 +122,35 @@ const fn shortcut_modifier() -> &'static str {
     }
 }
 
+/// What a script asked the page to do once its rows have loaded.
+#[derive(Default)]
+struct OnLoad {
+    row: Option<usize>,
+    dialog: Option<String>,
+}
+
 pub struct ListPage<C: Catalog> {
     catalog: C,
+    source: DataSource,
     search: Entity<InputState>,
     table: Entity<TableState<Grid<C>>>,
     filters: Vec<(&'static str, String)>,
     emit: Emit<C::Action>,
+    /// Counts the loads, so a slow answer never replaces a newer one.
+    load_generation: u64,
+    forced: Option<ForcedState>,
+    on_load: Option<OnLoad>,
     _subscriptions: Vec<Subscription>,
 }
 
 impl<C: Catalog> ListPage<C> {
-    pub fn new(catalog: C, state: LoadState, window: &mut Window, cx: &mut Context<Self>) -> Self {
+    pub fn new(
+        catalog: C,
+        backend: &Entity<Backend>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Self {
+        let source = backend.read(cx).source.clone();
         let search =
             cx.new(|cx| InputState::new(window, cx).placeholder(C::SEARCH_PLACEHOLDER));
         let page = cx.entity().downgrade();
@@ -148,10 +158,9 @@ impl<C: Catalog> ListPage<C> {
             page.update(cx, |page, cx| page.receive(signal, window, cx))
                 .ok();
         });
-        let rows = catalog.rows(&Query::default());
         let table = cx.new(|cx| {
-            let mut grid = Grid::new(catalog.columns(), rows, px(960.), emit.clone());
-            grid.set_state(state);
+            let mut grid = Grid::new(catalog.columns(), Vec::new(), px(960.), emit.clone());
+            grid.set_state(LoadState::Loading);
             TableState::new(grid, window, cx)
                 .col_movable(false)
                 .col_selectable(false)
@@ -167,7 +176,7 @@ impl<C: Catalog> ListPage<C> {
             }),
             cx.subscribe_in(&search, window, |page, _, event: &InputEvent, window, cx| {
                 match event {
-                    InputEvent::Change => page.reload(cx),
+                    InputEvent::Change => page.refresh_rows(cx),
                     InputEvent::PressEnter { .. } => page.focus_table(window, cx),
                     InputEvent::Focus | InputEvent::Blur => cx.notify(),
                 }
@@ -190,14 +199,86 @@ impl<C: Catalog> ListPage<C> {
                 TableEvent::DoubleClickedRow(_) => page.show_panel(cx),
                 _ => {}
             }),
+            cx.subscribe_in(
+                backend,
+                window,
+                |page, _, event: &BackendEvent, window, cx| {
+                    if matches!(event, BackendEvent::Changed(kind) if C::WATCH.contains(kind)) {
+                        page.load(window, cx);
+                    }
+                },
+            ),
         ];
-        Self {
+        let mut page = Self {
             catalog,
+            source,
             search,
             table,
             filters: Vec::new(),
             emit,
+            load_generation: 0,
+            forced: ForcedState::from_env(),
+            on_load: None,
             _subscriptions: subscriptions,
+        };
+        page.load(window, cx);
+        page
+    }
+
+    fn set_state(&mut self, state: LoadState, cx: &mut Context<Self>) {
+        self.table.update(cx, |table, cx| {
+            table.delegate_mut().set_state(state);
+            cx.notify();
+        });
+        cx.notify();
+    }
+
+    /// Fetches the catalog's data on the backend runtime and shows it when
+    /// it arrives. The table keeps its rows while a later load runs.
+    fn load(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        match self.forced {
+            Some(ForcedState::Loading) => return,
+            Some(ForcedState::Failed) => {
+                let reason = "The backend didn't answer in time. Check the connection, then try again.";
+                return self.set_state(LoadState::Failed(reason.to_owned()), cx);
+            }
+            Some(ForcedState::Empty) => return self.loaded(C::Data::default(), window, cx),
+            None => {}
+        }
+        self.load_generation += 1;
+        let generation = self.load_generation;
+        let load = self.catalog.load(&self.source);
+        cx.spawn_in(window, async move |page, cx| {
+            let result = load.await;
+            page.update_in(cx, |page, window, cx| {
+                if page.load_generation != generation {
+                    return;
+                }
+                match result {
+                    Ok(data) => page.loaded(data, window, cx),
+                    Err(error) => page.set_state(LoadState::Failed(describe(&error)), cx),
+                }
+            })
+            .ok();
+        })
+        .detach();
+    }
+
+    fn loaded(&mut self, data: C::Data, window: &mut Window, cx: &mut Context<Self>) {
+        self.catalog.apply(data);
+        self.set_state(LoadState::Ready, cx);
+        self.refresh_rows(cx);
+        if let Some(on_load) = self.on_load.take() {
+            if let Some(row_ix) = on_load.row {
+                self.table.update(cx, |table, cx| {
+                    if row_ix < table.delegate().len() {
+                        table.set_selected_row(row_ix, cx);
+                    }
+                });
+            }
+            if let Some(label) = on_load.dialog {
+                self.run_labelled(&label, window, cx);
+            }
         }
     }
 
@@ -208,8 +289,9 @@ impl<C: Catalog> ListPage<C> {
         }
     }
 
-    /// Reads the rows again and keeps the same row selected when it survives.
-    fn reload(&mut self, cx: &mut Context<Self>) {
+    /// Filters the loaded rows again and keeps the same row selected when it
+    /// survives.
+    fn refresh_rows(&mut self, cx: &mut Context<Self>) {
         let groups = self.catalog.chips(cx);
         self.filters.retain(|(group, key)| {
             groups
@@ -236,24 +318,22 @@ impl<C: Catalog> ListPage<C> {
         match signal {
             Signal::Action(action) => self.perform(action, window, cx),
             Signal::Retry => {
-                self.table
-                    .update(cx, |table, _| table.delegate_mut().set_state(LoadState::Ready));
-                self.reload(cx);
+                self.forced = None;
+                self.set_state(LoadState::Loading, cx);
+                self.load(window, cx);
             }
             Signal::ClearFilters => {
                 self.filters.clear();
                 self.search
                     .update(cx, |search, cx| search.set_value("", window, cx));
-                self.reload(cx);
+                self.refresh_rows(cx);
             }
         }
     }
 
     fn perform(&mut self, action: C::Action, window: &mut Window, cx: &mut Context<Self>) {
-        let outcome = self.catalog.perform(action);
-        self.reload(cx);
-        match outcome {
-            Outcome::Done => {}
+        match self.catalog.perform(action, &self.source) {
+            Outcome::Done => self.refresh_rows(cx),
             Outcome::Ask(spec, map) => {
                 let page = cx.entity().downgrade();
                 form::open(
@@ -269,6 +349,30 @@ impl<C: Catalog> ListPage<C> {
                     cx,
                 );
             }
+            Outcome::Run(command) => self.run(command, window, cx),
+            Outcome::Export { file_name, run } => {
+                let directory = std::env::var_os("HOME").map(PathBuf::from).unwrap_or_default();
+                let chosen = cx.prompt_for_new_path(&directory, Some(&file_name));
+                cx.spawn_in(window, async move |page, cx| {
+                    let path = match chosen.await {
+                        Ok(Ok(Some(path))) => path,
+                        Ok(Ok(None)) => return,
+                        Ok(Err(_)) | Err(_) => {
+                            page.update_in(cx, |_, window, cx| {
+                                window.push_notification(
+                                    Notification::error("Could not open the save dialog."),
+                                    cx,
+                                );
+                            })
+                            .ok();
+                            return;
+                        }
+                    };
+                    page.update_in(cx, |page, window, cx| page.run(run(path), window, cx))
+                        .ok();
+                })
+                .detach();
+            }
             Outcome::ShowPanel(id) => {
                 self.select_id(id, cx);
                 self.show_panel(cx);
@@ -280,6 +384,25 @@ impl<C: Catalog> ListPage<C> {
             Outcome::OpenUrl(url) => cx.open_url(&url),
             Outcome::Notice(text) => window.push_notification(text, cx),
         }
+    }
+
+    /// Waits for a backend call, reports how it went and loads the list again.
+    fn run(&mut self, command: Command, window: &mut Window, cx: &mut Context<Self>) {
+        cx.spawn_in(window, async move |page, cx| {
+            let result = command.await;
+            page.update_in(cx, |page, window, cx| {
+                match result {
+                    Ok(notice) if notice.is_empty() => {}
+                    Ok(notice) => window.push_notification(notice, cx),
+                    Err(error) => {
+                        window.push_notification(Notification::error(describe(&error)), cx);
+                    }
+                }
+                page.load(window, cx);
+            })
+            .ok();
+        })
+        .detach();
     }
 
     fn select_id(&mut self, id: u64, cx: &mut Context<Self>) {
@@ -320,7 +443,7 @@ impl<C: Catalog> ListPage<C> {
         if let Some(key) = key {
             self.filters.push((group, key));
         }
-        self.reload(cx);
+        self.refresh_rows(cx);
     }
 
     fn sync_table_width(&mut self, width: Pixels, cx: &mut Context<Self>) {
@@ -477,7 +600,7 @@ impl<C: Catalog> ListPage<C> {
             .child(count(total))
             .on_click(cx.listener(|page, _, _, cx| {
                 page.filters.clear();
-                page.reload(cx);
+                page.refresh_rows(cx);
             }));
         let mut row = div()
             .id("filter-chips")
@@ -654,8 +777,9 @@ pub trait PageHandle {
     fn count(&self, cx: &App) -> Option<usize>;
     fn focus(&self, window: &mut Window, cx: &mut App);
     fn focus_search(&self, window: &mut Window, cx: &mut App);
-    fn select_row(&self, row_ix: usize, cx: &mut App);
-    fn run_labelled(&self, label: &str, window: &mut Window, cx: &mut App);
+    /// Selects a row and opens the prompt behind a button label once the
+    /// rows have loaded. Scripted screenshots use it.
+    fn on_load(&self, row: Option<usize>, dialog: Option<String>, cx: &mut App);
 }
 
 impl<C: Catalog> PageHandle for Entity<ListPage<C>> {
@@ -681,17 +805,7 @@ impl<C: Catalog> PageHandle for Entity<ListPage<C>> {
         self.read(cx).table.focus_handle(cx).focus(window, cx);
     }
 
-    fn select_row(&self, row_ix: usize, cx: &mut App) {
-        self.update(cx, |page, cx| {
-            page.table.update(cx, |table, cx| {
-                if row_ix < table.delegate().len() {
-                    table.set_selected_row(row_ix, cx);
-                }
-            });
-        });
-    }
-
-    fn run_labelled(&self, label: &str, window: &mut Window, cx: &mut App) {
-        self.update(cx, |page, cx| page.run_labelled(label, window, cx));
+    fn on_load(&self, row: Option<usize>, dialog: Option<String>, cx: &mut App) {
+        self.update(cx, |page, _| page.on_load = Some(OnLoad { row, dialog }));
     }
 }

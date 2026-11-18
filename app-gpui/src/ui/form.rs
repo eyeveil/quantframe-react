@@ -23,6 +23,7 @@ pub enum FieldKind {
     Number {
         value: Option<i64>,
         min: i64,
+        max: Option<i64>,
         unit: Option<&'static str>,
     },
     Text {
@@ -67,6 +68,7 @@ impl Field {
             FieldKind::Number {
                 value,
                 min: 0,
+                max: None,
                 unit: None,
             },
         )
@@ -104,6 +106,13 @@ impl Field {
     pub fn min(mut self, minimum: i64) -> Self {
         if let FieldKind::Number { min, .. } = &mut self.kind {
             *min = minimum;
+        }
+        self
+    }
+
+    pub fn max(mut self, maximum: i64) -> Self {
+        if let FieldKind::Number { max, .. } = &mut self.kind {
+            *max = Some(maximum);
         }
         self
     }
@@ -324,7 +333,7 @@ impl Form {
         let mut valid = true;
         for (index, (field, control)) in self.spec.fields.iter().zip(&self.controls).enumerate() {
             let (value, error) = match (control, &field.kind) {
-                (Control::Input(input), FieldKind::Number { min, .. }) => {
+                (Control::Input(input), FieldKind::Number { min, max, .. }) => {
                     let text = input.read(cx).value();
                     let text = text.trim();
                     match text.parse::<i64>() {
@@ -332,8 +341,14 @@ impl Form {
                         _ if text.is_empty() => {
                             (Value::Number(None), Some("Enter a number.".to_owned()))
                         }
-                        Ok(number) if number >= *min => (Value::Number(Some(number)), None),
-                        Ok(_) => (Value::Number(None), Some(format!("Enter {min} or more."))),
+                        Ok(number) if number < *min => {
+                            (Value::Number(None), Some(format!("Enter {min} or more.")))
+                        }
+                        Ok(number) if max.is_some_and(|max| number > max) => (
+                            Value::Number(None),
+                            max.map(|max| format!("Enter {max} or less.")),
+                        ),
+                        Ok(number) => (Value::Number(Some(number)), None),
                         Err(_) => (
                             Value::Number(None),
                             Some("Enter a whole number.".to_owned()),

@@ -1,38 +1,30 @@
 //! The Syndicates tab: what the syndicates sell for standing, listed on
 //! Warframe Market by the live scraper.
 
-use std::cmp::Ordering;
+use std::{cmp::Ordering, collections::BTreeMap};
 
 use gpui::{AnyElement, App, Hsla, IntoElement, ParentElement, Styled, div, px, rgb};
 use gpui_kit_assets::IconName;
 
 use super::{
-    EXPORT_NOT_CONNECTED, MIN_PRICE_STEP, bulk_toolbar, market_url,
-    model::{Store, SyndicateItem},
-    status_chips, status_filter,
+    StockData, bulk_toolbar, every_row, ids, market_url, rank_label, status_chips, status_filter,
 };
 use crate::{
-    model::StockStatus,
+    data::{DataKind, DataSource},
+    model::{StockStatus, SyndicateItem, SyndicateItemListParams, SyndicateItemUpdate},
     theme::Theme,
     ui::{
         IconButton, cells, day_and_time,
         form::{Field, FormSpec},
         grid::{
-            Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, MenuEntry, Outcome, PrimaryAction,
-            Query, Stat, Tone, ToolbarItem, overflow_button,
+            Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, Load, MenuEntry, Outcome,
+            PrimaryAction, Query, Stat, Tone, ToolbarItem, overflow_button,
         },
-        number,
+        number, numeric,
         panel::{Fact, PanelAction, PanelModel},
         prompts, row_button,
     },
 };
-
-#[derive(Clone, Debug, Default)]
-pub struct SyndicateEdit {
-    min_price: Option<i64>,
-    min_profit: Option<i64>,
-    min_sma: Option<i64>,
-}
 
 #[derive(Clone, Debug)]
 pub enum SyndicateAction {
@@ -40,11 +32,8 @@ pub enum SyndicateAction {
     Sell(u64),
     Sold { id: u64, price: i64 },
     SellAtList(u64),
-    Edit(Vec<u64>),
-    Save { ids: Vec<u64>, edit: SyndicateEdit },
-    EditMinPrice(u64),
-    SetMinPrice { id: u64, price: Option<i64> },
-    StepMinPrice { id: u64, step: i64 },
+    Edit(u64),
+    Save { id: u64, update: SyndicateItemUpdate },
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
     Details(u64),
@@ -53,8 +42,16 @@ pub enum SyndicateAction {
     Export,
 }
 
+#[derive(Default)]
+pub struct SyndicateData {
+    stock: StockData<SyndicateItem>,
+    /// Item count per syndicate name.
+    syndicates: BTreeMap<String, usize>,
+}
+
+#[derive(Default)]
 pub struct Syndicates {
-    store: Store<SyndicateItem>,
+    data: SyndicateData,
 }
 
 /// The colour each syndicate flies in the game.
@@ -63,7 +60,7 @@ fn syndicate_color(name: &str) -> Hsla {
         "Steel Meridian" => 0xc4622d,
         "Arbiters of Hexis" => 0x9aa3ad,
         "Cephalon Suda" => 0x4f7fd9,
-        "The Perrin Sequence" => 0x3fa7b5,
+        "The Perrin Sequence" | "Perrin Sequence" => 0x3fa7b5,
         "Red Veil" => 0xc2413b,
         "New Loka" => 0x5aa55f,
         _ => 0x8e8e96,
@@ -71,116 +68,111 @@ fn syndicate_color(name: &str) -> Hsla {
     rgb(hex).into()
 }
 
-fn platinum_per_standing(item: &SyndicateItem) -> Option<String> {
-    item.platinum_per_thousand_standing()
-        .map(|rate| format!("{rate:.2}"))
+/// Platinum earned per 1,000 standing spent, at the list price.
+fn rate(item: &SyndicateItem) -> Option<f64> {
+    let price = item.list_price?;
+    (item.standing_cost > 0).then(|| price as f64 * 1000.0 / item.standing_cost as f64)
+}
+
+fn every_item() -> SyndicateItemListParams {
+    SyndicateItemListParams {
+        stock: every_row(),
+        syndicate: None,
+    }
 }
 
 impl Syndicates {
-    pub fn new(rows: Vec<SyndicateItem>) -> Self {
-        Self {
-            store: Store::new(rows),
-        }
-    }
-
     fn item(&self, id: u64) -> Option<SyndicateItem> {
-        self.store.get(id as i64).cloned()
-    }
-
-    fn edit_prompt(&self, ids: &[u64]) -> Option<FormSpec> {
-        let single = match ids {
-            [id] => Some(self.item(*id)?),
-            [] => return None,
-            _ => None,
-        };
-        let value = |pick: fn(&SyndicateItem) -> Option<i64>| single.as_ref().and_then(pick);
-        let spec = match &single {
-            Some(item) => FormSpec::new(format!("Edit {}", item.item_name), "Save"),
-            None => FormSpec::new(format!("Edit {} syndicate items", ids.len()), "Save")
-                .description(
-                    "Fill in only the fields to change. Empty fields keep each item's value.",
-                ),
-        };
-        Some(
-            spec.width(480.)
-                .field(
-                    Field::platinum(
-                        "min_price",
-                        "Minimum price",
-                        value(|item| item.properties.min_price),
-                    )
-                    .optional()
-                    .hint("The live scraper never lists below this."),
-                )
-                .field(
-                    Field::platinum(
-                        "min_profit",
-                        "Minimum profit",
-                        value(|item| item.properties.min_profit),
-                    )
-                    .optional()
-                    .half()
-                    .hint("Replaces the live scraper setting."),
-                )
-                .field(
-                    Field::number(
-                        "min_sma",
-                        "Minimum moving average",
-                        value(|item| item.properties.min_sma),
-                    )
-                    .optional()
-                    .half()
-                    .hint("Replaces the live scraper setting."),
-                ),
-        )
+        self.data
+            .stock
+            .rows
+            .iter()
+            .find(|item| item.id as u64 == id)
+            .cloned()
     }
 }
 
 impl Catalog for Syndicates {
     type Row = SyndicateItem;
     type Action = SyndicateAction;
+    type Data = SyndicateData;
 
     const NOUN: &'static str = "syndicate items";
     const SEARCH_PLACEHOLDER: &'static str = "Search syndicate items";
     const EMPTY_HINT: &'static str =
         "Import the syndicate offerings and the live scraper will price them for you.";
+    const WATCH: &'static [DataKind] = &[DataKind::SyndicateItems];
+
+    fn load(&self, source: &DataSource) -> Load<Self::Data> {
+        let rows = source.get_syndicate_item_pagination(&every_item());
+        let counts = source.get_syndicate_item_status_counts();
+        let report = source.get_syndicate_item_financial_report();
+        let syndicates = source.get_syndicate_item_syndicate_counts();
+        Box::pin(async move {
+            Ok(SyndicateData {
+                stock: StockData {
+                    rows: rows.await?.results,
+                    counts: counts.await?,
+                    report: report.await?,
+                },
+                syndicates: syndicates.await?,
+            })
+        })
+    }
+
+    fn apply(&mut self, data: Self::Data) {
+        self.data = data;
+    }
 
     fn columns(&self) -> Vec<ColumnSpec> {
         vec![
             ColumnSpec::new("item", "Item", 180.).flex().sortable(),
-            ColumnSpec::new("syndicate", "Syndicate", 176.).sortable(),
-            ColumnSpec::new("standing", "Standing", 96.).end().sortable().droppable(1),
-            ColumnSpec::new("list_price", "List price", 100.).end().sortable(),
-            ColumnSpec::new("rate", "Per 1,000 standing", 136.).end().sortable().droppable(2),
-            ColumnSpec::new("min_price", "Min price", 136.).sortable().droppable(3),
-            ColumnSpec::new("status", "Status", 168.).sortable(),
+            ColumnSpec::new("rank", "Rank", 96.).droppable(3),
+            ColumnSpec::new("syndicate", "Syndicate", 184.).sortable(),
+            ColumnSpec::new("standing", "Standing", 104.)
+                .end()
+                .sortable()
+                .droppable(1),
+            ColumnSpec::new("list_price", "List price", 104.)
+                .end()
+                .sortable(),
+            ColumnSpec::new("rate", "Per 1,000 standing", 144.)
+                .end()
+                .sortable()
+                .droppable(2),
+            ColumnSpec::new("status", "Status", 176.).sortable(),
             ColumnSpec::new("actions", "", 150.),
         ]
     }
 
     fn rows(&self, query: &Query) -> Vec<SyndicateItem> {
+        let status = status_filter(query);
         let syndicate = query.filter("syndicate");
-        self.store
-            .list(&query.text, status_filter(&self.store, query))
-            .into_iter()
+        self.data
+            .stock
+            .rows
+            .iter()
+            .filter(|item| status.is_none_or(|status| item.status == status))
             .filter(|item| syndicate.is_none_or(|name| item.syndicate_name == name))
+            .filter(|item| query.matches(&format!("{} {}", item.item_name, item.syndicate_name)))
+            .cloned()
             .collect()
     }
 
     fn chips(&self, cx: &App) -> Vec<ChipGroup> {
         vec![
-            status_chips(&self.store, cx),
+            status_chips(&self.data.stock.counts, cx),
             ChipGroup {
                 id: "syndicate",
                 chips: self
-                    .store
-                    .syndicate_counts()
-                    .into_iter()
+                    .data
+                    .syndicates
+                    .iter()
                     .map(|(name, count)| ChipSpec {
-                        color: Some(syndicate_color(&name)),
+                        color: Some(syndicate_color(name)),
                         key: name.clone(),
-                        label: name,
-                        count,
+                        label: name.clone(),
+                        count: *count,
                         tooltip: String::new(),
                     })
                     .collect(),
@@ -189,7 +181,7 @@ impl Catalog for Syndicates {
     }
 
     fn summary(&self) -> Vec<Stat> {
-        let rows = self.store.rows();
+        let rows = &self.data.stock.rows;
         let listed: i64 = rows.iter().filter_map(|item| item.list_price).sum();
         let standing: i64 = rows
             .iter()
@@ -198,12 +190,15 @@ impl Catalog for Syndicates {
             .sum();
         let best = rows
             .iter()
-            .filter_map(|item| Some((item.platinum_per_thousand_standing()?, item)))
+            .filter_map(|item| Some((rate(item)?, item)))
             .max_by(|a, b| a.0.total_cmp(&b.0));
-        let live = rows
-            .iter()
-            .filter(|item| item.status == StockStatus::Live)
-            .count();
+        let live = self
+            .data
+            .stock
+            .counts
+            .get(&StockStatus::Live)
+            .copied()
+            .unwrap_or(0);
         vec![
             Stat {
                 label: "Listed",
@@ -223,7 +218,7 @@ impl Catalog for Syndicates {
                 note: best.map_or(String::new(), |(_, item)| {
                     format!("per 1,000 standing, {}", item.item_name)
                 }),
-                tone: Tone::Positive,
+                tone: Tone::Plain,
             },
             Stat {
                 label: "Items",
@@ -239,7 +234,7 @@ impl Catalog for Syndicates {
             checked,
             "syndicate items",
             SyndicateAction::Export,
-            SyndicateAction::Edit,
+            None,
             None,
             SyndicateAction::Delete,
         )
@@ -253,11 +248,15 @@ impl Catalog for Syndicates {
         })
     }
 
-    fn perform(&mut self, action: SyndicateAction) -> Outcome<SyndicateAction> {
+    fn perform(&mut self, action: SyndicateAction, source: &DataSource) -> Outcome<SyndicateAction> {
         match action {
-            SyndicateAction::Import => Outcome::Notice(
-                "Importing syndicate offerings isn't connected to the backend yet.".to_owned(),
-            ),
+            SyndicateAction::Import => {
+                let import = source.syndicate_item_import_items();
+                Outcome::Run(Box::pin(async move {
+                    let count = import.await?;
+                    Ok(format!("Imported {} syndicate items.", number(count)))
+                }))
+            }
             SyndicateAction::Sell(id) => match self.item(id) {
                 Some(item) => Outcome::ask(
                     prompts::sold(&item.item_name, None, item.list_price),
@@ -272,89 +271,60 @@ impl Catalog for Syndicates {
             },
             SyndicateAction::SellAtList(id) => {
                 match self.item(id).and_then(|item| item.list_price) {
-                    Some(price) => self.perform(SyndicateAction::Sold { id, price }),
+                    Some(price) => self.perform(SyndicateAction::Sold { id, price }, source),
                     None => Outcome::Done,
                 }
             }
             SyndicateAction::Sold { id, price } => match self.item(id) {
-                Some(item) => Outcome::Notice(format!(
-                    "Sold {} for {} platinum.",
-                    item.item_name,
-                    number(price)
-                )),
-                None => Outcome::Done,
-            },
-            SyndicateAction::Edit(ids) => match self.edit_prompt(&ids) {
-                Some(spec) => Outcome::ask(spec, move |values| {
-                    Some(SyndicateAction::Save {
-                        ids: ids.clone(),
-                        edit: SyndicateEdit {
-                            min_price: values.number("min_price"),
-                            min_profit: values.number("min_profit"),
-                            min_sma: values.number("min_sma"),
-                        },
-                    })
-                }),
-                None => Outcome::Done,
-            },
-            SyndicateAction::Save { ids, edit } => {
-                let single = ids.len() == 1;
-                for id in &ids {
-                    self.store.update(*id as i64, |item| {
-                        let properties = &mut item.properties;
-                        if single {
-                            properties.min_price = edit.min_price;
-                            properties.min_profit = edit.min_profit;
-                            properties.min_sma = edit.min_sma;
-                        } else {
-                            properties.min_price = edit.min_price.or(properties.min_price);
-                            properties.min_profit = edit.min_profit.or(properties.min_profit);
-                            properties.min_sma = edit.min_sma.or(properties.min_sma);
-                        }
-                    });
+                Some(item) => {
+                    let notice = format!(
+                        "Sold {} for {} platinum.",
+                        item.item_name,
+                        number(price)
+                    );
+                    Outcome::run(
+                        source.syndicate_item_sell(
+                            item.wfm_url,
+                            item.sub_type,
+                            item.syndicate_unique_name,
+                            price,
+                        ),
+                        notice,
+                    )
                 }
-                Outcome::Done
-            }
-            SyndicateAction::EditMinPrice(id) => match self.item(id) {
+                None => Outcome::Done,
+            },
+            SyndicateAction::Edit(id) => match self.item(id) {
                 Some(item) => Outcome::ask(
-                    prompts::price_limit(
-                        &format!("Minimum price for {}", item.item_name),
-                        "Minimum price",
-                        "The live scraper never lists below this. Leave it empty for no minimum.",
-                        item.properties.min_price,
+                    FormSpec::new(format!("Edit {}", item.item_name), "Save").field(
+                        Field::number("standing_cost", "Standing cost", Some(item.standing_cost))
+                            .unit("standing")
+                            .hint("What the syndicate charges for one."),
                     ),
                     move |values| {
-                        Some(SyndicateAction::SetMinPrice {
+                        Some(SyndicateAction::Save {
                             id,
-                            price: values.number("price"),
+                            update: SyndicateItemUpdate {
+                                standing_cost: values.number("standing_cost"),
+                                ..SyndicateItemUpdate::default()
+                            },
                         })
                     },
                 ),
                 None => Outcome::Done,
             },
-            SyndicateAction::SetMinPrice { id, price } => {
-                self.store.update(id as i64, |item| {
-                    item.properties.min_price = price.filter(|price| *price > 0);
-                });
-                Outcome::Done
+            SyndicateAction::Save { id, update } => {
+                Outcome::run_quietly(source.syndicate_item_update(id as i64, update))
             }
-            SyndicateAction::StepMinPrice { id, step } => {
-                self.store.update(id as i64, |item| {
-                    let next = item.properties.min_price.unwrap_or(0) + step;
-                    item.properties.min_price = (next > 0).then_some(next);
-                });
-                Outcome::Done
-            }
-            SyndicateAction::Delete(ids) if ids.is_empty() => Outcome::Done,
-            SyndicateAction::Delete(ids) => Outcome::ask(
-                prompts::delete(ids.len(), "syndicate item", "syndicate items"),
-                move |_| Some(SyndicateAction::Deleted(ids.clone())),
+            SyndicateAction::Delete(rows) if rows.is_empty() => Outcome::Done,
+            SyndicateAction::Delete(rows) => Outcome::ask(
+                prompts::delete(rows.len(), "syndicate item", "syndicate items"),
+                move |_| Some(SyndicateAction::Deleted(rows.clone())),
             ),
-            SyndicateAction::Deleted(ids) => {
-                let ids: Vec<i64> = ids.iter().map(|id| *id as i64).collect();
-                self.store.delete(&ids);
-                Outcome::Done
-            }
+            SyndicateAction::Deleted(rows) => match rows.as_slice() {
+                [id] => Outcome::run_quietly(source.syndicate_item_delete(*id as i64)),
+                _ => Outcome::run_quietly(source.syndicate_item_delete_multiple(ids(&rows))),
+            },
             SyndicateAction::Details(id) => Outcome::ShowPanel(id),
             SyndicateAction::CopyName(id) => match self.item(id) {
                 Some(item) => Outcome::Copy {
@@ -364,10 +334,15 @@ impl Catalog for Syndicates {
                 None => Outcome::Done,
             },
             SyndicateAction::OpenMarket(id) => match self.item(id) {
-                Some(item) => Outcome::OpenUrl(market_url("items", &item.wfm_url)),
+                Some(item) => Outcome::OpenUrl(market_url(&item.wfm_url)),
                 None => Outcome::Done,
             },
-            SyndicateAction::Export => Outcome::Notice(EXPORT_NOT_CONNECTED.to_owned()),
+            SyndicateAction::Export => {
+                let source = source.clone();
+                Outcome::export("syndicate-items.json", move |path| {
+                    Box::pin(source.export_syndicate_item_json(&every_item(), path))
+                })
+            }
         }
     }
 
@@ -380,11 +355,7 @@ impl Catalog for Syndicates {
             "syndicate" => a.syndicate_name.cmp(&b.syndicate_name),
             "standing" => a.standing_cost.cmp(&b.standing_cost),
             "list_price" => a.list_price.cmp(&b.list_price),
-            "rate" => a
-                .platinum_per_thousand_standing()
-                .unwrap_or(-1.0)
-                .total_cmp(&b.platinum_per_thousand_standing().unwrap_or(-1.0)),
-            "min_price" => a.properties.min_price.cmp(&b.properties.min_price),
+            "rate" => rate(a).unwrap_or(-1.0).total_cmp(&rate(b).unwrap_or(-1.0)),
             "status" => a.status.label().cmp(b.status.label()),
             _ => a.item_name.cmp(&b.item_name),
         }
@@ -392,10 +363,10 @@ impl Catalog for Syndicates {
 
     fn cell(row: &SyndicateItem, key: &str, emit: &Emit<SyndicateAction>, cx: &App) -> AnyElement {
         let theme = Theme::global(cx);
-        let colors = theme.colors;
         let id = row.id as u64;
         match key {
             "item" => cells::name(row.item_name.clone(), &[], cx),
+            "rank" => cells::text(rank_label(&row.sub_type).unwrap_or_default()),
             "syndicate" => cells::status(
                 syndicate_color(&row.syndicate_name),
                 row.syndicate_name.clone(),
@@ -403,40 +374,14 @@ impl Catalog for Syndicates {
             ),
             "standing" => cells::amount(Some(row.standing_cost), "", cx),
             "list_price" => cells::amount(row.list_price, "Not listed", cx),
-            "rate" => match platinum_per_standing(row) {
-                Some(rate) => crate::ui::numeric(rate)
-                    .text_color(colors.text)
+            "rate" => match rate(row) {
+                Some(rate) => numeric(format!("{rate:.2}"))
+                    .text_color(theme.colors.text)
                     .into_any_element(),
                 None => cells::amount(None, "", cx),
             },
-            "min_price" => cells::stepped_price(
-                id,
-                row.properties.min_price,
-                MIN_PRICE_STEP,
-                SyndicateAction::StepMinPrice {
-                    id,
-                    step: -MIN_PRICE_STEP,
-                },
-                SyndicateAction::StepMinPrice {
-                    id,
-                    step: MIN_PRICE_STEP,
-                },
-                emit,
-                cx,
-            ),
             "status" => cells::status(theme.status_color(row.status), row.status.label(), cx),
             _ => {
-                let edit = if row.has_override() {
-                    IconButton::new(
-                        ("edit", id),
-                        IconName::SquarePen,
-                        "Edit. This item replaces the live scraper's profit settings.",
-                    )
-                    .tone(colors.warning)
-                    .hover_tone(colors.warning)
-                } else {
-                    IconButton::new(("edit", id), IconName::SquarePen, "Edit")
-                };
                 let menu_row = row.clone();
                 cells::actions()
                     .child(
@@ -456,8 +401,9 @@ impl Catalog for Syndicates {
                         .on_click(emit.on_click(SyndicateAction::SellAtList(id))),
                     )
                     .child(
-                        edit.in_row()
-                            .on_click(emit.on_click(SyndicateAction::Edit(vec![id]))),
+                        IconButton::new(("edit", id), IconName::SquarePen, "Edit")
+                            .in_row()
+                            .on_click(emit.on_click(SyndicateAction::Edit(id))),
                     )
                     .child(overflow_button(
                         id,
@@ -472,11 +418,11 @@ impl Catalog for Syndicates {
     fn cell_text(row: &SyndicateItem, key: &str) -> Option<String> {
         match key {
             "item" => Some(row.item_name.clone()),
+            "rank" => rank_label(&row.sub_type),
             "syndicate" => Some(row.syndicate_name.clone()),
             "standing" => Some(number(row.standing_cost)),
             "list_price" => row.list_price.map(number),
-            "rate" => platinum_per_standing(row),
-            "min_price" => row.properties.min_price.map(number),
+            "rate" => rate(row).map(|rate| format!("{rate:.2}")),
             "status" => Some(row.status.label().to_owned()),
             _ => None,
         }
@@ -497,12 +443,7 @@ impl Catalog for Syndicates {
             ));
         }
         menu.extend([
-            MenuEntry::new("Edit", IconName::SquarePen, SyndicateAction::Edit(vec![id])),
-            MenuEntry::new(
-                "Set minimum price",
-                IconName::Tag,
-                SyndicateAction::EditMinPrice(id),
-            ),
+            MenuEntry::new("Edit", IconName::SquarePen, SyndicateAction::Edit(id)),
             MenuEntry::new(
                 "Show details",
                 IconName::PanelRight,
@@ -525,7 +466,10 @@ impl Catalog for Syndicates {
         let id = row.id as u64;
         PanelModel {
             title: row.item_name.clone(),
-            subtitle: row.syndicate_name.clone(),
+            subtitle: match rank_label(&row.sub_type) {
+                Some(rank) => format!("{rank}, {}", row.syndicate_name),
+                None => row.syndicate_name.clone(),
+            },
             status: Some((
                 row.status.label().to_owned(),
                 theme.status_color(row.status),
@@ -536,17 +480,12 @@ impl Catalog for Syndicates {
             facts: vec![
                 Fact::new("Standing cost", number(row.standing_cost)),
                 Fact::amount("List price", row.list_price, "Not listed"),
-                match platinum_per_standing(row) {
-                    Some(rate) => Fact::new("Platinum per 1,000 standing", rate),
-                    None => Fact::new("Platinum per 1,000 standing", "Not listed").tone(Tone::Muted),
+                match rate(row) {
+                    Some(rate) => Fact::new("Platinum per 1,000 standing", format!("{rate:.2}")),
+                    None => {
+                        Fact::new("Platinum per 1,000 standing", "Not listed").tone(Tone::Muted)
+                    }
                 },
-                Fact::amount("Minimum price", row.properties.min_price, "Not set"),
-                Fact::amount("Minimum profit", row.properties.min_profit, "Scraper setting"),
-                Fact::amount(
-                    "Minimum moving average",
-                    row.properties.min_sma,
-                    "Scraper setting",
-                ),
                 Fact::new("Last checked", day_and_time(&row.updated_at)),
             ],
             primary: vec![
@@ -559,12 +498,7 @@ impl Catalog for Syndicates {
                 .enabled(row.list_price.is_some()),
             ],
             secondary: vec![
-                PanelAction::new("Edit", IconName::SquarePen, SyndicateAction::Edit(vec![id])),
-                PanelAction::new(
-                    "Set minimum price",
-                    IconName::Tag,
-                    SyndicateAction::EditMinPrice(id),
-                ),
+                PanelAction::new("Edit", IconName::SquarePen, SyndicateAction::Edit(id)),
                 PanelAction::new("Copy name", IconName::Copy, SyndicateAction::CopyName(id)),
                 PanelAction::new(
                     "Open on Warframe Market",

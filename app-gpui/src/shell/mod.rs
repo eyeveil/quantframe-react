@@ -3,8 +3,6 @@
 
 mod nav;
 
-use std::rc::Rc;
-
 use gpui::{
     AnyElement, App, Context, Decorations, Div, Entity, IntoElement, ParentElement, Render,
     Stateful, Styled, Subscription, Window, div, img, prelude::*, px,
@@ -19,16 +17,14 @@ use gpui_kit_assets::IconName;
 
 use crate::{
     assets::APP_ICON,
-    data::DataSource,
+    data::{Backend, BackendEvent, DataKind, DataSource},
     listings,
     model::{LiveScraperMessage, LiveScraperState, StockStatus, User, UserStatus},
     orders,
     theme::{Appearance, AppearanceChoice, Theme, tabular_figures},
     trade_messages,
     ui::{
-        IconButton, dot, focus_ring, icon, number,
-        page::{self, PreviewState},
-        placeholder,
+        IconButton, dot, focus_ring, icon, number, page, placeholder,
         screen::TabbedScreen,
         text_button,
     },
@@ -36,6 +32,7 @@ use crate::{
 use nav::{Screen, ScreenGroup};
 
 pub struct AppShell {
+    source: DataSource,
     screen: Screen,
     listings: Entity<TabbedScreen>,
     orders: Entity<TabbedScreen>,
@@ -71,38 +68,79 @@ impl Startup {
 }
 
 impl AppShell {
-    pub fn new(source: Rc<dyn DataSource>, window: &mut Window, cx: &mut Context<Self>) -> Self {
+    pub fn new(backend: Entity<Backend>, window: &mut Window, cx: &mut Context<Self>) -> Self {
         page::init(cx);
         Theme::follow_system(window.appearance(), cx);
-        let scraper = source.live_scraper_get_state();
-        let live_orders = source
-            .get_stock_item_status_counts()
-            .get(&StockStatus::Live)
-            .copied()
-            .unwrap_or(0);
-        let user = source.user();
-        let state = PreviewState::from_env();
+        let source = backend.read(cx).source.clone();
         let startup = Startup::from_env();
-        let shell = Self {
+        let mut shell = Self {
             screen: startup.screen.unwrap_or(Screen::Listings),
-            listings: listings::screen(&source, state, window, cx),
-            orders: orders::screen(&user, state, window, cx),
-            trade_messages: trade_messages::screen(state, window, cx),
-            last_message: scraper.message.clone(),
-            scraper,
-            user,
-            live_orders,
-            _subscriptions: vec![cx.observe_window_appearance(window, |_, window, cx| {
-                Theme::follow_system(window.appearance(), cx);
-            })],
+            listings: listings::screen(&backend, window, cx),
+            orders: orders::screen(&backend, window, cx),
+            trade_messages: trade_messages::screen(&backend, window, cx),
+            last_message: None,
+            scraper: LiveScraperState::default(),
+            user: User::default(),
+            live_orders: 0,
+            source,
+            _subscriptions: vec![
+                cx.observe_window_appearance(window, |_, window, cx| {
+                    Theme::follow_system(window.appearance(), cx);
+                }),
+                cx.subscribe(&backend, |shell, _, event: &BackendEvent, cx| {
+                    match event {
+                        BackendEvent::LiveScraperRunning(running) => {
+                            shell.scraper.is_running = *running;
+                            if !running {
+                                shell.scraper.message = None;
+                            }
+                        }
+                        BackendEvent::LiveScraperMessage(message) => {
+                            shell.last_message = Some(message.clone());
+                            shell.scraper.message = Some(message.clone());
+                        }
+                        BackendEvent::Changed(DataKind::User | DataKind::StockItems) => {
+                            shell.refresh(cx);
+                        }
+                        _ => return,
+                    }
+                    cx.notify();
+                }),
+            ],
         };
+        shell.refresh(cx);
         cx.defer_in(window, move |shell, window, cx| {
-            shell.apply_startup(&startup, window, cx);
+            shell.apply_startup(startup, window, cx);
         });
         shell
     }
 
-    fn apply_startup(&mut self, startup: &Startup, window: &mut Window, cx: &mut Context<Self>) {
+    /// Reads the user, the live scraper state and the live order count again.
+    fn refresh(&mut self, cx: &mut Context<Self>) {
+        let source = self.source.clone();
+        cx.spawn(async move |shell, cx| {
+            let user = source.user().await;
+            let scraper = source.live_scraper_get_state().await;
+            let counts = source.get_stock_item_status_counts().await;
+            shell
+                .update(cx, |shell, cx| {
+                    if let Ok(user) = user {
+                        shell.user = user;
+                    }
+                    if let Ok(scraper) = scraper {
+                        shell.scraper.is_running = scraper.is_running;
+                    }
+                    if let Ok(counts) = counts {
+                        shell.live_orders = counts.get(&StockStatus::Live).copied().unwrap_or(0);
+                    }
+                    cx.notify();
+                })
+                .ok();
+        })
+        .detach();
+    }
+
+    fn apply_startup(&mut self, startup: Startup, window: &mut Window, cx: &mut Context<Self>) {
         let Some(screen) = self.built_screen().cloned() else {
             return;
         };
@@ -112,12 +150,7 @@ impl AppShell {
             }
             let page = screen.page();
             page.focus(window, cx);
-            if let Some(row) = startup.row {
-                page.select_row(row, cx);
-            }
-            if let Some(label) = &startup.dialog {
-                page.run_labelled(label, window, cx);
-            }
+            page.on_load(startup.row, startup.dialog, cx);
         });
     }
 
@@ -145,13 +178,35 @@ impl AppShell {
     }
 
     fn toggle_scraper(&mut self, cx: &mut Context<Self>) {
-        self.scraper.is_running = !self.scraper.is_running;
-        self.scraper.message = self
-            .scraper
-            .is_running
-            .then(|| self.last_message.clone())
-            .flatten();
-        cx.notify();
+        let source = self.source.clone();
+        let start = !self.scraper.is_running;
+        cx.spawn(async move |shell, cx| {
+            let state = if start {
+                source.live_scraper_start().await
+            } else {
+                source.live_scraper_stop().await
+            };
+            shell
+                .update(cx, |shell, cx| {
+                    if let Ok(state) = state {
+                        shell.scraper.is_running = state.is_running;
+                        shell.scraper.message = shell
+                            .scraper
+                            .is_running
+                            .then(|| shell.last_message.clone())
+                            .flatten();
+                    }
+                    cx.notify();
+                })
+                .ok();
+        })
+        .detach();
+    }
+
+    /// The name to show for the account. An anonymous user has none.
+    fn account_name(&self) -> Option<&str> {
+        let name = self.user.wfm_username.trim();
+        (!self.user.anonymous && !name.is_empty()).then_some(name)
     }
 
     fn nav_item(&self, screen: Screen, cx: &mut Context<Self>) -> Stateful<Div> {
@@ -299,9 +354,9 @@ impl AppShell {
                                     .text_size(theme.type_scale.body)
                                     .font_weight(theme.type_scale.label_weight)
                                     .text_color(colors.text)
-                                    .child(self.user.wfm_username.clone()),
+                                    .child(self.account_name().unwrap_or("Not signed in").to_owned()),
                             )
-                            .child(
+                            .children(self.account_name().map(|_| {
                                 div()
                                     .flex()
                                     .items_center()
@@ -309,8 +364,8 @@ impl AppShell {
                                     .text_size(theme.type_scale.caption)
                                     .text_color(colors.text_muted)
                                     .child(dot(self.user_status_color(&theme), px(6.)))
-                                    .child(self.user.wfm_status.label()),
-                            ),
+                                    .child(self.user.wfm_status.label())
+                            })),
                     ),
             )
     }
@@ -437,18 +492,18 @@ impl AppShell {
                         self.live_orders, self.user.order_limit
                     )),
             )
-            .child(
-                div()
+            .child(match self.account_name() {
+                Some(name) => div()
                     .flex()
                     .items_center()
                     .gap(px(6.))
                     .child(dot(self.user_status_color(theme), px(6.)))
                     .child(format!(
-                        "{}, {}",
-                        self.user.wfm_username,
+                        "{name}, {}",
                         self.user.wfm_status.label().to_lowercase()
                     )),
-            )
+                None => div().child("Not signed in"),
+            })
     }
 
     fn status_bar(&self, cx: &App) -> Div {

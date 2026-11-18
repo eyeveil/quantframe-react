@@ -47,6 +47,7 @@ impl AppState {
         ),
         Error,
     > {
+        crate::host::ensure_online("AppState:Login")?;
         // WFM: sign in and update the already-created client in place. Its
         // shared base makes the new token visible to every clone.
         let device_id = self.wfm_client.get_device_id();
@@ -98,6 +99,7 @@ impl AppState {
     }
 
     pub async fn validate(&mut self) -> Result<(WFUserPrivate, QFUserPrivate), Error> {
+        crate::host::ensure_online("AppState:Validate")?;
         if self.user.wfm_token == "" || self.user.qf_token == "" {
             return Err(Error::new(
                 "AppState:Validate",

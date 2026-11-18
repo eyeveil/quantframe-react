@@ -5,7 +5,7 @@ use gpui_kit_assets::IconName;
 
 use super::{
     IconButton, dot_label,
-    grid::{Emit, Tone, centered},
+    grid::{Emit, centered},
     icon, number, numeric,
 };
 use crate::theme::{Theme, tabular_figures};
@@ -52,16 +52,6 @@ pub fn amount(value: Option<i64>, empty: &'static str, cx: &App) -> AnyElement {
     match value {
         Some(value) => numeric(number(value)).text_color(colors.text),
         None => numeric(empty).text_color(colors.text_faint),
-    }
-    .into_any_element()
-}
-
-/// A right-aligned amount in a tone, for a profit or a loss.
-pub fn toned_amount(value: Option<i64>, empty: &'static str, tone: Tone, cx: &App) -> AnyElement {
-    let theme = Theme::global(cx);
-    match value {
-        Some(value) => numeric(number(value)).text_color(tone.color(theme)),
-        None => numeric(empty).text_color(theme.colors.text_faint),
     }
     .into_any_element()
 }

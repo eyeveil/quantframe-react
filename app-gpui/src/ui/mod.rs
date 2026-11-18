@@ -43,10 +43,6 @@ pub fn number(value: i64) -> String {
     grouped
 }
 
-pub fn percent(ratio: f64) -> String {
-    format!("{:.1}%", ratio * 100.0)
-}
-
 /// The day and time of an RFC 3339 timestamp, as `17 Nov, 09:42`.
 pub fn day_and_time(timestamp: &str) -> String {
     const MONTHS: [&str; 12] = [
@@ -433,7 +429,8 @@ pub fn placeholder(name: IconName, title: &str, detail: &str, cx: &App) -> Div {
         )
         .child(
             div()
-                .max_w(px(420.))
+                .max_w(px(560.))
+                .text_center()
                 .text_size(theme.type_scale.caption + px(1.))
                 .text_color(colors.text_muted)
                 .child(detail.to_owned()),

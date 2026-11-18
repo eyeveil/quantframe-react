@@ -1,88 +1,90 @@
 //! The Trade messages screen: priced lists of items, custom entries and
 //! rivens that become trade chat messages.
 
-pub mod model;
-
-use std::cmp::Ordering;
+use std::{
+    cmp::Ordering,
+    collections::BTreeMap,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 use gpui::{AnyElement, App, AppContext, Entity, IntoElement, ParentElement, Styled, Window, div, px};
 use gpui_kit_assets::IconName;
 
 use crate::{
-    model::SubType,
-    preview,
+    data::{Backend, DataKind, DataSource},
+    model::{
+        ListParams, NewTradeEntry, PriceLookupParams, SubType, TradeEntry, TradeEntryGroup,
+        TradeEntryListParams, TradeEntryUpdate,
+    },
     theme::Theme,
     ui::{
         IconButton, cells, day_and_time,
         form::{Field, FormSpec},
         grid::{
-            Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, MenuEntry, Outcome, PrimaryAction,
-            Query, Stat, Tone, ToolbarItem, overflow_button,
+            Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, Load, MenuEntry, Outcome,
+            PrimaryAction, Query, Stat, Tone, ToolbarItem, overflow_button,
         },
         number,
-        page::{ListPage, PreviewState},
+        page::ListPage,
         panel::{Fact, PanelAction, PanelModel},
         prompts::{self, MessageItem},
         row_button,
         screen::TabbedScreen,
     },
 };
-use model::{RivenSearch, TradeEntry, TradeGroup, TradeStore};
 
 /// The step of the buttons beside a price, in platinum.
 const PRICE_STEP: i64 = 5;
 
-pub fn screen(state: PreviewState, window: &mut Window, cx: &mut App) -> Entity<TabbedScreen> {
-    let load = state.load_state();
-    let entries = state.rows(preview::trade_entries());
+const GROUPS: [(TradeEntryGroup, &str); 3] = [
+    (TradeEntryGroup::Item, "Items"),
+    (TradeEntryGroup::Custom, "Custom"),
+    (TradeEntryGroup::Riven, "Rivens"),
+];
+
+pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> Entity<TabbedScreen> {
     cx.new(|cx| {
         let mut screen = TabbedScreen::new("trade-tab");
-        for group in TradeGroup::ALL {
-            let rows = entries
-                .iter()
-                .filter(|entry| entry.group == group)
-                .cloned()
-                .collect();
+        for (group, label) in GROUPS {
             let page = cx.new(|cx| {
                 ListPage::new(
                     TradeEntries {
-                        store: TradeStore::new(rows, preview::riven_candidates()),
+                        rows: Vec::new(),
                         group,
                     },
-                    load.clone(),
+                    backend,
                     window,
                     cx,
                 )
             });
-            screen.add(group.as_str(), group.label(), page, cx);
+            screen.add(group.as_str(), label, page, cx);
         }
         screen
     })
 }
 
+/// The settings of "Find rivens".
+#[derive(Clone, Debug)]
+pub struct RivenSearch {
+    min_price: i64,
+    min_volume: i64,
+    discount_percent: i64,
+    round_to: i64,
+    override_existing: bool,
+    tags: Vec<String>,
+}
+
 #[derive(Clone, Debug)]
 pub enum TradeAction {
     Add,
-    Create {
-        name: String,
-        rank: Option<i64>,
-        price: i64,
-        tags: Vec<String>,
-    },
+    Create(NewTradeEntry),
     Message(Vec<u64>),
     CopyMessage(String),
     FindRivens,
     FoundRivens(RivenSearch),
     Edit(Vec<u64>),
-    Save {
-        ids: Vec<u64>,
-        price: Option<i64>,
-        tags: Option<Vec<String>>,
-    },
-    StepPrice {
-        id: u64,
-        step: i64,
-    },
+    Save { ids: Vec<u64>, update: TradeEntryUpdate },
+    StepPrice { id: u64, step: i64 },
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
     Details(u64),
@@ -91,55 +93,101 @@ pub enum TradeAction {
 }
 
 pub struct TradeEntries {
-    store: TradeStore,
-    group: TradeGroup,
+    rows: Vec<TradeEntry>,
+    group: TradeEntryGroup,
+}
+
+/// Today's UTC date as `YYYY-MM-DD`, from the days since the Unix epoch.
+fn today() -> String {
+    let seconds = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_secs() as i64);
+    let days = seconds.div_euclid(86_400) + 719_468;
+    let era = days.div_euclid(146_097);
+    let day_of_era = days.rem_euclid(146_097);
+    let year_of_era =
+        (day_of_era - day_of_era / 1_460 + day_of_era / 36_524 - day_of_era / 146_096) / 365;
+    let day_of_year = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
+    let month_index = (5 * day_of_year + 2) / 153;
+    let day = day_of_year - (153 * month_index + 2) / 5 + 1;
+    let month = if month_index < 10 {
+        month_index + 3
+    } else {
+        month_index - 9
+    };
+    let year = year_of_era + era * 400 + i64::from(month <= 2);
+    format!("{year:04}-{month:02}-{day:02}")
+}
+
+fn rank_label(entry: &TradeEntry) -> Option<String> {
+    entry.sub_type.as_ref().and_then(SubType::label)
+}
+
+fn updated(entry: &TradeEntry) -> String {
+    day_and_time(&entry.updated_at)
 }
 
 impl TradeEntries {
     fn entry(&self, id: u64) -> Option<TradeEntry> {
-        self.store.get(id as i64).cloned()
+        self.rows.iter().find(|entry| entry.id as u64 == id).cloned()
     }
 
-    fn all(&self) -> Vec<TradeEntry> {
-        self.store.list(self.group, "", None)
+    fn params(&self) -> TradeEntryListParams {
+        TradeEntryListParams {
+            list: ListParams {
+                limit: -1,
+                ..ListParams::default()
+            },
+            group: Some(self.group.as_str().to_owned()),
+            tags: Vec::new(),
+        }
     }
 
     /// Rivens are bought, items and custom entries are sold.
     const fn prefix(&self) -> &'static str {
         match self.group {
-            TradeGroup::Riven => "WTB",
-            TradeGroup::Item | TradeGroup::Custom => "WTS",
+            TradeEntryGroup::Riven => "WTB",
+            TradeEntryGroup::Item | TradeEntryGroup::Custom => "WTS",
         }
     }
 
     const fn singular(&self) -> &'static str {
         match self.group {
-            TradeGroup::Item => "item",
-            TradeGroup::Custom => "entry",
-            TradeGroup::Riven => "riven",
+            TradeEntryGroup::Item => "item",
+            TradeEntryGroup::Custom => "entry",
+            TradeEntryGroup::Riven => "riven",
         }
+    }
+
+    fn tag_counts(&self) -> BTreeMap<String, usize> {
+        let mut counts = BTreeMap::new();
+        for tag in self.rows.iter().flat_map(|entry| &entry.tags) {
+            *counts.entry(tag.clone()).or_default() += 1;
+        }
+        counts
     }
 
     fn add_prompt(&self) -> FormSpec {
         let spec = FormSpec::new(format!("Add {}", self.singular()), "Add");
         let spec = match self.group {
-            TradeGroup::Item => spec
-                .field(Field::choice("name", "Item", preview::tradable_items(), None))
+            TradeEntryGroup::Item => spec
+                .field(
+                    Field::text("name", "Item", "", "Arcane Energize")
+                        .hint("The item's name on Warframe Market."),
+                )
                 .field(
                     Field::number("rank", "Rank", None)
                         .optional()
                         .half()
                         .hint("For mods and arcanes."),
                 ),
-            TradeGroup::Custom => {
+            TradeEntryGroup::Custom => {
                 spec.field(Field::text("name", "Name", "", "Maxed Serration"))
             }
-            TradeGroup::Riven => spec.field(Field::choice(
-                "name",
-                "Weapon",
-                preview::riven_weapons(),
-                None,
-            )),
+            TradeEntryGroup::Riven => spec.field(
+                Field::text("name", "Weapon", "", "Rubico")
+                    .hint("The weapon's name on Warframe Market."),
+            ),
         };
         spec.field(Field::platinum("price", "Price", Some(1)).min(1).half())
             .field(
@@ -155,8 +203,8 @@ impl TradeEntries {
             [] => return None,
             _ => None,
         };
-        let price = Field::platinum("price", "Price", single.as_ref().map(|entry| entry.price))
-            .min(1);
+        let price =
+            Field::platinum("price", "Price", single.as_ref().map(|entry| entry.price)).min(1);
         let tags = Field::text(
             "tags",
             "Tags",
@@ -183,59 +231,124 @@ impl TradeEntries {
 
     fn message_items(&self, ids: &[u64]) -> Vec<MessageItem> {
         let entries = if ids.is_empty() {
-            self.all()
+            self.rows.clone()
         } else {
             ids.iter().filter_map(|id| self.entry(*id)).collect()
         };
         entries
             .into_iter()
             .map(|entry| MessageItem {
-                rank: entry.rank_label(),
+                rank: rank_label(&entry),
                 price: Some(entry.price),
                 name: entry.name,
             })
             .collect()
+    }
+
+    /// Looks up today's riven prices and adds a discounted entry for every
+    /// weapon that passes the limits.
+    fn find_rivens(&self, search: RivenSearch, source: &DataSource) -> Outcome<TradeAction> {
+        let source = source.clone();
+        let existing = self.rows.clone();
+        Outcome::Run(Box::pin(async move {
+            let mut params = PriceLookupParams::new(today(), today());
+            params.limit = -1;
+            let prices = source.riven_prices_lookup(&params).await?.results;
+            let round = search.round_to.max(1);
+            let mut changed = 0;
+            for riven in prices {
+                if riven.min_price < search.min_price as f64
+                    || riven.volume < search.min_volume as f64
+                {
+                    continue;
+                }
+                let discounted =
+                    (riven.min_price * (100 - search.discount_percent) as f64 / 100.0) as i64;
+                let price = (discounted / round * round).max(1);
+                match existing.iter().find(|entry| entry.name == riven.name) {
+                    Some(entry) if search.override_existing => {
+                        let update = TradeEntryUpdate {
+                            price: Some(price),
+                            tags: None,
+                        };
+                        source.trade_entry_update(entry.id, update).await?;
+                    }
+                    Some(_) => continue,
+                    None => {
+                        let entry = NewTradeEntry {
+                            raw: riven.wfm_url,
+                            sub_type: None,
+                            price,
+                            group: TradeEntryGroup::Riven,
+                            tags: search.tags.clone(),
+                        };
+                        source.trade_entry_create(entry).await?;
+                    }
+                }
+                changed += 1;
+            }
+            Ok(match changed {
+                0 => "No riven passed the limits.".to_owned(),
+                1 => "Added or repriced 1 riven.".to_owned(),
+                changed => format!("Added or repriced {changed} rivens."),
+            })
+        }))
     }
 }
 
 impl Catalog for TradeEntries {
     type Row = TradeEntry;
     type Action = TradeAction;
+    type Data = Vec<TradeEntry>;
 
     const NOUN: &'static str = "trade entries";
     const SEARCH_PLACEHOLDER: &'static str = "Search entries";
     const EMPTY_HINT: &'static str =
         "Add what you trade with a price, then write a trade chat message from the list.";
+    /// The backend sends no event for trade entries. The page loads the list
+    /// again after each change it makes.
+    const WATCH: &'static [DataKind] = &[];
+
+    fn load(&self, source: &DataSource) -> Load<Self::Data> {
+        let rows = source.get_trade_entry_pagination(&self.params());
+        Box::pin(async move { Ok(rows.await?.results) })
+    }
+
+    fn apply(&mut self, data: Self::Data) {
+        self.rows = data;
+    }
 
     fn columns(&self) -> Vec<ColumnSpec> {
-        let mut columns = vec![ColumnSpec::new("name", "Name", 200.).flex().sortable()];
-        if self.group == TradeGroup::Item {
-            columns.push(ColumnSpec::new("rank", "Rank", 104.));
-        }
-        columns.push(ColumnSpec::new("price", "Price", 136.).sortable());
-        if self.group != TradeGroup::Custom {
-            columns.push(ColumnSpec::new("min_price", "Market low", 104.).end().sortable().droppable(1));
-            columns.push(ColumnSpec::new("profit", "Potential profit", 124.).end().sortable());
+        let mut columns = vec![ColumnSpec::new("name", "Name", 220.).flex().sortable()];
+        if self.group == TradeEntryGroup::Item {
+            columns.push(ColumnSpec::new("rank", "Rank", 120.));
         }
         columns.extend([
-            ColumnSpec::new("tags", "Tags", 190.).droppable(2),
-            ColumnSpec::new("updated", "Updated", 128.).sortable().droppable(3),
-            ColumnSpec::new("actions", "", 176.),
+            ColumnSpec::new("price", "Price", 148.).sortable(),
+            ColumnSpec::new("tags", "Tags", 280.).droppable(1),
+            ColumnSpec::new("updated", "Updated", 148.)
+                .sortable()
+                .droppable(2),
+            ColumnSpec::new("actions", "", 184.),
         ]);
         columns
     }
 
     fn rows(&self, query: &Query) -> Vec<TradeEntry> {
-        self.store
-            .list(self.group, &query.text, query.filter("tag"))
+        let tag = query.filter("tag");
+        self.rows
+            .iter()
+            .filter(|entry| tag.is_none_or(|tag| entry.tags.iter().any(|own| own == tag)))
+            .filter(|entry| query.matches(&entry.name))
+            .cloned()
+            .collect()
     }
 
     fn chips(&self, _: &App) -> Vec<ChipGroup> {
         vec![ChipGroup {
             id: "tag",
             chips: self
-                .store
-                .tag_counts(self.group)
+                .tag_counts()
                 .into_iter()
                 .map(|(tag, count)| ChipSpec {
                     key: tag.clone(),
@@ -249,38 +362,31 @@ impl Catalog for TradeEntries {
     }
 
     fn summary(&self) -> Vec<Stat> {
-        let rows = self.all();
-        let asking: i64 = rows.iter().map(|entry| entry.price).sum();
-        let profit: i64 = rows
-            .iter()
-            .filter_map(|entry| entry.properties.potential_profit)
-            .sum();
-        let mut stats = vec![
+        let asking: i64 = self.rows.iter().map(|entry| entry.price).sum();
+        let highest = self.rows.iter().max_by_key(|entry| entry.price);
+        vec![
             Stat {
                 label: "Entries",
-                value: number(rows.len() as i64),
-                note: "in this list".to_owned(),
+                value: number(self.rows.len() as i64),
+                note: format!("{} tags", self.tag_counts().len()),
                 tone: Tone::Plain,
             },
             Stat {
                 label: match self.group {
-                    TradeGroup::Riven => "Offering",
-                    TradeGroup::Item | TradeGroup::Custom => "Asking",
+                    TradeEntryGroup::Riven => "Offering",
+                    TradeEntryGroup::Item | TradeEntryGroup::Custom => "Asking",
                 },
                 value: number(asking),
                 note: "platinum for one of each".to_owned(),
                 tone: Tone::Plain,
             },
-        ];
-        if self.group != TradeGroup::Custom {
-            stats.push(Stat {
-                label: "Potential profit",
-                value: number(profit),
-                note: "against the market lows".to_owned(),
-                tone: Tone::of_profit(profit),
-            });
-        }
-        stats
+            Stat {
+                label: "Highest price",
+                value: highest.map_or("None".to_owned(), |entry| number(entry.price)),
+                note: highest.map_or(String::new(), |entry| entry.name.clone()),
+                tone: Tone::Plain,
+            },
+        ]
     }
 
     fn toolbar(&self, checked: &[u64]) -> Vec<ToolbarItem<TradeAction>> {
@@ -296,11 +402,11 @@ impl Catalog for TradeEntries {
             action: Some(TradeAction::Message(checked.to_vec())),
             danger: false,
         }];
-        if self.group == TradeGroup::Riven {
+        if self.group == TradeEntryGroup::Riven {
             toolbar.push(ToolbarItem {
                 id: "find-rivens",
                 icon: IconName::ScanSearch,
-                tooltip: "Find rivens worth buying from the last hour of prices".to_owned(),
+                tooltip: "Find rivens worth buying from today's prices".to_owned(),
                 action: Some(TradeAction::FindRivens),
                 danger: false,
             });
@@ -334,42 +440,36 @@ impl Catalog for TradeEntries {
     fn primary(&self) -> Option<PrimaryAction<TradeAction>> {
         Some(PrimaryAction {
             label: match self.group {
-                TradeGroup::Item => "Add item",
-                TradeGroup::Custom => "Add entry",
-                TradeGroup::Riven => "Add riven",
+                TradeEntryGroup::Item => "Add item",
+                TradeEntryGroup::Custom => "Add entry",
+                TradeEntryGroup::Riven => "Add riven",
             },
             icon: IconName::Plus,
             action: TradeAction::Add,
         })
     }
 
-    fn perform(&mut self, action: TradeAction) -> Outcome<TradeAction> {
+    fn perform(&mut self, action: TradeAction, source: &DataSource) -> Outcome<TradeAction> {
         match action {
             TradeAction::Add => {
-                let named = self.group == TradeGroup::Custom;
+                let group = self.group;
                 Outcome::ask(self.add_prompt(), move |values| {
-                    Some(TradeAction::Create {
-                        name: if named {
-                            values.text("name")
-                        } else {
-                            values.choice("name")?
+                    let name = values.text("name");
+                    Some(TradeAction::Create(NewTradeEntry {
+                        raw: match group {
+                            TradeEntryGroup::Custom => name,
+                            TradeEntryGroup::Item | TradeEntryGroup::Riven => {
+                                name.to_lowercase().replace(' ', "_")
+                            }
                         },
-                        rank: values.number("rank"),
+                        sub_type: values.number("rank").map(SubType::rank),
                         price: values.number("price")?,
+                        group,
                         tags: values.list("tags"),
-                    })
+                    }))
                 })
             }
-            TradeAction::Create {
-                name,
-                rank,
-                price,
-                tags,
-            } => {
-                self.store
-                    .create(self.group, name, rank.map(SubType::rank), price, tags);
-                Outcome::Done
-            }
+            TradeAction::Create(entry) => Outcome::run_quietly(source.trade_entry_create(entry)),
             TradeAction::Message(ids) => {
                 let items = self.message_items(&ids);
                 if items.is_empty() {
@@ -391,15 +491,11 @@ impl Catalog for TradeEntries {
             TradeAction::FindRivens => Outcome::ask(
                 FormSpec::new("Find rivens", "Add to the list")
                     .description(
-                        "Looks through the last hour of riven prices and adds every weapon that passes these limits, priced below its market low.",
+                        "Looks through today's riven prices and adds every weapon that passes these limits, priced below its market low.",
                     )
                     .width(480.)
                     .field(Field::platinum("min_price", "Market low at least", Some(50)).half())
-                    .field(
-                        Field::number("min_volume", "Trades at least", Some(10))
-                            .unit("an hour")
-                            .half(),
-                    )
+                    .field(Field::number("min_volume", "Trades at least", Some(10)).half())
                     .field(
                         Field::number("discount", "Discount", Some(25))
                             .unit("percent")
@@ -431,14 +527,7 @@ impl Catalog for TradeEntries {
                     }))
                 },
             ),
-            TradeAction::FoundRivens(search) => {
-                let count = self.store.find_rivens(&search);
-                Outcome::Notice(match count {
-                    0 => "No riven passed the limits.".to_owned(),
-                    1 => "Added or repriced 1 riven.".to_owned(),
-                    count => format!("Added or repriced {count} rivens."),
-                })
-            }
+            TradeAction::FoundRivens(search) => self.find_rivens(search, source),
             TradeAction::Edit(ids) => match self.edit_prompt(&ids) {
                 Some(spec) => {
                     let single = ids.len() == 1;
@@ -446,39 +535,45 @@ impl Catalog for TradeEntries {
                         let tags = values.list("tags");
                         Some(TradeAction::Save {
                             ids: ids.clone(),
-                            price: values.number("price"),
-                            tags: (single || !tags.is_empty()).then_some(tags),
+                            update: TradeEntryUpdate {
+                                price: values.number("price"),
+                                tags: (single || !tags.is_empty()).then_some(tags),
+                            },
                         })
                     })
                 }
                 None => Outcome::Done,
             },
-            TradeAction::Save { ids, price, tags } => {
-                for id in &ids {
-                    self.store.update(*id as i64, |entry| {
-                        entry.price = price.unwrap_or(entry.price);
-                        if let Some(tags) = &tags {
-                            entry.tags.clone_from(tags);
-                        }
-                    });
-                }
-                Outcome::Done
+            TradeAction::Save { ids, update } => {
+                let source = source.clone();
+                Outcome::Run(Box::pin(async move {
+                    for id in ids {
+                        source.trade_entry_update(id as i64, update.clone()).await?;
+                    }
+                    Ok(String::new())
+                }))
             }
-            TradeAction::StepPrice { id, step } => {
-                self.store
-                    .update(id as i64, |entry| entry.price = (entry.price + step).max(1));
-                Outcome::Done
-            }
+            TradeAction::StepPrice { id, step } => match self.entry(id) {
+                Some(entry) => Outcome::run_quietly(source.trade_entry_update(
+                    entry.id,
+                    TradeEntryUpdate {
+                        price: Some((entry.price + step).max(1)),
+                        tags: None,
+                    },
+                )),
+                None => Outcome::Done,
+            },
             TradeAction::Delete(ids) if ids.is_empty() => Outcome::Done,
             TradeAction::Delete(ids) => Outcome::ask(
                 prompts::delete(ids.len(), "trade entry", "trade entries"),
                 move |_| Some(TradeAction::Deleted(ids.clone())),
             ),
-            TradeAction::Deleted(ids) => {
-                let ids: Vec<i64> = ids.iter().map(|id| *id as i64).collect();
-                self.store.delete(&ids);
-                Outcome::Done
-            }
+            TradeAction::Deleted(rows) => match rows.as_slice() {
+                [id] => Outcome::run_quietly(source.trade_entry_delete(*id as i64)),
+                _ => Outcome::run_quietly(source.trade_entry_delete_multiple(
+                    rows.iter().map(|id| *id as i64).collect(),
+                )),
+            },
             TradeAction::Details(id) => Outcome::ShowPanel(id),
             TradeAction::CopyName(id) => match self.entry(id) {
                 Some(entry) => Outcome::Copy {
@@ -488,7 +583,11 @@ impl Catalog for TradeEntries {
                 None => Outcome::Done,
             },
             TradeAction::Export => {
-                Outcome::Notice("Export isn't connected to the backend yet.".to_owned())
+                let source = source.clone();
+                let params = self.params();
+                Outcome::export("trade-messages.json", move |path| {
+                    Box::pin(source.export_trade_entry_json(&params, path))
+                })
             }
         }
     }
@@ -500,11 +599,6 @@ impl Catalog for TradeEntries {
     fn compare(key: &str, a: &TradeEntry, b: &TradeEntry) -> Ordering {
         match key {
             "price" => a.price.cmp(&b.price),
-            "min_price" => a.properties.min_price.cmp(&b.properties.min_price),
-            "profit" => a
-                .properties
-                .potential_profit
-                .cmp(&b.properties.potential_profit),
             "updated" => a.updated_at.cmp(&b.updated_at),
             _ => a.name.cmp(&b.name),
         }
@@ -515,7 +609,7 @@ impl Catalog for TradeEntries {
         let id = row.id as u64;
         match key {
             "name" => cells::name(row.name.clone(), &[], cx),
-            "rank" => cells::text(row.rank_label().unwrap_or_default()),
+            "rank" => cells::text(rank_label(row).unwrap_or_default()),
             "price" => cells::stepped_price(
                 id,
                 Some(row.price),
@@ -531,17 +625,8 @@ impl Catalog for TradeEntries {
                 emit,
                 cx,
             ),
-            "min_price" => cells::amount(row.properties.min_price, "Unknown", cx),
-            "profit" => {
-                let profit = row.properties.potential_profit;
-                cells::toned_amount(profit, "Unknown", Tone::of_profit(profit.unwrap_or(0)), cx)
-            }
             "tags" => cells::tags(&row.tags, cx),
-            "updated" => cells::text(if row.updated_at.is_empty() {
-                "Just now".to_owned()
-            } else {
-                day_and_time(&row.updated_at)
-            }),
+            "updated" => cells::text(updated(row)),
             _ => {
                 let menu_row = row.clone();
                 cells::actions()
@@ -575,12 +660,10 @@ impl Catalog for TradeEntries {
     fn cell_text(row: &TradeEntry, key: &str) -> Option<String> {
         match key {
             "name" => Some(row.name.clone()),
-            "rank" => row.rank_label(),
+            "rank" => rank_label(row),
             "price" => Some(number(row.price)),
-            "min_price" => row.properties.min_price.map(number),
-            "profit" => row.properties.potential_profit.map(number),
             "tags" => Some(row.tags.join(", ")),
-            "updated" => Some(day_and_time(&row.updated_at)),
+            "updated" => Some(updated(row)),
             _ => None,
         }
     }
@@ -602,39 +685,22 @@ impl Catalog for TradeEntries {
 
     fn panel(row: &TradeEntry, _: &App) -> PanelModel<TradeAction> {
         let id = row.id as u64;
-        let profit = row.properties.potential_profit;
         PanelModel {
             title: row.name.clone(),
-            subtitle: match row.rank_label() {
-                Some(rank) => format!("{rank}, {}", row.group.label().to_lowercase()),
-                None => row.group.label().to_owned(),
-            },
+            subtitle: rank_label(row).unwrap_or_else(|| "Trade entry".to_owned()),
             status: None,
             note: None,
             history: Vec::new(),
             lines: None,
             facts: vec![
                 Fact::new("Price", number(row.price)),
-                Fact::amount("Market low", row.properties.min_price, "Unknown"),
-                match profit {
-                    Some(profit) => {
-                        Fact::new("Potential profit", number(profit)).tone(Tone::of_profit(profit))
-                    }
-                    None => Fact::new("Potential profit", "Unknown").tone(Tone::Muted),
-                },
                 if row.tags.is_empty() {
                     Fact::new("Tags", "None").tone(Tone::Muted)
                 } else {
                     Fact::new("Tags", row.tags.join(", "))
                 },
-                Fact::new(
-                    "Updated",
-                    if row.updated_at.is_empty() {
-                        "Just now".to_owned()
-                    } else {
-                        day_and_time(&row.updated_at)
-                    },
-                ),
+                Fact::new("Updated", updated(row)),
+                Fact::new("Created", day_and_time(&row.created_at)),
             ],
             primary: vec![PanelAction::new(
                 "Write a trade chat message",

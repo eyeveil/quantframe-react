@@ -21,6 +21,7 @@ use crate::{
 
 #[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn chat_refresh(app: State<'_, Mutex<AppState>>) -> Result<(), Error> {
+    crate::host::ensure_online("Command::ChatRefresh")?;
     let app = app.lock()?.clone();
 
     let result = app.wfm_client.chat().get_chats().await;
@@ -113,6 +114,7 @@ pub async fn get_chat_pagination(
 
 #[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn chat_delete(id: String, app: State<'_, Mutex<AppState>>) -> Result<String, Error> {
+    crate::host::ensure_online("Command::ChatDelete")?;
     let app = app.lock()?.clone();
 
     let result = app.wfm_client.chat().leave_chat(&id).await;
@@ -157,6 +159,17 @@ pub async fn chat_get_messages_by_id(
     app: State<'_, Mutex<AppState>>,
 ) -> Result<Vec<ChatMessage>, Error> {
     let app = app.lock()?.clone();
+    if crate::host::is_offline() {
+        return Ok(app
+            .wfm_client
+            .chat()
+            .cache_chats()
+            .chats
+            .iter()
+            .find(|chat| chat.id == id)
+            .map(|chat| chat.messages.clone())
+            .unwrap_or_default());
+    }
     match app.wfm_client.chat().get_chat_messages(&id).await {
         Ok(messages) => {
             info(
@@ -215,6 +228,7 @@ pub async fn chat_send_message(
     msg: String,
     app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
+    crate::host::ensure_online("Command::ChatSendMessage")?;
     let app = app.lock()?.clone();
 
     let socket = match app.wfm_chat_socket.as_ref() {

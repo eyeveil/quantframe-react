@@ -26,6 +26,7 @@ pub async fn order_refresh(
     app: State<'_, Mutex<AppState>>,
     cache: State<'_, Mutex<CacheState>>,
 ) -> Result<(), Error> {
+    crate::host::ensure_online("Command::OrderRefresh")?;
     let app_state = app.lock()?.clone();
     let cache_state = cache.lock()?.clone();
     app_state
@@ -190,6 +191,7 @@ pub async fn order_delete_all(
     app_state: State<'_, Mutex<AppState>>,
     cache_state: State<'_, Mutex<CacheState>>,
 ) -> Result<(), Error> {
+    crate::host::ensure_online("Command::OrderDeleteAll")?;
     let app = app_state.lock()?.clone();
     order_refresh(app_state, cache_state).await.map_err(|e| {
         track_event!(
@@ -249,6 +251,7 @@ pub async fn order_delete_by_id(
     id: String,
     app: State<'_, Mutex<AppState>>,
 ) -> Result<(), Error> {
+    crate::host::ensure_online("Command::OrderDeleteById")?;
     let app = app.lock()?.clone();
     let order = app.wfm_client.order().cache_orders().get_by_id(&id);
     if order.is_none() {

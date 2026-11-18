@@ -5,12 +5,15 @@
 #
 #   bash app-gpui/scripts/render-screens.sh [output dir] [shot name ...]
 #
-# With no shot names it renders them all. Xvfb has no window manager, so
-# QF_WINDOW_CONTROLS makes the app draw its own window buttons. The pointer
-# starts at the screen centre, over the table, so it moves to the status bar
-# before the app starts and no row shows its hover colour. The app reads its
-# settings from a temporary XDG_CONFIG_HOME, so a render never changes the
-# user's saved appearance or item panel setting.
+# With no shot names it renders them all. The app runs the backend on
+# src-tauri/fixtures, which it copies to a fresh temporary directory, so a
+# render makes no network request and changes no data. Xvfb has no window
+# manager, so QF_WINDOW_CONTROLS makes the app draw its own window buttons.
+# The pointer starts at the screen centre, over the table, so it steps down
+# to the status bar before the capture and no row shows its hover colour. One
+# long jump leaves the hover colour in place.
+# The app reads its settings from a temporary XDG_CONFIG_HOME, so a render
+# never changes the user's saved appearance or item panel setting.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -36,7 +39,7 @@ shots=(
   "listings-syndicates|QF_SCREEN=listings QF_TAB=syndicates QF_THEME=dark"
   "orders-orders|QF_SCREEN=orders QF_TAB=orders QF_THEME=dark"
   "orders-auctions|QF_SCREEN=orders QF_TAB=auctions QF_THEME=dark"
-  "orders-auctions-panel|QF_SCREEN=orders QF_TAB=auctions QF_THEME=dark QF_PANEL=open QF_ROW=5"
+  "orders-auctions-panel|QF_SCREEN=orders QF_TAB=auctions QF_THEME=dark QF_PANEL=open QF_ROW=1"
   "trade-messages-items|QF_SCREEN=trade-messages QF_TAB=item QF_THEME=dark"
   "trade-messages-custom|QF_SCREEN=trade-messages QF_TAB=custom QF_THEME=dark"
   "trade-messages-rivens|QF_SCREEN=trade-messages QF_TAB=riven QF_THEME=dark"
@@ -53,10 +56,15 @@ for shot in "${shots[@]}"; do
     continue
   fi
   xvfb-run -a -s '-screen 0 1440x900x24' bash -c "
-    xdotool mousemove 700 893
-    env QF_PANEL=closed $settings QF_WINDOW_CONTROLS=1 XDG_CONFIG_HOME='$config' '$binary' &
+    env QF_FIXTURES='$root/src-tauri/fixtures' QF_PANEL=closed $settings QF_WINDOW_CONTROLS=1 \\
+      XDG_CONFIG_HOME='$config' '$binary' &
     app=\$!
     sleep 5
+    for step in 1 2 3 4 5 6; do
+      xdotool mousemove_relative -- 30 72
+      sleep 0.15
+    done
+    sleep 1
     import -window root '$out/$name.png'
     kill \$app
   "

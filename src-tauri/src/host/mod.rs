@@ -1,7 +1,10 @@
 use std::{
     future::Future,
     path::{Path, PathBuf},
-    sync::{Arc, Mutex, OnceLock},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex, OnceLock,
+    },
 };
 
 use serde_json::{json, Value};
@@ -55,6 +58,28 @@ pub trait Host: Send + Sync {
 }
 
 static HOST: OnceLock<Arc<dyn Host>> = OnceLock::new();
+static OFFLINE: AtomicBool = AtomicBool::new(false);
+
+/// Fixture mode. Requests to warframe.market, the Quantframe API, and webhooks are refused.
+pub fn set_offline(offline: bool) {
+    OFFLINE.store(offline, Ordering::Relaxed);
+}
+
+pub fn is_offline() -> bool {
+    OFFLINE.load(Ordering::Relaxed)
+}
+
+/// Returns an error in fixture mode. Call before any request to warframe.market.
+pub fn ensure_online(component: &str) -> Result<(), Error> {
+    if is_offline() {
+        return Err(Error::new(
+            component,
+            "Fixture mode makes no network requests",
+            get_location!(),
+        ));
+    }
+    Ok(())
+}
 static RUNTIME: OnceLock<Handle> = OnceLock::new();
 
 /// Installs the host and the runtime used by `spawn`. Later calls are ignored.
