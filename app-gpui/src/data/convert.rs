@@ -1,20 +1,28 @@
 //! Maps backend types onto the view models in `crate::model`.
 
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex, RwLock},
+};
+
 use qf_app_lib::{
+    cache::{CacheState, types as cache},
     entity::{
         dto::{FinancialReport as BackendReport, PaginatedResult, PriceHistory as BackendPrice},
         enums::{
             StockStatus as BackendStatus, TransactionItemType as BackendItemType,
             TransactionType as BackendTransactionType,
         },
-        stock_item, stock_riven, syndicate_item, trade_entry, transaction, wish_list,
+        stock_item, stock_riven,
+        stock_riven::{MatchRivenStruct, MinMaxStruct},
+        syndicate_item, trade_entry, transaction, wish_list,
     },
     qf_api::types as qf,
     qf_utils::{Properties, SubType as BackendSubType},
     utils::SubTypeExt,
     wf_market::{enums as wfm_enums, types as wfm},
 };
-use serde_json::Value;
+use serde_json::{Value, json};
 
 use crate::model::*;
 
@@ -108,12 +116,21 @@ fn cooldown(properties: &Properties) -> Option<CoolDownInfo> {
     })
 }
 
+fn int(properties: &Properties, key: &str) -> Option<i64> {
+    let value: Option<Value> = properties.get_property_value(key, None);
+    value.and_then(|value| value.as_i64().or_else(|| value.as_f64().map(|v| v.round() as i64)))
+}
+
+fn flag(properties: &Properties, key: &str) -> bool {
+    properties.get_property_value(key, false)
+}
+
 pub fn stock_item(model: stock_item::Model) -> StockItem {
     let properties = StockItemProperties {
-        min_price: model.properties.get_property_value("min_price", None),
-        min_sma: model.properties.get_property_value("min_sma", None),
-        min_profit: model.properties.get_property_value("min_profit", None),
-        is_bulk: model.properties.get_property_value("is_bulk", false),
+        min_price: int(&model.properties, "min_price"),
+        min_sma: int(&model.properties, "min_sma"),
+        min_profit: int(&model.properties, "min_profit"),
+        is_bulk: flag(&model.properties, "is_bulk"),
         cooldown: cooldown(&model.properties),
     };
     StockItem {
@@ -135,7 +152,113 @@ pub fn stock_item(model: stock_item::Model) -> StockItem {
     }
 }
 
+static LABELS: RwLock<Option<Arc<HashMap<String, String>>>> = RwLock::new(None);
+
+/// The cache's display label of every riven attribute, by slug. The table is
+/// read once the cache has attributes and kept for the process.
+pub fn attribute_labels() -> Arc<HashMap<String, String>> {
+    if let Some(labels) = LABELS.read().ok().and_then(|labels| labels.clone()) {
+        return labels;
+    }
+    let labels: HashMap<String, String> = qf_app_lib::host::managed::<Mutex<CacheState>>()
+        .ok()
+        .and_then(|cache| cache.lock().ok()?.attribute().get_items().ok())
+        .unwrap_or_default()
+        .into_iter()
+        .map(|attribute| (attribute.wfm_url, attribute.label))
+        .collect();
+    let labels = Arc::new(labels);
+    if !labels.is_empty()
+        && let Ok(mut slot) = LABELS.write()
+    {
+        *slot = Some(labels.clone());
+    }
+    labels
+}
+
+/// The label for an attribute slug, or the slug as words when the cache
+/// doesn't know it.
+fn attribute_label(labels: &HashMap<String, String>, slug: &str) -> String {
+    labels.get(slug).cloned().unwrap_or_else(|| {
+        slug.split('_')
+            .map(|word| {
+                let mut chars = word.chars();
+                chars
+                    .next()
+                    .map(|first| first.to_uppercase().chain(chars).collect::<String>())
+                    .unwrap_or_default()
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    })
+}
+
+fn riven_filter(filter: MatchRivenStruct) -> RivenFilter {
+    let min_max = |value: Option<MinMaxStruct>| {
+        value.map(|value| MinMax {
+            min: value.min,
+            max: value.max,
+        })
+    };
+    RivenFilter {
+        enabled: filter.enabled.unwrap_or(false),
+        mastery_rank: min_max(filter.mastery_rank),
+        re_rolls: min_max(filter.re_rolls),
+        polarity: filter.polarity,
+        similarity: filter.similarity,
+        required_negative: filter.required_negative.unwrap_or(false),
+        attributes: filter
+            .attributes
+            .unwrap_or_default()
+            .into_iter()
+            .map(|attribute| RivenFilterAttribute {
+                wfm_url: attribute.url_name,
+                positive: attribute.positive,
+                is_required: attribute.is_required,
+            })
+            .collect(),
+    }
+}
+
+/// The backend form of a riven filter, as `stock_riven_update` reads it.
+pub fn backend_riven_filter(filter: &RivenFilter) -> Value {
+    let min_max = |value: &Option<MinMax>| {
+        value.map(|value| json!({ "min": value.min, "max": value.max }))
+    };
+    let mut map = serde_json::Map::new();
+    map.insert("enabled".into(), json!(filter.enabled));
+    if let Some(value) = min_max(&filter.mastery_rank) {
+        map.insert("mastery_rank".into(), value);
+    }
+    if let Some(value) = min_max(&filter.re_rolls) {
+        map.insert("re_rolls".into(), value);
+    }
+    if let Some(polarity) = &filter.polarity {
+        map.insert("polarity".into(), json!(polarity));
+    }
+    if let Some(similarity) = filter.similarity {
+        map.insert("similarity".into(), json!(similarity));
+    }
+    map.insert("required_negative".into(), json!(filter.required_negative));
+    map.insert(
+        "attributes".into(),
+        filter
+            .attributes
+            .iter()
+            .map(|attribute| {
+                json!({
+                    "url_name": attribute.wfm_url,
+                    "positive": attribute.positive,
+                    "is_required": attribute.is_required,
+                })
+            })
+            .collect(),
+    );
+    Value::Object(map)
+}
+
 pub fn stock_riven(model: stock_riven::Model) -> StockRiven {
+    let labels = attribute_labels();
     StockRiven {
         id: model.id,
         uuid: model.uuid,
@@ -154,6 +277,7 @@ pub fn stock_riven(model: stock_riven::Model) -> StockRiven {
             .0
             .into_iter()
             .map(|attribute| RivenAttribute {
+                label: attribute_label(&labels, &attribute.wfm_url),
                 wfm_url: attribute.wfm_url,
                 positive: attribute.positive,
                 value: attribute.value,
@@ -167,10 +291,21 @@ pub fn stock_riven(model: stock_riven::Model) -> StockRiven {
         price_history: price_history(model.price_history.0),
         updated_at: model.updated_at.to_rfc3339(),
         created_at: model.created_at.to_rfc3339(),
+        properties: StockRivenProperties {
+            min_price: int(&model.properties, "min_price"),
+            is_predicted: flag(&model.properties, "is_predicted"),
+        },
+        filter: riven_filter(model.filter),
     }
 }
 
 pub fn wish_list_item(model: wish_list::Model) -> WishListItem {
+    let properties = WishListProperties {
+        min_price: int(&model.properties, "min_price"),
+        max_price: int(&model.properties, "max_price"),
+        is_bulk: flag(&model.properties, "is_bulk"),
+        cooldown: cooldown(&model.properties),
+    };
     WishListItem {
         id: model.id,
         wfm_id: model.wfm_id,
@@ -185,10 +320,15 @@ pub fn wish_list_item(model: wish_list::Model) -> WishListItem {
         price_history: price_history(model.price_history.0),
         updated_at: model.updated_at.to_rfc3339(),
         created_at: model.created_at.to_rfc3339(),
+        properties,
     }
 }
 
 pub fn syndicate_item(model: syndicate_item::Model) -> SyndicateItem {
+    let properties = SyndicateItemProperties {
+        min_price: int(&model.properties, "min_price"),
+        cooldown: cooldown(&model.properties),
+    };
     SyndicateItem {
         id: model.id,
         wfm_id: model.wfm_id,
@@ -204,6 +344,7 @@ pub fn syndicate_item(model: syndicate_item::Model) -> SyndicateItem {
         price_history: price_history(model.price_history.0),
         updated_at: model.updated_at.to_rfc3339(),
         created_at: model.created_at.to_rfc3339(),
+        properties,
     }
 }
 
@@ -216,6 +357,20 @@ fn tags(tags: &str) -> Vec<String> {
 }
 
 pub fn trade_entry(model: trade_entry::Model) -> TradeEntry {
+    let properties = model.properties.as_ref();
+    let number = |key: &str| {
+        properties
+            .and_then(|properties| properties.get(key))
+            .and_then(|value| value.as_i64().or_else(|| value.as_f64().map(|v| v.round() as i64)))
+    };
+    let properties = TradeEntryProperties {
+        min_price: number("min_price"),
+        potential_profit: number("potential_profit"),
+        last_updated: properties
+            .and_then(|properties| properties.get("last_updated"))
+            .and_then(Value::as_str)
+            .map(str::to_owned),
+    };
     TradeEntry {
         id: model.id,
         wfm_id: model.wfm_id,
@@ -226,7 +381,23 @@ pub fn trade_entry(model: trade_entry::Model) -> TradeEntry {
         tags: tags(&model.tags),
         updated_at: model.updated_at.to_rfc3339(),
         created_at: model.created_at.to_rfc3339(),
+        properties,
     }
+}
+
+/// The JSON `trade_entry_create` stores, without the keys left unset.
+pub fn backend_trade_properties(properties: &TradeEntryProperties) -> Option<Value> {
+    let mut map = serde_json::Map::new();
+    if let Some(price) = properties.min_price {
+        map.insert("min_price".into(), json!(price));
+    }
+    if let Some(profit) = properties.potential_profit {
+        map.insert("potential_profit".into(), json!(profit));
+    }
+    if let Some(day) = &properties.last_updated {
+        map.insert("last_updated".into(), json!(day));
+    }
+    (!map.is_empty()).then_some(Value::Object(map))
 }
 
 pub fn transaction_type(kind: BackendTransactionType) -> TransactionType {
@@ -306,10 +477,18 @@ pub fn order(order: wfm::Order) -> WfmOrder {
         visible: order.visible,
         created_at: order.created_at,
         updated_at: order.updated_at,
+        potential_profit: order
+            .properties
+            .get_property_value::<Option<Value>>("potential_profit", None)
+            .and_then(|value| value.as_i64().or_else(|| value.as_f64().map(|v| v.round() as i64))),
+        closed_avg: order
+            .properties
+            .get_property_value::<Option<f64>>("closed_avg", None),
     }
 }
 
 pub fn auction(auction: wfm::Auction) -> WfmAuction {
+    let labels = attribute_labels();
     let item = auction.item;
     WfmAuction {
         name: auction
@@ -335,6 +514,7 @@ pub fn auction(auction: wfm::Auction) -> WfmAuction {
             .unwrap_or_default()
             .into_iter()
             .map(|attribute| RivenAttribute {
+                label: attribute_label(&labels, &attribute.url_name),
                 wfm_url: attribute.url_name,
                 positive: attribute.positive,
                 value: attribute.value,
@@ -346,9 +526,46 @@ pub fn auction(auction: wfm::Auction) -> WfmAuction {
         is_direct_sell: auction.is_direct_sell,
         visible: auction.visible,
         closed: auction.closed,
+        can_import: auction.properties.get_property_value("can_import", false),
         note: auction.note,
         created: auction.created,
         updated: auction.updated,
+    }
+}
+
+pub fn tradable_item(item: cache::CacheTradableItem) -> TradableItem {
+    let sub_type = item.sub_type;
+    TradableItem {
+        wfm_id: item.wfm_id,
+        wfm_url: item.wfm_url,
+        name: item.name,
+        unique_name: item.unique_name,
+        tags: item.tags,
+        bulk_tradable: item.bulk_tradable,
+        max_rank: sub_type.as_ref().and_then(|sub| sub.max_rank),
+        variants: sub_type.and_then(|sub| sub.variants).unwrap_or_default(),
+    }
+}
+
+pub fn riven_weapon(weapon: cache::CacheWeaponBase) -> RivenWeapon {
+    RivenWeapon {
+        wfm_url: weapon.wfm_riven_url,
+        wfm_id: weapon.wfm_riven_id,
+        name: weapon.name,
+        unique_name: weapon.unique_name,
+        riven_type: weapon.riven_type,
+        disposition: weapon.disposition,
+    }
+}
+
+pub fn riven_stat(attribute: cache::CacheAttribute) -> RivenStat {
+    RivenStat {
+        wfm_url: attribute.wfm_url,
+        label: attribute.label,
+        unit: attribute.unit,
+        positive_only: attribute.positive_only.unwrap_or(false),
+        negative_only: attribute.negative_only.unwrap_or(false),
+        exclusive_to: attribute.exclusive_to.unwrap_or_default(),
     }
 }
 

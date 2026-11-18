@@ -6,19 +6,19 @@ use gpui::{AnyElement, App, IntoElement, ParentElement, Styled, div, px};
 use gpui_kit_assets::IconName;
 
 use super::{
-    StockData, bulk_toolbar, every_row, ids, load_stock, market_url, slug, status_chips,
-    status_filter,
+    StockData, bulk_toolbar, every_row, ids, limit_cell, limit_field, load_stock, market_url,
+    slug, status_chips, status_filter, stepped,
 };
 use crate::{
     data::{DataKind, DataSource},
-    model::{NewStockItem, StockItem, StockItemUpdate, StockStatus, SubType},
+    model::{NewStockItem, StockItem, StockItemUpdate, StockStatus, SubType, TradableItem},
     theme::Theme,
     ui::{
-        IconButton, cells, day_and_time,
-        form::{Field, FormSpec},
+        IconButton, cells, choices, day_and_time,
+        form::{Field, FormSpec, FormValues},
         grid::{
             Catalog, ChipGroup, ColumnSpec, Emit, Load, MenuEntry, Outcome, PrimaryAction, Query,
-            Stat, Tone, ToolbarItem, overflow_button,
+            Stat, Tone, ToolbarItem, overflow_button, with_cache,
         },
         number,
         panel::{Fact, PanelAction, PanelModel},
@@ -36,6 +36,7 @@ pub enum ItemAction {
     SellAtList(u64),
     Edit(Vec<u64>),
     Save { ids: Vec<u64>, update: StockItemUpdate },
+    StepMinPrice { id: u64, step: i64 },
     ToggleHidden(u64),
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
@@ -50,6 +51,26 @@ pub enum ItemAction {
 #[derive(Default)]
 pub struct Items {
     data: StockData<StockItem>,
+    /// The cache's tradable items for the add dialog, loaded once.
+    catalog: Vec<TradableItem>,
+}
+
+/// An item's add dialog: a select over the cache's items, or a typed name
+/// when the cache list is missing.
+pub(super) fn item_field(catalog: &[TradableItem], example: &'static str) -> Field {
+    if catalog.is_empty() {
+        Field::text("name", "Item", "", example).hint("The item's name on Warframe Market.")
+    } else {
+        Field::search("item", "Item", choices::items(catalog), None)
+    }
+}
+
+/// The Warframe Market slug an add dialog chose or the user typed.
+pub(super) fn chosen_item(values: &FormValues) -> Option<String> {
+    match values.choice("item") {
+        Some(slug) => Some(slug),
+        None => Some(slug(&values.text("name"))).filter(|slug| !slug.is_empty()),
+    }
 }
 
 impl Items {
@@ -61,12 +82,19 @@ impl Items {
             .cloned()
     }
 
+    fn bulk_tradable(&self, item: &StockItem) -> bool {
+        self.catalog
+            .iter()
+            .any(|entry| entry.wfm_url == item.wfm_url && entry.bulk_tradable)
+    }
+
     fn edit_prompt(&self, ids: &[u64]) -> Option<FormSpec> {
         let single = match ids {
             [id] => Some(self.item(*id)?),
             [] => return None,
             _ => None,
         };
+        let properties = single.as_ref().map(|item| item.properties.clone());
         let bought = Field::platinum(
             "bought",
             "Bought",
@@ -77,17 +105,77 @@ impl Items {
         let owned = Field::number("owned", "Owned", single.as_ref().map(|item| item.owned))
             .min(1)
             .half();
+        let min_price = Field::platinum(
+            "min_price",
+            "Minimum price",
+            properties.as_ref().and_then(|p| p.min_price),
+        )
+        .optional()
+        .hint("The scraper never lists below it. Empty sets no floor.");
+        let min_profit = Field::platinum(
+            "min_profit",
+            "Minimum profit",
+            properties.as_ref().and_then(|p| p.min_profit),
+        )
+        .min(-1)
+        .optional()
+        .half()
+        .hint("Empty uses the scraper setting.");
+        let min_sma = Field::platinum(
+            "min_sma",
+            "Minimum moving average",
+            properties.as_ref().and_then(|p| p.min_sma),
+        )
+        .min(-1)
+        .optional()
+        .half()
+        .hint("Empty uses the scraper setting.");
         Some(match &single {
-            Some(item) => FormSpec::new(format!("Edit {}", item.item_name), "Save")
-                .field(bought)
-                .field(owned),
+            Some(item) => {
+                let spec = FormSpec::new(format!("Edit {}", item.item_name), "Save")
+                    .width(480.)
+                    .field(bought)
+                    .field(owned)
+                    .field(min_price)
+                    .field(min_profit)
+                    .field(min_sma);
+                if self.bulk_tradable(item) {
+                    spec.field(Field::toggle(
+                        "is_bulk",
+                        "Trade in batches",
+                        item.properties.is_bulk,
+                    ))
+                } else {
+                    spec
+                }
+            }
             None => FormSpec::new(format!("Edit {} items", ids.len()), "Save")
+                .width(480.)
                 .description(
                     "Fill in only the fields to change. Empty fields keep each item's value.",
                 )
                 .field(bought.optional())
-                .field(owned.optional()),
+                .field(owned.optional())
+                .field(min_price)
+                .field(min_profit)
+                .field(min_sma),
         })
+    }
+
+    fn saved(ids: &[u64], values: &FormValues, bulk: bool) -> ItemAction {
+        let single = ids.len() == 1;
+        ItemAction::Save {
+            ids: ids.to_vec(),
+            update: StockItemUpdate {
+                bought: values.number("bought"),
+                owned: values.number("owned"),
+                min_price: limit_field(values, "min_price", single),
+                min_profit: limit_field(values, "min_profit", single),
+                min_sma: limit_field(values, "min_sma", single),
+                is_bulk: (single && bulk).then(|| values.flag("is_bulk")),
+                ..StockItemUpdate::default()
+            },
+        }
     }
 
     fn message_items(&self, ids: &[u64]) -> Vec<MessageItem> {
@@ -106,7 +194,7 @@ impl Items {
 impl Catalog for Items {
     type Row = StockItem;
     type Action = ItemAction;
-    type Data = StockData<StockItem>;
+    type Data = (StockData<StockItem>, Option<Vec<TradableItem>>);
 
     const NOUN: &'static str = "stock items";
     const SEARCH_PLACEHOLDER: &'static str = "Search items";
@@ -115,15 +203,23 @@ impl Catalog for Items {
     const WATCH: &'static [DataKind] = &[DataKind::StockItems];
 
     fn load(&self, source: &DataSource) -> Load<Self::Data> {
-        load_stock(
-            source.get_stock_item_pagination(&every_row()),
-            source.get_stock_item_status_counts(),
-            source.get_stock_item_financial_report(),
+        with_cache(
+            load_stock(
+                source.get_stock_item_pagination(&every_row()),
+                source.get_stock_item_status_counts(),
+                source.get_stock_item_financial_report(),
+            ),
+            self.catalog
+                .is_empty()
+                .then(|| source.cache_get_tradable_items()),
         )
     }
 
-    fn apply(&mut self, data: Self::Data) {
+    fn apply(&mut self, (data, catalog): Self::Data) {
         self.data = data;
+        if let Some(catalog) = catalog {
+            self.catalog = catalog;
+        }
     }
 
     fn columns(&self) -> Vec<ColumnSpec> {
@@ -137,8 +233,7 @@ impl Catalog for Items {
             ColumnSpec::new("list_price", "List price", 104.)
                 .end()
                 .sortable(),
-            ColumnSpec::new("min_price", "Min price", 96.)
-                .end()
+            ColumnSpec::new("min_price", "Min price", 124.)
                 .sortable()
                 .droppable(3),
             ColumnSpec::new("owned", "Owned", 78.)
@@ -221,10 +316,7 @@ impl Catalog for Items {
         match action {
             ItemAction::Add => Outcome::ask(
                 FormSpec::new("Add item", "Add item")
-                    .field(
-                        Field::text("name", "Item", "", "Arcane Energize")
-                            .hint("The item's name on Warframe Market."),
-                    )
+                    .field(item_field(&self.catalog, "Arcane Energize"))
                     .field(
                         Field::number("rank", "Rank", None)
                             .optional()
@@ -238,7 +330,7 @@ impl Catalog for Items {
                     ),
                 |values| {
                     Some(ItemAction::Create(NewStockItem {
-                        raw: slug(&values.text("name")),
+                        raw: chosen_item(values)?,
                         sub_type: values.number("rank").map(SubType::rank),
                         quantity: values.number("quantity")?,
                         bought: values.number("bought")?,
@@ -246,7 +338,12 @@ impl Catalog for Items {
                 },
             ),
             ItemAction::Create(input) => {
-                let notice = format!("Added {} {} to stock.", number(input.quantity), input.raw);
+                let name = self
+                    .catalog
+                    .iter()
+                    .find(|item| item.wfm_url == input.raw)
+                    .map_or(input.raw.clone(), |item| item.name.clone());
+                let notice = format!("Added {} {name} to stock.", number(input.quantity));
                 Outcome::run(source.stock_item_create(input), notice)
             }
             ItemAction::Sell(id) => match self.item(id) {
@@ -297,18 +394,30 @@ impl Catalog for Items {
                 None => Outcome::Done,
             },
             ItemAction::Edit(ids) => match self.edit_prompt(&ids) {
-                Some(spec) => Outcome::ask(spec, move |values| {
-                    Some(ItemAction::Save {
-                        ids: ids.clone(),
-                        update: StockItemUpdate {
-                            bought: values.number("bought"),
-                            owned: values.number("owned"),
-                            ..StockItemUpdate::default()
-                        },
-                    })
-                }),
+                Some(spec) => {
+                    let bulk = match ids.as_slice() {
+                        [id] => self.item(*id).is_some_and(|item| self.bulk_tradable(&item)),
+                        _ => false,
+                    };
+                    Outcome::ask(spec, move |values| Some(Self::saved(&ids, values, bulk)))
+                }
                 None => Outcome::Done,
             },
+            ItemAction::StepMinPrice { id, step } => {
+                match self
+                    .item(id)
+                    .and_then(|item| Some((item.id, stepped(item.properties.min_price, step)?)))
+                {
+                    Some((id, min_price)) => Outcome::run_quietly(source.stock_item_update(
+                        id,
+                        StockItemUpdate {
+                            min_price: Some(min_price),
+                            ..StockItemUpdate::default()
+                        },
+                    )),
+                    None => Outcome::Done,
+                }
+            }
             ItemAction::Save { ids: rows, update } => match rows.as_slice() {
                 [id] => Outcome::run_quietly(source.stock_item_update(*id as i64, update)),
                 _ => Outcome::run_quietly(source.stock_item_update_multiple(ids(&rows), update)),
@@ -409,7 +518,13 @@ impl Catalog for Items {
             "rank" => cells::text(row.rank_label().unwrap_or_default()),
             "bought" => cells::amount(Some(row.bought), "", cx),
             "list_price" => cells::amount(row.list_price, "Not listed", cx),
-            "min_price" => cells::amount(row.properties.min_price, "Not set", cx),
+            "min_price" => limit_cell(
+                id,
+                row.properties.min_price,
+                |step| ItemAction::StepMinPrice { id, step },
+                emit,
+                cx,
+            ),
             "owned" => cells::amount(Some(row.owned), "", cx),
             "status" => cells::status(theme.status_color(row.status), row.status.label(), cx),
             _ => {
@@ -558,6 +673,10 @@ impl Catalog for Items {
                     "Minimum moving average",
                     properties.min_sma,
                     "Scraper setting",
+                ),
+                Fact::new(
+                    "Trades in batches",
+                    if properties.is_bulk { "Yes" } else { "No" },
                 ),
                 Fact::new("Last checked", day_and_time(&row.updated_at)),
             ],

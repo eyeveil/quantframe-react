@@ -12,6 +12,8 @@ pub struct UpdateTradeEntry {
     pub tags: FieldChange<Vec<String>>,
     #[serde(default)]
     pub sub_type: FieldChange<Option<SubType>>,
+    #[serde(default)]
+    pub properties: FieldChange<serde_json::Value>,
 }
 
 impl UpdateTradeEntry {
@@ -30,6 +32,11 @@ impl UpdateTradeEntry {
             Value(v) => item.sub_type = Set(v),
             _ => {}
         }
+        match self.properties {
+            Value(v) => item.properties = Set(Some(v)),
+            Null => item.properties = Set(None),
+            Ignore => {}
+        }
         item
     }
     pub fn new(id: i64) -> Self {
@@ -38,6 +45,7 @@ impl UpdateTradeEntry {
             price: FieldChange::Ignore,
             tags: FieldChange::Ignore,
             sub_type: FieldChange::Ignore,
+            properties: FieldChange::Ignore,
         }
     }
 }

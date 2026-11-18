@@ -67,6 +67,10 @@ impl Model {
             price: FieldChange::Value(self.price),
             tags: FieldChange::Value(self.tags.split(',').map(|s| s.to_string()).collect()),
             sub_type: FieldChange::Value(self.sub_type.clone()),
+            properties: match &self.properties {
+                Some(properties) => FieldChange::Value(properties.clone()),
+                None => FieldChange::Ignore,
+            },
         }
     }
 }

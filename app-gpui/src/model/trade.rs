@@ -14,6 +14,18 @@ pub struct TradeEntry {
     pub tags: Vec<String>,
     pub updated_at: String,
     pub created_at: String,
+    pub properties: TradeEntryProperties,
+}
+
+/// What "Find rivens" stores on a riven entry.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct TradeEntryProperties {
+    /// The lowest price on the market when the entry was priced.
+    pub min_price: Option<i64>,
+    /// The market low minus the entry's price.
+    pub potential_profit: Option<i64>,
+    /// The day the market low is from, `YYYY-MM-DD`.
+    pub last_updated: Option<String>,
 }
 
 /// Input of `trade_entry_create`.
@@ -24,6 +36,34 @@ pub struct NewTradeEntry {
     pub price: i64,
     pub group: TradeEntryGroup,
     pub tags: Vec<String>,
+    /// Reprices an existing entry for the same item instead of failing.
+    pub override_existing: bool,
+    pub properties: TradeEntryProperties,
+}
+
+impl NewTradeEntry {
+    pub fn new(raw: impl Into<String>, group: TradeEntryGroup, price: i64) -> Self {
+        Self {
+            raw: raw.into(),
+            sub_type: None,
+            price,
+            group,
+            tags: Vec::new(),
+            override_existing: false,
+            properties: TradeEntryProperties::default(),
+        }
+    }
+}
+
+/// A tag as words with a capital first letter, such as "Arcane enhancement"
+/// for `arcane_enhancement`.
+pub fn tag_label(tag: &str) -> String {
+    let words = tag.trim().replace(['_', '-'], " ");
+    let mut chars = words.chars();
+    match chars.next() {
+        Some(first) => first.to_uppercase().chain(chars).collect(),
+        None => String::new(),
+    }
 }
 
 /// The groups `trade_entry_create` accepts. `raw` is a warframe.market item

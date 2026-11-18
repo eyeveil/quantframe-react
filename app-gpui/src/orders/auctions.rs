@@ -2,7 +2,7 @@
 
 use std::cmp::Ordering;
 
-use gpui::{AnyElement, App, IntoElement, ParentElement};
+use gpui::{AnyElement, App, IntoElement, ParentElement, prelude::FluentBuilder};
 use gpui_kit_assets::IconName;
 
 use super::row_key;
@@ -137,7 +137,7 @@ impl Catalog for Auctions {
             ColumnSpec::new("updated", "Updated", 132.)
                 .sortable()
                 .droppable(4),
-            ColumnSpec::new("actions", "", 76.),
+            ColumnSpec::new("actions", "", 104.),
         ]
     }
 
@@ -219,7 +219,7 @@ impl Catalog for Auctions {
                 source.auction_delete_all(),
                 "Deleted the auctions from Warframe Market.",
             ),
-            AuctionAction::Import(key) => match self.auction(key) {
+            AuctionAction::Import(key) => match self.auction(key).filter(|auction| auction.can_import) {
                 Some(auction) => Outcome::ask(
                     FormSpec::new(format!("Import {}", title(&auction)), "Import")
                         .description(
@@ -307,6 +307,17 @@ impl Catalog for Auctions {
             _ => {
                 let menu_row = row.clone();
                 cells::actions()
+                    .when(row.can_import, |actions| {
+                        actions.child(
+                            IconButton::new(
+                                ("import", id),
+                                IconName::PackagePlus,
+                                "Import into stock",
+                            )
+                            .in_row()
+                            .on_click(emit.on_click(AuctionAction::Import(id))),
+                        )
+                    })
                     .child(
                         IconButton::new(("delete", id), IconName::Trash, "Delete this auction")
                             .in_row()
@@ -339,12 +350,15 @@ impl Catalog for Auctions {
 
     fn row_menu(row: &WfmAuction) -> Vec<MenuEntry<AuctionAction>> {
         let id = row_key(&row.id);
-        vec![
-            MenuEntry::new(
+        let mut menu = Vec::new();
+        if row.can_import {
+            menu.push(MenuEntry::new(
                 "Import into stock",
                 IconName::PackagePlus,
                 AuctionAction::Import(id),
-            ),
+            ));
+        }
+        menu.extend([
             MenuEntry::new(
                 "Show details",
                 IconName::PanelRight,
@@ -357,7 +371,8 @@ impl Catalog for Auctions {
                 AuctionAction::OpenMarket(id),
             ),
             MenuEntry::new("Delete", IconName::Trash, AuctionAction::Delete(id)).separated(),
-        ]
+        ]);
+        menu
     }
 
     fn panel(row: &WfmAuction, cx: &App) -> PanelModel<AuctionAction> {
@@ -387,14 +402,27 @@ impl Catalog for Auctions {
                 Fact::amount("Mastery rank", row.mastery_level, "Unknown"),
                 Fact::amount("Rank", row.mod_rank, "Unknown"),
                 Fact::amount("Re-rolls", row.re_rolls, "Unknown"),
+                Fact::new(
+                    "In stock",
+                    if row.can_import {
+                        "No, can be imported"
+                    } else if row.is_direct_sell {
+                        "Yes"
+                    } else {
+                        "Bidding auctions don't import"
+                    },
+                ),
                 Fact::new("Created", day_and_time(&row.created)),
                 Fact::new("Updated", day_and_time(&row.updated)),
             ],
-            primary: vec![PanelAction::new(
-                "Import into stock",
-                IconName::PackagePlus,
-                AuctionAction::Import(id),
-            )],
+            primary: vec![
+                PanelAction::new(
+                    "Import into stock",
+                    IconName::PackagePlus,
+                    AuctionAction::Import(id),
+                )
+                .enabled(row.can_import),
+            ],
             secondary: vec![
                 PanelAction::new("Copy name", IconName::Copy, AuctionAction::CopyName(id)),
                 PanelAction::new(

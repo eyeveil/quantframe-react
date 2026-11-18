@@ -32,6 +32,11 @@ pub struct WfmOrder {
     pub visible: bool,
     pub created_at: String,
     pub updated_at: String,
+    /// What one unit earns over the recent closing average, from the
+    /// backend's price data. `None` when the backend has no price for it.
+    pub potential_profit: Option<i64>,
+    /// The recent closing average price.
+    pub closed_avg: Option<f64>,
 }
 
 /// One row of `get_wfm_orders_status_counts`.
@@ -66,6 +71,9 @@ pub struct WfmAuction {
     pub note: String,
     pub created: String,
     pub updated: String,
+    /// A direct-sell auction with no stock riven behind it, which the
+    /// backend can import into stock.
+    pub can_import: bool,
 }
 
 /// The payload of `get_wfm_auctions_overview`.

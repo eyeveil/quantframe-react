@@ -10,7 +10,9 @@ use qf_app_lib::{
 };
 use serde_json::{Value, json};
 
-use super::{all, changes, dto, status_counts, stock_list, syndicate_list, to_backend};
+use super::{
+    all, dto, status_counts, stock_list, syndicate_list, to_backend, with_properties,
+};
 use crate::{
     data::{DataResult, DataSource, convert},
     model::*,
@@ -509,12 +511,13 @@ impl DataSource {
         update: SyndicateItemUpdate,
     ) -> impl Future<Output = DataResult<SyndicateItem>> + Send + 'static {
         self.call(async move {
-            let input = dto(changes(
+            let input = dto(with_properties(
                 id,
                 &[
                     ("list_price", update.list_price.map(|v| json!(v))),
                     ("standing_cost", update.standing_cost.map(|v| json!(v))),
                 ],
+                &[("min_price", update.min_price.map(|v| json!(v)))],
             ))?;
             Ok(convert::syndicate_item(
                 syndicate_item::syndicate_item_update(input).await?,
@@ -563,7 +566,7 @@ impl DataSource {
 }
 
 fn stock_item_changes(id: i64, update: &StockItemUpdate) -> Value {
-    changes(
+    with_properties(
         id,
         &[
             ("owned", update.owned.map(|v| json!(v))),
@@ -571,11 +574,17 @@ fn stock_item_changes(id: i64, update: &StockItemUpdate) -> Value {
             ("list_price", update.list_price.map(|v| json!(v))),
             ("is_hidden", update.is_hidden.map(|v| json!(v))),
         ],
+        &[
+            ("min_price", update.min_price.map(|v| json!(v))),
+            ("min_sma", update.min_sma.map(|v| json!(v))),
+            ("min_profit", update.min_profit.map(|v| json!(v))),
+            ("is_bulk", update.is_bulk.map(|v| json!(v))),
+        ],
     )
 }
 
 fn stock_riven_changes(id: i64, update: &StockRivenUpdate) -> Value {
-    changes(
+    with_properties(
         id,
         &[
             ("bought", update.bought.map(|v| json!(v))),
@@ -583,17 +592,24 @@ fn stock_riven_changes(id: i64, update: &StockRivenUpdate) -> Value {
             ("re_rolls", update.re_rolls.map(|v| json!(v))),
             ("mastery_rank", update.mastery_rank.map(|v| json!(v))),
             ("is_hidden", update.is_hidden.map(|v| json!(v))),
+            ("filter", update.filter.as_ref().map(convert::backend_riven_filter)),
         ],
+        &[("min_price", update.min_price.map(|v| json!(v)))],
     )
 }
 
 fn wish_list_changes(id: i64, update: &WishListUpdate) -> Value {
-    changes(
+    with_properties(
         id,
         &[
             ("quantity", update.quantity.map(|v| json!(v))),
             ("list_price", update.list_price.map(|v| json!(v))),
             ("is_hidden", update.is_hidden.map(|v| json!(v))),
+        ],
+        &[
+            ("min_price", update.min_price.map(|v| json!(v))),
+            ("max_price", update.max_price.map(|v| json!(v))),
+            ("is_bulk", update.is_bulk.map(|v| json!(v))),
         ],
     )
 }

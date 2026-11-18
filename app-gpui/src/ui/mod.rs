@@ -1,6 +1,7 @@
 //! Pieces shared by the shell and the screens.
 
 pub mod cells;
+pub mod choices;
 pub mod form;
 pub mod grid;
 pub mod page;

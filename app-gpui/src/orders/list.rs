@@ -3,6 +3,7 @@
 use std::{cmp::Ordering, collections::BTreeMap};
 
 use gpui::{AnyElement, App, Hsla, IntoElement, ParentElement, Styled, div, px};
+use crate::ui::numeric;
 use gpui_kit_assets::IconName;
 use serde_json::json;
 
@@ -96,6 +97,11 @@ fn total(order: &WfmOrder) -> i64 {
     order.platinum * order.quantity
 }
 
+/// The estimated profit of every unit of the order, as the totals count it.
+fn profit(order: &WfmOrder) -> Option<i64> {
+    order.potential_profit.map(|profit| profit * order.quantity)
+}
+
 impl Orders {
     fn order(&self, key: u64) -> Option<WfmOrder> {
         self.data
@@ -160,6 +166,10 @@ impl Catalog for Orders {
                 .end()
                 .sortable()
                 .droppable(1),
+            ColumnSpec::new("profit", "Est. profit", 104.)
+                .end()
+                .sortable()
+                .droppable(3),
             ColumnSpec::new("updated", "Updated", 140.)
                 .sortable()
                 .droppable(2),
@@ -419,6 +429,7 @@ impl Catalog for Orders {
             "quantity" => a.quantity.cmp(&b.quantity),
             "platinum" => a.platinum.cmp(&b.platinum),
             "total" => total(a).cmp(&total(b)),
+            "profit" => profit(a).cmp(&profit(b)),
             "updated" => a.updated_at.cmp(&b.updated_at),
             _ => a.item_name.cmp(&b.item_name),
         }
@@ -443,6 +454,12 @@ impl Catalog for Orders {
             "quantity" => cells::amount(Some(row.quantity), "", cx),
             "platinum" => cells::amount(Some(row.platinum), "", cx),
             "total" => cells::amount(Some(total(row)), "", cx),
+            "profit" => match profit(row) {
+                Some(profit) => numeric(number(profit))
+                    .text_color(Tone::of_profit(profit).color(theme))
+                    .into_any_element(),
+                None => cells::amount(None, "No price data", cx),
+            },
             "updated" => cells::text(day_and_time(&row.updated_at)),
             _ => {
                 let menu_row = row.clone();
@@ -486,6 +503,7 @@ impl Catalog for Orders {
             "quantity" => Some(number(row.quantity)),
             "platinum" => Some(number(row.platinum)),
             "total" => Some(number(total(row))),
+            "profit" => profit(row).map(number),
             "updated" => Some(day_and_time(&row.updated_at)),
             _ => None,
         }
@@ -543,6 +561,16 @@ impl Catalog for Orders {
                 Fact::new("Price", number(row.platinum)),
                 Fact::new("Quantity", number(row.quantity)),
                 Fact::new("Total", number(total(row))),
+                match row.potential_profit {
+                    Some(profit) => Fact::new("Estimated profit per unit", number(profit))
+                        .tone(Tone::of_profit(profit)),
+                    None => Fact::new("Estimated profit per unit", "No price data")
+                        .tone(Tone::Muted),
+                },
+                match row.closed_avg {
+                    Some(average) => Fact::new("Closing average", format!("{average:.1}")),
+                    None => Fact::new("Closing average", "No price data").tone(Tone::Muted),
+                },
                 Fact::amount("Units per trade", row.per_trade, "One"),
                 Fact::new("Created", day_and_time(&row.created_at)),
                 Fact::new("Updated", day_and_time(&row.updated_at)),

@@ -7,7 +7,8 @@ use gpui::{AnyElement, App, Hsla, IntoElement, ParentElement, Styled, div, px, r
 use gpui_kit_assets::IconName;
 
 use super::{
-    StockData, bulk_toolbar, every_row, ids, market_url, rank_label, status_chips, status_filter,
+    StockData, bulk_toolbar, every_row, ids, limit_cell, limit_field, market_url, rank_label,
+    status_chips, status_filter, stepped,
 };
 use crate::{
     data::{DataKind, DataSource},
@@ -34,6 +35,7 @@ pub enum SyndicateAction {
     SellAtList(u64),
     Edit(u64),
     Save { id: u64, update: SyndicateItemUpdate },
+    StepMinPrice { id: u64, step: i64 },
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
     Details(u64),
@@ -136,6 +138,9 @@ impl Catalog for Syndicates {
             ColumnSpec::new("list_price", "List price", 104.)
                 .end()
                 .sortable(),
+            ColumnSpec::new("min_price", "Min price", 124.)
+                .sortable()
+                .droppable(4),
             ColumnSpec::new("rate", "Per 1,000 standing", 144.)
                 .end()
                 .sortable()
@@ -296,16 +301,31 @@ impl Catalog for Syndicates {
             },
             SyndicateAction::Edit(id) => match self.item(id) {
                 Some(item) => Outcome::ask(
-                    FormSpec::new(format!("Edit {}", item.item_name), "Save").field(
-                        Field::number("standing_cost", "Standing cost", Some(item.standing_cost))
+                    FormSpec::new(format!("Edit {}", item.item_name), "Save")
+                        .field(
+                            Field::number(
+                                "standing_cost",
+                                "Standing cost",
+                                Some(item.standing_cost),
+                            )
                             .unit("standing")
                             .hint("What the syndicate charges for one."),
-                    ),
+                        )
+                        .field(
+                            Field::platinum(
+                                "min_price",
+                                "Minimum price",
+                                item.properties.min_price,
+                            )
+                            .optional()
+                            .hint("The scraper never lists below it. Empty sets no floor."),
+                        ),
                     move |values| {
                         Some(SyndicateAction::Save {
                             id,
                             update: SyndicateItemUpdate {
                                 standing_cost: values.number("standing_cost"),
+                                min_price: limit_field(values, "min_price", true),
                                 ..SyndicateItemUpdate::default()
                             },
                         })
@@ -313,6 +333,21 @@ impl Catalog for Syndicates {
                 ),
                 None => Outcome::Done,
             },
+            SyndicateAction::StepMinPrice { id, step } => {
+                match self
+                    .item(id)
+                    .and_then(|item| Some((item.id, stepped(item.properties.min_price, step)?)))
+                {
+                    Some((id, min_price)) => Outcome::run_quietly(source.syndicate_item_update(
+                        id,
+                        SyndicateItemUpdate {
+                            min_price: Some(min_price),
+                            ..SyndicateItemUpdate::default()
+                        },
+                    )),
+                    None => Outcome::Done,
+                }
+            }
             SyndicateAction::Save { id, update } => {
                 Outcome::run_quietly(source.syndicate_item_update(id as i64, update))
             }
@@ -355,6 +390,7 @@ impl Catalog for Syndicates {
             "syndicate" => a.syndicate_name.cmp(&b.syndicate_name),
             "standing" => a.standing_cost.cmp(&b.standing_cost),
             "list_price" => a.list_price.cmp(&b.list_price),
+            "min_price" => a.properties.min_price.cmp(&b.properties.min_price),
             "rate" => rate(a).unwrap_or(-1.0).total_cmp(&rate(b).unwrap_or(-1.0)),
             "status" => a.status.label().cmp(b.status.label()),
             _ => a.item_name.cmp(&b.item_name),
@@ -374,6 +410,13 @@ impl Catalog for Syndicates {
             ),
             "standing" => cells::amount(Some(row.standing_cost), "", cx),
             "list_price" => cells::amount(row.list_price, "Not listed", cx),
+            "min_price" => limit_cell(
+                id,
+                row.properties.min_price,
+                |step| SyndicateAction::StepMinPrice { id, step },
+                emit,
+                cx,
+            ),
             "rate" => match rate(row) {
                 Some(rate) => numeric(format!("{rate:.2}"))
                     .text_color(theme.colors.text)
@@ -422,6 +465,7 @@ impl Catalog for Syndicates {
             "syndicate" => Some(row.syndicate_name.clone()),
             "standing" => Some(number(row.standing_cost)),
             "list_price" => row.list_price.map(number),
+            "min_price" => row.properties.min_price.map(number),
             "rate" => rate(row).map(|rate| format!("{rate:.2}")),
             "status" => Some(row.status.label().to_owned()),
             _ => None,
@@ -480,6 +524,7 @@ impl Catalog for Syndicates {
             facts: vec![
                 Fact::new("Standing cost", number(row.standing_cost)),
                 Fact::amount("List price", row.list_price, "Not listed"),
+                Fact::amount("Minimum price", row.properties.min_price, "Not set"),
                 match rate(row) {
                     Some(rate) => Fact::new("Platinum per 1,000 standing", format!("{rate:.2}")),
                     None => {

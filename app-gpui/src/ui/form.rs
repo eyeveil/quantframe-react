@@ -11,7 +11,7 @@ use gpui_component::{
     IndexPath, WindowExt,
     button::ButtonVariants,
     input::{Input, InputEvent, InputState},
-    searchable_list::SearchableVec,
+    searchable_list::{SearchableListItem, SearchableVec},
     select::{Select, SelectState},
     switch::Switch,
 };
@@ -31,12 +31,41 @@ pub enum FieldKind {
         placeholder: &'static str,
     },
     Choice {
-        options: Vec<String>,
+        options: Vec<Choice>,
         selected: Option<usize>,
+        searchable: bool,
     },
     Toggle {
         value: bool,
     },
+}
+
+/// One entry of a select: the text shown and the value the form returns.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Choice {
+    label: SharedString,
+    value: SharedString,
+}
+
+impl Choice {
+    pub fn new(label: impl Into<SharedString>, value: impl Into<SharedString>) -> Self {
+        Self {
+            label: label.into(),
+            value: value.into(),
+        }
+    }
+}
+
+impl SearchableListItem for Choice {
+    type Value = SharedString;
+
+    fn title(&self) -> SharedString {
+        self.label.clone()
+    }
+
+    fn value(&self) -> &SharedString {
+        &self.value
+    }
 }
 
 pub struct Field {
@@ -90,13 +119,47 @@ impl Field {
         )
     }
 
+    /// A select whose entries are their own values. More than eight entries
+    /// get a search box.
     pub fn choice(
         key: &'static str,
         label: &str,
         options: Vec<String>,
         selected: Option<usize>,
     ) -> Self {
-        Self::new(key, label, FieldKind::Choice { options, selected })
+        let searchable = options.len() > 8;
+        let options = options
+            .into_iter()
+            .map(|option| Choice::new(option.clone(), option))
+            .collect();
+        Self::new(
+            key,
+            label,
+            FieldKind::Choice {
+                options,
+                selected,
+                searchable,
+            },
+        )
+    }
+
+    /// A select with a search box over a long list, such as every tradable
+    /// item. The form returns the chosen entry's value.
+    pub fn search(
+        key: &'static str,
+        label: &str,
+        options: Vec<Choice>,
+        selected: Option<usize>,
+    ) -> Self {
+        Self::new(
+            key,
+            label,
+            FieldKind::Choice {
+                options,
+                selected,
+                searchable: true,
+            },
+        )
     }
 
     pub fn toggle(key: &'static str, label: &str, value: bool) -> Self {
@@ -265,7 +328,7 @@ impl FormValues {
 
 enum Control {
     Input(Entity<InputState>),
-    Select(Entity<SelectState<SearchableVec<SharedString>>>),
+    Select(Entity<SelectState<SearchableVec<Choice>>>),
     Toggle(bool),
 }
 
@@ -294,13 +357,15 @@ impl Form {
                 FieldKind::Text { value, placeholder } => {
                     Control::Input(text_input(value, placeholder, &mut subscriptions, window, cx))
                 }
-                FieldKind::Choice { options, selected } => {
-                    let options: Vec<SharedString> =
-                        options.iter().cloned().map(SharedString::from).collect();
-                    let searchable = options.len() > 8;
+                FieldKind::Choice {
+                    options,
+                    selected,
+                    searchable,
+                } => {
                     let selected = selected.map(IndexPath::new);
+                    let searchable = *searchable;
                     Control::Select(cx.new(|cx| {
-                        SelectState::new(SearchableVec::new(options), selected, window, cx)
+                        SelectState::new(SearchableVec::new(options.clone()), selected, window, cx)
                             .searchable(searchable)
                     }))
                 }
@@ -406,10 +471,11 @@ impl Form {
                 }
             }
             (Control::Input(input), _) => Input::new(input).into_any_element(),
-            (Control::Select(select), _) => Select::new(select)
-                .placeholder("Choose")
+            (Control::Select(select), FieldKind::Choice { searchable, .. }) => Select::new(select)
+                .placeholder(if *searchable { "Type to search" } else { "Choose" })
                 .w_full()
                 .into_any_element(),
+            (Control::Select(select), _) => Select::new(select).w_full().into_any_element(),
             (Control::Toggle(value), _) => Switch::new(("toggle", index))
                 .checked(*value)
                 .label(field.label.clone())

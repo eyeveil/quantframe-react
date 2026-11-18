@@ -2,6 +2,7 @@
 //! the Tauri commands in `src-tauri/src/commands`.
 
 mod app;
+mod cache;
 mod market;
 mod stock;
 mod trades;
@@ -100,12 +101,28 @@ fn status_counts(
 
 /// Sets each `Some` field of an update on the DTO's JSON.
 fn changes(id: i64, fields: &[(&str, Option<Value>)]) -> Value {
-    let mut map = Map::new();
+    with_properties(id, fields, &[])
+}
+
+/// Sets each `Some` field of an update on the DTO's JSON, and each `Some`
+/// property under `properties`, which the backend merges into the stored
+/// ones.
+fn with_properties(
+    id: i64,
+    fields: &[(&str, Option<Value>)],
+    properties: &[(&str, Option<Value>)],
+) -> Value {
+    let pick = |fields: &[(&str, Option<Value>)]| {
+        fields
+            .iter()
+            .filter_map(|(key, value)| Some(((*key).to_owned(), value.clone()?)))
+            .collect::<Map<String, Value>>()
+    };
+    let mut map = pick(fields);
     map.insert("id".into(), json!(id));
-    for (key, value) in fields {
-        if let Some(value) = value {
-            map.insert((*key).into(), value.clone());
-        }
+    let properties = pick(properties);
+    if !properties.is_empty() {
+        map.insert("properties".into(), Value::Object(properties));
     }
     Value::Object(map)
 }

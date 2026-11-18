@@ -251,6 +251,23 @@ pub type Export = Pin<Box<dyn Future<Output = DataResult<PathBuf>> + Send>>;
 /// A load of everything a catalog shows.
 pub type Load<D> = Pin<Box<dyn Future<Output = DataResult<D>> + Send>>;
 
+/// Adds a cache list to a load. `fetch` is `None` once the catalog has the
+/// list. A failed fetch leaves the list out, so the rows still show and the
+/// add dialog falls back to a typed name.
+pub fn with_cache<T: Send + 'static, C: Send + 'static>(
+    load: Load<T>,
+    fetch: Option<impl Future<Output = DataResult<C>> + Send + 'static>,
+) -> Load<(T, Option<C>)> {
+    Box::pin(async move {
+        let data = load.await?;
+        let list = match fetch {
+            Some(fetch) => fetch.await.ok(),
+            None => None,
+        };
+        Ok((data, list))
+    })
+}
+
 /// What the screen does after a catalog has handled an action.
 pub enum Outcome<A> {
     /// Nothing is left to do.

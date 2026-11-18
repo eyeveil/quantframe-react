@@ -6,19 +6,21 @@ use gpui::{AnyElement, App, IntoElement, ParentElement, Styled, div, px};
 use gpui_kit_assets::IconName;
 
 use super::{
-    StockData, bulk_toolbar, every_row, ids, load_stock, market_url, rank_label, slug,
-    status_chips, status_filter,
+    StockData, bulk_toolbar, every_row, ids,
+    items::{chosen_item, item_field},
+    limit_cell, limit_field, load_stock, market_url, rank_label, status_chips, status_filter,
+    stepped,
 };
 use crate::{
     data::{DataKind, DataSource},
-    model::{NewStockItem, StockStatus, SubType, WishListItem, WishListUpdate},
+    model::{NewStockItem, StockStatus, SubType, TradableItem, WishListItem, WishListUpdate},
     theme::Theme,
     ui::{
         IconButton, cells, day_and_time,
-        form::{Field, FormSpec},
+        form::{Field, FormSpec, FormValues},
         grid::{
             Catalog, ChipGroup, ColumnSpec, Emit, Load, MenuEntry, Outcome, PrimaryAction, Query,
-            Stat, Tone, ToolbarItem, overflow_button,
+            Stat, Tone, ToolbarItem, overflow_button, with_cache,
         },
         number,
         panel::{Fact, PanelAction, PanelModel},
@@ -36,6 +38,7 @@ pub enum WishAction {
     BuyAtBid(u64),
     Edit(Vec<u64>),
     Save { ids: Vec<u64>, update: WishListUpdate },
+    StepMaxPrice { id: u64, step: i64 },
     ToggleHidden(u64),
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
@@ -50,6 +53,8 @@ pub enum WishAction {
 #[derive(Default)]
 pub struct WishList {
     data: StockData<WishListItem>,
+    /// The cache's tradable items for the add dialog, loaded once.
+    catalog: Vec<TradableItem>,
 }
 
 impl WishList {
@@ -67,6 +72,7 @@ impl WishList {
             [] => return None,
             _ => None,
         };
+        let properties = single.as_ref().map(|wish| wish.properties.clone());
         let quantity = Field::number(
             "quantity",
             "Quantity",
@@ -74,12 +80,68 @@ impl WishList {
         )
         .min(1)
         .hint("How many you still want.");
+        let max_price = Field::platinum(
+            "max_price",
+            "Maximum price",
+            properties.as_ref().and_then(|p| p.max_price),
+        )
+        .optional()
+        .half()
+        .hint("The scraper never bids above it.");
+        let min_price = Field::platinum(
+            "min_price",
+            "Minimum price",
+            properties.as_ref().and_then(|p| p.min_price),
+        )
+        .optional()
+        .half()
+        .hint("The scraper never bids below it.");
         Some(match &single {
             Some(wish) => {
-                FormSpec::new(format!("Edit {}", wish.item_name), "Save").field(quantity)
+                let spec = FormSpec::new(format!("Edit {}", wish.item_name), "Save")
+                    .width(480.)
+                    .field(quantity)
+                    .field(max_price)
+                    .field(min_price);
+                if self.bulk_tradable(wish) {
+                    spec.field(Field::toggle(
+                        "is_bulk",
+                        "Trade in batches",
+                        wish.properties.is_bulk,
+                    ))
+                } else {
+                    spec
+                }
             }
-            None => FormSpec::new(format!("Edit {} wishes", ids.len()), "Save").field(quantity),
+            None => FormSpec::new(format!("Edit {} wishes", ids.len()), "Save")
+                .width(480.)
+                .description(
+                    "Fill in only the fields to change. Empty fields keep each wish's value.",
+                )
+                .field(quantity.optional())
+                .field(max_price)
+                .field(min_price),
         })
+    }
+
+    fn bulk_tradable(&self, wish: &WishListItem) -> bool {
+        self.catalog
+            .iter()
+            .any(|entry| entry.wfm_url == wish.wfm_url && entry.bulk_tradable)
+    }
+
+    fn saved(ids: &[u64], values: &FormValues, bulk: bool) -> WishAction {
+        let single = ids.len() == 1;
+        WishAction::Save {
+            ids: ids.to_vec(),
+            update: WishListUpdate {
+                quantity: values.number("quantity"),
+                max_price: limit_field(values, "max_price", single),
+                min_price: limit_field(values, "min_price", single),
+                is_bulk: (single && bulk).then(|| values.flag("is_bulk")),
+                ..WishListUpdate::default()
+            },
+        }
     }
 
     fn message_items(&self, ids: &[u64]) -> Vec<MessageItem> {
@@ -98,7 +160,7 @@ impl WishList {
 impl Catalog for WishList {
     type Row = WishListItem;
     type Action = WishAction;
-    type Data = StockData<WishListItem>;
+    type Data = (StockData<WishListItem>, Option<Vec<TradableItem>>);
 
     const NOUN: &'static str = "wishes";
     const SEARCH_PLACEHOLDER: &'static str = "Search the wish list";
@@ -107,15 +169,23 @@ impl Catalog for WishList {
     const WATCH: &'static [DataKind] = &[DataKind::WishList];
 
     fn load(&self, source: &DataSource) -> Load<Self::Data> {
-        load_stock(
-            source.get_wish_list_pagination(&every_row()),
-            source.get_wish_list_status_counts(),
-            source.get_wish_list_financial_report(),
+        with_cache(
+            load_stock(
+                source.get_wish_list_pagination(&every_row()),
+                source.get_wish_list_status_counts(),
+                source.get_wish_list_financial_report(),
+            ),
+            self.catalog
+                .is_empty()
+                .then(|| source.cache_get_tradable_items()),
         )
     }
 
-    fn apply(&mut self, data: Self::Data) {
+    fn apply(&mut self, (data, catalog): Self::Data) {
         self.data = data;
+        if let Some(catalog) = catalog {
+            self.catalog = catalog;
+        }
     }
 
     fn columns(&self) -> Vec<ColumnSpec> {
@@ -123,6 +193,9 @@ impl Catalog for WishList {
             ColumnSpec::new("item", "Item", 200.).flex().sortable(),
             ColumnSpec::new("rank", "Rank", 120.),
             ColumnSpec::new("quantity", "Quantity", 96.).end().sortable(),
+            ColumnSpec::new("max_price", "Max price", 124.)
+                .sortable()
+                .droppable(2),
             ColumnSpec::new("list_price", "Bid", 96.).end().sortable(),
             ColumnSpec::new("total", "Cost at the bid", 124.)
                 .end()
@@ -201,10 +274,7 @@ impl Catalog for WishList {
         match action {
             WishAction::Add => Outcome::ask(
                 FormSpec::new("Add wish", "Add wish")
-                    .field(
-                        Field::text("name", "Item", "", "Wisp Prime Set")
-                            .hint("The item's name on Warframe Market."),
-                    )
+                    .field(item_field(&self.catalog, "Wisp Prime Set"))
                     .field(
                         Field::number("rank", "Rank", None)
                             .optional()
@@ -214,7 +284,7 @@ impl Catalog for WishList {
                     .field(Field::number("quantity", "Quantity", Some(1)).min(1).half()),
                 |values| {
                     Some(WishAction::Create(NewStockItem {
-                        raw: slug(&values.text("name")),
+                        raw: chosen_item(values)?,
                         sub_type: values.number("rank").map(SubType::rank),
                         quantity: values.number("quantity")?,
                         bought: 0,
@@ -222,7 +292,12 @@ impl Catalog for WishList {
                 },
             ),
             WishAction::Create(input) => {
-                let notice = format!("Added {} to the wish list.", input.raw);
+                let name = self
+                    .catalog
+                    .iter()
+                    .find(|item| item.wfm_url == input.raw)
+                    .map_or(input.raw.clone(), |item| item.name.clone());
+                let notice = format!("Added {name} to the wish list.");
                 Outcome::run(source.wish_list_create(input), notice)
             }
             WishAction::Buy(id) => match self.wish(id) {
@@ -273,17 +348,30 @@ impl Catalog for WishList {
                 None => Outcome::Done,
             },
             WishAction::Edit(ids) => match self.edit_prompt(&ids) {
-                Some(spec) => Outcome::ask(spec, move |values| {
-                    Some(WishAction::Save {
-                        ids: ids.clone(),
-                        update: WishListUpdate {
-                            quantity: values.number("quantity"),
-                            ..WishListUpdate::default()
-                        },
-                    })
-                }),
+                Some(spec) => {
+                    let bulk = match ids.as_slice() {
+                        [id] => self.wish(*id).is_some_and(|wish| self.bulk_tradable(&wish)),
+                        _ => false,
+                    };
+                    Outcome::ask(spec, move |values| Some(Self::saved(&ids, values, bulk)))
+                }
                 None => Outcome::Done,
             },
+            WishAction::StepMaxPrice { id, step } => {
+                match self
+                    .wish(id)
+                    .and_then(|wish| Some((wish.id, stepped(wish.properties.max_price, step)?)))
+                {
+                    Some((id, max_price)) => Outcome::run_quietly(source.wish_list_update(
+                        id,
+                        WishListUpdate {
+                            max_price: Some(max_price),
+                            ..WishListUpdate::default()
+                        },
+                    )),
+                    None => Outcome::Done,
+                }
+            }
             WishAction::Save { ids: rows, update } => match rows.as_slice() {
                 [id] => Outcome::run_quietly(source.wish_list_update(*id as i64, update)),
                 _ => Outcome::run_quietly(source.wish_list_update_multiple(ids(&rows), update)),
@@ -353,6 +441,7 @@ impl Catalog for WishList {
         let total = |wish: &WishListItem| wish.list_price.map(|price| price * wish.quantity);
         match key {
             "quantity" => a.quantity.cmp(&b.quantity),
+            "max_price" => a.properties.max_price.cmp(&b.properties.max_price),
             "list_price" => a.list_price.cmp(&b.list_price),
             "total" => total(a).cmp(&total(b)),
             "status" => a.status.label().cmp(b.status.label()),
@@ -369,10 +458,20 @@ impl Catalog for WishList {
                 if row.is_hidden {
                     flags.push((IconName::EyeOff, "Hidden from Warframe Market"));
                 }
+                if row.properties.is_bulk {
+                    flags.push((IconName::Handshake, "Trades in batches"));
+                }
                 cells::name(row.item_name.clone(), &flags, cx)
             }
             "rank" => cells::text(rank_label(&row.sub_type).unwrap_or_default()),
             "quantity" => cells::amount(Some(row.quantity), "", cx),
+            "max_price" => limit_cell(
+                id,
+                row.properties.max_price,
+                |step| WishAction::StepMaxPrice { id, step },
+                emit,
+                cx,
+            ),
             "list_price" => cells::amount(row.list_price, "No bid", cx),
             "total" => cells::amount(
                 row.list_price.map(|price| price * row.quantity),
@@ -419,6 +518,7 @@ impl Catalog for WishList {
             "item" => Some(row.item_name.clone()),
             "rank" => rank_label(&row.sub_type),
             "quantity" => Some(number(row.quantity)),
+            "max_price" => row.properties.max_price.map(number),
             "list_price" => row.list_price.map(number),
             "total" => row.list_price.map(|price| number(price * row.quantity)),
             "status" => Some(row.status.label().to_owned()),
@@ -496,6 +596,12 @@ impl Catalog for WishList {
                     "Cost at the bid",
                     row.list_price.map(|price| price * row.quantity),
                     "No bid",
+                ),
+                Fact::amount("Maximum price", row.properties.max_price, "Not set"),
+                Fact::amount("Minimum price", row.properties.min_price, "Not set"),
+                Fact::new(
+                    "Trades in batches",
+                    if row.properties.is_bulk { "Yes" } else { "No" },
                 ),
                 Fact::new("Last checked", day_and_time(&row.updated_at)),
             ],

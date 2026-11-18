@@ -49,6 +49,377 @@ fn export_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("qf-gpui-test-{}-{name}.json", std::process::id()))
 }
 
+/// The lists the add dialogs choose from.
+async fn cache_lists(source: &DataSource) {
+    let items = ok(
+        "cache_get_tradable_items",
+        source.cache_get_tradable_items().await,
+    );
+    assert_eq!(items.len(), 3893);
+    assert!(items.windows(2).all(|pair| pair[0].name <= pair[1].name));
+    let rhino: Vec<&TradableItem> = items
+        .iter()
+        .filter(|item| item.name.to_lowercase().contains("rhino"))
+        .collect();
+    let set = rhino
+        .iter()
+        .find(|item| item.name == "Rhino Prime Set")
+        .expect("typing rhino finds Rhino Prime Set");
+    assert_eq!(set.wfm_url, "rhino_prime_set");
+    assert!(!set.bulk_tradable);
+    let flow = items.iter().find(|item| item.name == "Primed Flow").expect("Primed Flow");
+    assert_eq!(flow.max_rank, Some(10));
+    assert!(
+        items
+            .iter()
+            .find(|item| item.name == "Arcane Energize")
+            .expect("Arcane Energize")
+            .bulk_tradable
+    );
+
+    let weapons = ok(
+        "cache_get_riven_weapons",
+        source.cache_get_riven_weapons().await,
+    );
+    assert!(weapons.len() > 300, "only {} riven weapons", weapons.len());
+    let rubico = weapons.iter().find(|weapon| weapon.name == "Rubico").expect("Rubico");
+    assert_eq!(rubico.wfm_url, "rubico");
+    assert_eq!(rubico.riven_type, "rifle");
+    assert!(!rubico.wfm_id.is_empty());
+
+    let stats = ok(
+        "cache_get_riven_attributes",
+        source.cache_get_riven_attributes().await,
+    );
+    assert_eq!(stats.len(), 50);
+    let critical = stats
+        .iter()
+        .find(|stat| stat.wfm_url == "critical_chance")
+        .expect("critical_chance");
+    assert_eq!(critical.label, "Critical Chance");
+    let punch = stats.iter().find(|stat| stat.wfm_url == "punch_through").expect("punch_through");
+    assert!(punch.fits("rifle") && !punch.fits("melee"));
+}
+
+/// The properties, profits and flags the trader screens show.
+async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &ListParams) {
+    let items = ok(
+        "get_stock_item_pagination",
+        source.get_stock_item_pagination(all).await,
+    )
+    .results;
+    let limited = items
+        .iter()
+        .find(|item| item.properties.min_price.is_some())
+        .expect("a stock item with a minimum price");
+    assert_eq!(limited.properties.min_price, Some(limited.bought + 5));
+    assert!(items.iter().any(|item| item.properties.min_sma == Some(15)
+        && item.properties.min_profit == Some(10)));
+    assert!(items.iter().any(|item| item.properties.is_bulk));
+    let item = items
+        .iter()
+        .find(|item| item.properties.min_price.is_none())
+        .expect("a stock item without limits")
+        .clone();
+    let raised = ok(
+        "stock_item_update min_price",
+        source
+            .stock_item_update(
+                item.id,
+                StockItemUpdate {
+                    min_price: Some(65),
+                    min_profit: Some(12),
+                    min_sma: Some(-1),
+                    is_bulk: Some(true),
+                    ..StockItemUpdate::default()
+                },
+            )
+            .await,
+    );
+    assert_eq!(raised.properties.min_price, Some(65));
+    assert_eq!(raised.properties.min_profit, Some(12));
+    assert_eq!(raised.properties.min_sma, Some(-1));
+    assert!(raised.properties.is_bulk);
+    assert_eq!(raised.bought, item.bought);
+    let cleared = ok(
+        "stock_item_update clear",
+        source
+            .stock_item_update(
+                item.id,
+                StockItemUpdate {
+                    min_price: Some(0),
+                    is_bulk: Some(false),
+                    ..StockItemUpdate::default()
+                },
+            )
+            .await,
+    );
+    assert_eq!(cleared.properties.min_price, None);
+    assert_eq!(cleared.properties.min_profit, Some(12));
+    assert!(!cleared.properties.is_bulk);
+    let reread = ok(
+        "stock_item_get_by_id",
+        source.stock_item_get_by_id(item.id).await,
+    );
+    assert_eq!(reread.properties.min_profit, Some(12));
+
+    let rivens = ok(
+        "get_stock_riven_pagination",
+        source.get_stock_riven_pagination(all).await,
+    )
+    .results;
+    assert!(rivens.iter().any(|riven| riven.properties.is_predicted));
+    let filtered = rivens
+        .iter()
+        .find(|riven| riven.filter.enabled)
+        .expect("a riven with a filter");
+    assert_eq!(filtered.filter.mastery_rank, Some(MinMax { min: 8, max: Some(16) }));
+    assert_eq!(filtered.filter.similarity, Some(60.0));
+    assert_eq!(filtered.filter.attributes.len(), filtered.attributes.len());
+    assert!(
+        rivens
+            .iter()
+            .flat_map(|riven| &riven.attributes)
+            .all(|attribute| !attribute.label.is_empty() && !attribute.label.contains('_'))
+    );
+    let crit = rivens
+        .iter()
+        .flat_map(|riven| &riven.attributes)
+        .find(|attribute| attribute.wfm_url == "critical_chance");
+    if let Some(crit) = crit {
+        assert_eq!(crit.label, "Critical Chance");
+    }
+    let riven = rivens
+        .iter()
+        .find(|riven| !riven.filter.enabled && riven.properties.min_price.is_none())
+        .expect("a riven without limits")
+        .clone();
+    let mut filter = RivenFilter {
+        enabled: true,
+        re_rolls: Some(MinMax { min: 2, max: Some(20) }),
+        required_negative: true,
+        attributes: riven
+            .attributes
+            .iter()
+            .map(|attribute| RivenFilterAttribute {
+                wfm_url: attribute.wfm_url.clone(),
+                positive: attribute.positive,
+                is_required: true,
+            })
+            .collect(),
+        ..RivenFilter::default()
+    };
+    let saved = ok(
+        "stock_riven_update filter",
+        source
+            .stock_riven_update(
+                riven.id,
+                StockRivenUpdate {
+                    min_price: Some(150),
+                    filter: Some(filter.clone()),
+                    ..StockRivenUpdate::default()
+                },
+            )
+            .await,
+    );
+    assert_eq!(saved.properties.min_price, Some(150));
+    assert_eq!(saved.filter, filter);
+    filter.enabled = false;
+    let saved = ok(
+        "stock_riven_update filter off",
+        source
+            .stock_riven_update(
+                riven.id,
+                StockRivenUpdate {
+                    filter: Some(filter.clone()),
+                    ..StockRivenUpdate::default()
+                },
+            )
+            .await,
+    );
+    assert!(!saved.filter.enabled);
+    assert_eq!(saved.properties.min_price, Some(150));
+
+    let wishes = ok(
+        "get_wish_list_pagination",
+        source.get_wish_list_pagination(all).await,
+    )
+    .results;
+    let capped = wishes
+        .iter()
+        .find(|wish| wish.properties.max_price.is_some())
+        .expect("a wish with a maximum price");
+    assert!(capped.properties.max_price.is_some_and(|price| price > 12));
+    assert!(wishes.iter().any(|wish| wish.properties.min_price.is_some()));
+    assert!(wishes.iter().any(|wish| wish.properties.is_bulk));
+    let wish = wishes[1].clone();
+    let saved = ok(
+        "wish_list_update max_price",
+        source
+            .wish_list_update(
+                wish.id,
+                WishListUpdate {
+                    max_price: Some(140),
+                    min_price: Some(30),
+                    ..WishListUpdate::default()
+                },
+            )
+            .await,
+    );
+    assert_eq!(saved.properties.max_price, Some(140));
+    assert_eq!(saved.properties.min_price, Some(30));
+    assert_eq!(saved.quantity, wish.quantity);
+
+    let synds = ok(
+        "get_syndicate_item_pagination",
+        source
+            .get_syndicate_item_pagination(&SyndicateItemListParams {
+                stock: all.clone(),
+                syndicate: None,
+            })
+            .await,
+    )
+    .results;
+    assert!(synds.iter().any(|item| item.properties.min_price.is_some()));
+    let synd = synds
+        .iter()
+        .find(|item| item.properties.min_price.is_none())
+        .expect("a syndicate item without a minimum price");
+    let saved = ok(
+        "syndicate_item_update min_price",
+        source
+            .syndicate_item_update(
+                synd.id,
+                SyndicateItemUpdate {
+                    min_price: Some(22),
+                    ..SyndicateItemUpdate::default()
+                },
+            )
+            .await,
+    );
+    assert_eq!(saved.properties.min_price, Some(22));
+    assert_eq!(saved.standing_cost, synd.standing_cost);
+
+    let orders = ok(
+        "get_wfm_orders_pagination",
+        source
+            .get_wfm_orders_pagination(&OrderListParams {
+                list: list.clone(),
+                order_type: None,
+            })
+            .await,
+    )
+    .results;
+    assert!(orders.iter().all(|order| order.potential_profit.is_some()));
+    assert!(orders.iter().all(|order| order.closed_avg.is_some_and(|avg| avg > 0.0)));
+    let sell_profit: i64 = orders
+        .iter()
+        .filter(|order| order.order_type == OrderType::Sell)
+        .map(|order| order.potential_profit.unwrap_or(0) * order.quantity)
+        .sum();
+    let totals = ok(
+        "get_wfm_orders_status_counts",
+        source.get_wfm_orders_status_counts().await,
+    );
+    assert!(sell_profit > 0);
+    assert_eq!(totals[&OrderType::Sell].potential_profit, sell_profit as f64);
+
+    let auctions = ok(
+        "get_wfm_auctions_pagination",
+        source.get_wfm_auctions_pagination(list).await,
+    )
+    .results;
+    assert_eq!(auctions.iter().filter(|auction| auction.can_import).count(), 2);
+    assert!(
+        auctions
+            .iter()
+            .flat_map(|auction| &auction.attributes)
+            .all(|attribute| !attribute.label.contains('_'))
+    );
+
+    let entries = ok(
+        "get_trade_entry_pagination",
+        source
+            .get_trade_entry_pagination(&TradeEntryListParams {
+                list: list.clone(),
+                ..TradeEntryListParams::default()
+            })
+            .await,
+    )
+    .results;
+    let count = |group: &str| entries.iter().filter(|entry| entry.group == group).count();
+    assert_eq!((count("item"), count("custom"), count("riven")), (12, 5, 6));
+    let riven = entries
+        .iter()
+        .find(|entry| entry.group == "riven")
+        .expect("a riven entry");
+    let low = riven.properties.min_price.expect("market low");
+    assert_eq!(riven.properties.potential_profit, Some(low - riven.price));
+    assert_eq!(riven.properties.last_updated.as_deref(), Some("2026-11-17"));
+    assert!(
+        entries
+            .iter()
+            .flat_map(|entry| &entry.tags)
+            .any(|tag| tag == "arcane_enhancement")
+    );
+    assert_eq!(tag_label("arcane_enhancement"), "Arcane enhancement");
+    assert_eq!(tag_label("prime"), "Prime");
+    let created = ok(
+        "trade_entry_create riven",
+        source
+            .trade_entry_create(NewTradeEntry {
+                tags: vec!["interesting".into()],
+                properties: TradeEntryProperties {
+                    min_price: Some(200),
+                    potential_profit: Some(30),
+                    last_updated: Some("2026-11-18".into()),
+                },
+                ..NewTradeEntry::new("tigris", TradeEntryGroup::Riven, 170)
+            })
+            .await,
+    );
+    assert_eq!(created.group, "riven");
+    assert_eq!(created.properties.min_price, Some(200));
+    assert_eq!(created.properties.potential_profit, Some(30));
+    let repriced = ok(
+        "trade_entry_create override",
+        source
+            .trade_entry_create(NewTradeEntry {
+                override_existing: true,
+                tags: vec!["interesting".into()],
+                properties: TradeEntryProperties {
+                    min_price: Some(190),
+                    potential_profit: Some(30),
+                    last_updated: Some("2026-11-18".into()),
+                },
+                ..NewTradeEntry::new("tigris", TradeEntryGroup::Riven, 160)
+            })
+            .await,
+    );
+    assert_eq!(repriced.id, created.id);
+    assert_eq!(repriced.price, 160);
+    assert_eq!(repriced.properties.min_price, Some(190));
+    ok(
+        "trade_entry_delete",
+        source.trade_entry_delete(created.id).await,
+    );
+    let custom = ok(
+        "trade_entry_create custom",
+        source
+            .trade_entry_create(NewTradeEntry::new(
+                "Forma carry",
+                TradeEntryGroup::Custom,
+                9,
+            ))
+            .await,
+    );
+    assert_eq!(custom.name, "Forma carry");
+    ok(
+        "trade_entry_delete",
+        source.trade_entry_delete(custom.id).await,
+    );
+}
+
 #[test]
 fn every_data_source_method_works_in_fixture_mode() {
     let (source, mut events) =
@@ -74,6 +445,8 @@ fn every_data_source_method_works_in_fixture_mode() {
             limit: -1,
             ..ListParams::default()
         };
+        cache_lists(&source).await;
+        trader_fields(&source, &all, &list).await;
 
         let items = non_empty(
             "get_stock_item_pagination",
@@ -656,11 +1029,9 @@ fn every_data_source_method_works_in_fixture_mode() {
             "trade_entry_create",
             source
                 .trade_entry_create(NewTradeEntry {
-                    raw: "abating_link".into(),
                     sub_type: Some(SubType::rank(0)),
-                    price: 15,
-                    group: TradeEntryGroup::Item,
                     tags: vec!["mod".into()],
+                    ..NewTradeEntry::new("abating_link", TradeEntryGroup::Item, 15)
                 })
                 .await,
         );

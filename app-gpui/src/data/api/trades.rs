@@ -98,6 +98,8 @@ impl DataSource {
                 "price": input.price,
                 "group": input.group.as_str(),
                 "tags": input.tags,
+                "override_existing": input.override_existing,
+                "properties": convert::backend_trade_properties(&input.properties),
             }))?;
             Ok(convert::trade_entry(
                 trade_entry::trade_entry_create(input).await?,

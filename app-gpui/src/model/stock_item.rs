@@ -65,11 +65,16 @@ pub struct NewStockItem {
     pub bought: i64,
 }
 
-/// Input of `stock_item_update`. `None` leaves a field unchanged.
+/// Input of `stock_item_update`. `None` leaves a field unchanged. The
+/// backend clears a price limit that is set to 0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct StockItemUpdate {
     pub owned: Option<i64>,
     pub bought: Option<i64>,
     pub list_price: Option<i64>,
     pub is_hidden: Option<bool>,
+    pub min_price: Option<i64>,
+    pub min_sma: Option<i64>,
+    pub min_profit: Option<i64>,
+    pub is_bulk: Option<bool>,
 }

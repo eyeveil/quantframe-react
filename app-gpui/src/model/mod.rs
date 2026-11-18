@@ -4,6 +4,7 @@
 
 mod analytics;
 mod app;
+mod cache;
 mod dashboard;
 mod financial_report;
 mod inventory;
@@ -21,6 +22,7 @@ mod wfm;
 mod wish_list;
 
 pub use analytics::{ItemPrice, PriceLookupParams, RivenPrice, SyndicateItemPrice, UserActivity};
+pub use cache::{RivenStat, RivenWeapon, TradableItem};
 pub use app::{AppInfo, EeLogLine, EeLogParams, GdprState, RouteLimiter, WfmDebugState};
 pub use dashboard::{BestSeller, CategorySummary, Chart, DashboardSummary, PeriodSummary};
 pub use financial_report::FinancialReport;
@@ -32,19 +34,24 @@ pub use pagination::{
 };
 pub use price_history::PriceHistory;
 pub use stock_item::{CoolDownInfo, NewStockItem, StockItem, StockItemProperties, StockItemUpdate};
-pub use stock_riven::{NewStockRiven, RivenAttribute, StockRiven, StockRivenUpdate};
+pub use stock_riven::{
+    MinMax, NewStockRiven, RivenAttribute, RivenFilter, RivenFilterAttribute, StockRiven,
+    StockRivenProperties, StockRivenUpdate,
+};
 pub use stock_status::StockStatus;
 pub use sub_type::SubType;
-pub use syndicate_item::{NewSyndicateItem, SyndicateItem, SyndicateItemUpdate};
+pub use syndicate_item::{
+    NewSyndicateItem, SyndicateItem, SyndicateItemProperties, SyndicateItemUpdate,
+};
 pub use trade::{
-    NewTradeEntry, TradeEntry, TradeEntryGroup, TradeEntryUpdate, Transaction, TransactionItemType,
-    TransactionType, TransactionUpdate,
+    NewTradeEntry, TradeEntry, TradeEntryGroup, TradeEntryProperties, TradeEntryUpdate,
+    Transaction, TransactionItemType, TransactionType, TransactionUpdate, tag_label,
 };
 pub use user::{Ban, BanService, User, UserStatus};
 pub use wfm::{
     AuctionOverview, Chat, ChatMessage, ChatUser, OrderTotals, OrderType, WfmAuction, WfmOrder,
 };
-pub use wish_list::{WishListItem, WishListUpdate};
+pub use wish_list::{WishListItem, WishListProperties, WishListUpdate};
 
 /// The full settings tree, edited in place and saved with `app_update_settings`.
 pub type Settings = qf_app_lib::app::Settings;

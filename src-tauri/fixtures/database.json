@@ -41,7 +41,10 @@
    ],
    "created_at": "2026-09-19T18:00:00.000Z",
    "updated_at": "2026-10-18T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 24
+   }
   },
   {
    "wfm_id": "5c182b739603780081b09a53",
@@ -96,7 +99,11 @@
    "price_history": [],
    "created_at": "2026-09-21T18:00:00.000Z",
    "updated_at": "2026-10-19T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_profit": 10,
+    "min_sma": 15
+   }
   },
   {
    "wfm_id": "56783f24cbfa8f0432dd89b2",
@@ -144,7 +151,10 @@
    ],
    "created_at": "2026-09-23T18:00:00.000Z",
    "updated_at": "2026-10-20T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 72
+   }
   },
   {
    "wfm_id": "62d3494075156700ce450df4",
@@ -243,7 +253,10 @@
    ],
    "created_at": "2026-09-27T18:00:00.000Z",
    "updated_at": "2026-10-22T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 41
+   }
   },
   {
    "wfm_id": "56c3bbfc5d2f0202da32e943",
@@ -263,7 +276,11 @@
    ],
    "created_at": "2026-09-28T18:00:00.000Z",
    "updated_at": "2026-10-23T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_profit": 10,
+    "min_sma": 15
+   }
   },
   {
    "wfm_id": "56783f24cbfa8f0432dd899d",
@@ -367,7 +384,10 @@
    ],
    "created_at": "2026-10-01T18:00:00.000Z",
    "updated_at": "2026-10-24T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 113
+   }
   },
   {
    "wfm_id": "57bc9c84e506eb45ea251455",
@@ -484,6 +504,11 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_price": 102,
+    "min_profit": 10,
+    "min_sma": 15
    }
   },
   {
@@ -636,6 +661,9 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_price": 53
    }
   },
   {
@@ -733,6 +761,10 @@
    "changes": [],
    "sub_type": {
     "rank": 5
+   },
+   "properties": {
+    "min_profit": 10,
+    "min_sma": 15
    }
   },
   {
@@ -772,6 +804,9 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_price": 109
    }
   },
   {
@@ -844,6 +879,9 @@
    "changes": [],
    "sub_type": {
     "rank": 5
+   },
+   "properties": {
+    "is_bulk": true
    }
   },
   {
@@ -862,6 +900,10 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_price": 34,
+    "is_bulk": false
    }
   },
   {
@@ -893,6 +935,9 @@
    "changes": [],
    "sub_type": {
     "rank": 5
+   },
+   "properties": {
+    "is_bulk": true
    }
   },
   {
@@ -928,6 +973,10 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_profit": 10,
+    "min_sma": 15
    }
   },
   {
@@ -985,6 +1034,9 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_price": 99
    }
   },
   {
@@ -1097,6 +1149,10 @@
    "changes": [],
    "sub_type": {
     "variant": "intact"
+   },
+   "properties": {
+    "min_price": 120,
+    "is_bulk": false
    }
   },
   {
@@ -1120,6 +1176,11 @@
    "changes": [],
    "sub_type": {
     "variant": "intact"
+   },
+   "properties": {
+    "min_profit": 10,
+    "min_sma": 15,
+    "is_bulk": true
    }
   },
   {
@@ -1159,6 +1220,9 @@
    "changes": [],
    "sub_type": {
     "variant": "intact"
+   },
+   "properties": {
+    "is_bulk": false
    }
   }
  ],
@@ -1193,7 +1257,29 @@
    "bought": 222,
    "list_price": null,
    "filter": {
-    "enabled": false
+    "enabled": true,
+    "mastery_rank": {
+     "min": 8,
+     "max": 16
+    },
+    "re_rolls": {
+     "min": 0,
+     "max": 40
+    },
+    "similarity": 60.0,
+    "required_negative": false,
+    "attributes": [
+     {
+      "url_name": "ammo_efficiency",
+      "positive": true,
+      "is_required": true
+     },
+     {
+      "url_name": "status_chance",
+      "positive": true,
+      "is_required": true
+     }
+    ]
    },
    "is_hidden": false,
    "comment": "",
@@ -1214,7 +1300,10 @@
     }
    ],
    "created_at": "2026-09-28T18:00:00.000Z",
-   "updated_at": "2026-10-28T18:00:00.000Z"
+   "updated_at": "2026-10-28T18:00:00.000Z",
+   "properties": {
+    "min_price": 262
+   }
   },
   {
    "wfm_weapon_id": "5e41458f7b0275011bc5b7cc",
@@ -1254,7 +1343,10 @@
    "uuid": "",
    "price_history": [],
    "created_at": "2026-09-29T18:00:00.000Z",
-   "updated_at": "2026-10-29T18:00:00.000Z"
+   "updated_at": "2026-10-29T18:00:00.000Z",
+   "properties": {
+    "is_predicted": true
+   }
   },
   {
    "wfm_weapon_id": "5d6e947e7ea27b048cbea8cc",
@@ -1356,7 +1448,10 @@
     }
    ],
    "created_at": "2026-10-01T18:00:00.000Z",
-   "updated_at": "2026-10-31T18:00:00.000Z"
+   "updated_at": "2026-10-31T18:00:00.000Z",
+   "properties": {
+    "min_price": 128
+   }
   },
   {
    "wfm_weapon_id": "5c5ca81696e8d2003834fe34",
@@ -1433,7 +1528,29 @@
    "bought": 288,
    "list_price": 552,
    "filter": {
-    "enabled": false
+    "enabled": true,
+    "mastery_rank": {
+     "min": 8,
+     "max": 16
+    },
+    "re_rolls": {
+     "min": 0,
+     "max": 40
+    },
+    "similarity": 60.0,
+    "required_negative": false,
+    "attributes": [
+     {
+      "url_name": "base_damage_/_melee_damage",
+      "positive": true,
+      "is_required": true
+     },
+     {
+      "url_name": "damage_to_techrot",
+      "positive": true,
+      "is_required": true
+     }
+    ]
    },
    "is_hidden": false,
    "comment": "",
@@ -1454,7 +1571,10 @@
     }
    ],
    "created_at": "2026-10-03T18:00:00.000Z",
-   "updated_at": "2026-11-02T18:00:00.000Z"
+   "updated_at": "2026-11-02T18:00:00.000Z",
+   "properties": {
+    "is_predicted": true
+   }
   },
   {
    "wfm_weapon_id": "5c5ca81696e8d2003834fe28",
@@ -1500,7 +1620,10 @@
    "uuid": "",
    "price_history": [],
    "created_at": "2026-10-04T18:00:00.000Z",
-   "updated_at": "2026-11-03T18:00:00.000Z"
+   "updated_at": "2026-11-03T18:00:00.000Z",
+   "properties": {
+    "min_price": 71
+   }
   },
   {
    "wfm_weapon_id": "626a197ef40db600660a1d93",
@@ -1653,7 +1776,11 @@
     }
    ],
    "created_at": "2026-10-07T18:00:00.000Z",
-   "updated_at": "2026-11-06T18:00:00.000Z"
+   "updated_at": "2026-11-06T18:00:00.000Z",
+   "properties": {
+    "min_price": 324,
+    "is_predicted": true
+   }
   },
   {
    "wfm_weapon_id": "5c5ca81696e8d2003834fdcf",
@@ -1691,7 +1818,34 @@
    "bought": 215,
    "list_price": 407,
    "filter": {
-    "enabled": false
+    "enabled": true,
+    "mastery_rank": {
+     "min": 8,
+     "max": 16
+    },
+    "re_rolls": {
+     "min": 0,
+     "max": 40
+    },
+    "similarity": 60.0,
+    "required_negative": false,
+    "attributes": [
+     {
+      "url_name": "multishot",
+      "positive": true,
+      "is_required": true
+     },
+     {
+      "url_name": "damage_to_orokin",
+      "positive": true,
+      "is_required": true
+     },
+     {
+      "url_name": "gas",
+      "positive": true,
+      "is_required": true
+     }
+    ]
    },
    "is_hidden": false,
    "comment": "",
@@ -1811,7 +1965,10 @@
    "uuid": "",
    "price_history": [],
    "created_at": "2026-10-10T18:00:00.000Z",
-   "updated_at": "2026-11-09T18:00:00.000Z"
+   "updated_at": "2026-11-09T18:00:00.000Z",
+   "properties": {
+    "min_price": 114
+   }
   },
   {
    "wfm_weapon_id": "5c5ca81696e8d2003834fe2e",
@@ -1874,7 +2031,10 @@
     }
    ],
    "created_at": "2026-10-11T18:00:00.000Z",
-   "updated_at": "2026-11-10T18:00:00.000Z"
+   "updated_at": "2026-11-10T18:00:00.000Z",
+   "properties": {
+    "is_predicted": true
+   }
   },
   {
    "wfm_weapon_id": "5f498a379426ed005af5ecae",
@@ -1968,7 +2128,10 @@
    "created_at": "2026-10-08T18:00:00.000Z",
    "updated_at": "2026-11-07T18:00:00.000Z",
    "is_hidden": false,
-   "changes": []
+   "changes": [],
+   "properties": {
+    "max_price": 116
+   }
   },
   {
    "wfm_id": "639a8d9474b02f003889eb84",
@@ -1999,7 +2162,10 @@
    "created_at": "2026-10-09T18:00:00.000Z",
    "updated_at": "2026-11-07T18:00:00.000Z",
    "is_hidden": false,
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 110
+   }
   },
   {
    "wfm_id": "5e839496267539077b0dd6d3",
@@ -2013,7 +2179,10 @@
    "created_at": "2026-10-10T18:00:00.000Z",
    "updated_at": "2026-11-08T18:00:00.000Z",
    "is_hidden": false,
-   "changes": []
+   "changes": [],
+   "properties": {
+    "max_price": 110
+   }
   },
   {
    "wfm_id": "56463c24b66f8358acce4451",
@@ -2035,6 +2204,9 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "is_bulk": true
    }
   },
   {
@@ -2049,7 +2221,10 @@
    "created_at": "2026-10-12T18:00:00.000Z",
    "updated_at": "2026-11-09T18:00:00.000Z",
    "is_hidden": false,
-   "changes": []
+   "changes": [],
+   "properties": {
+    "max_price": 88
+   }
   },
   {
    "wfm_id": "54a74454e779892d5e515648",
@@ -2071,6 +2246,9 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_price": 100
    }
   },
   {
@@ -2090,7 +2268,10 @@
    "created_at": "2026-10-14T18:00:00.000Z",
    "updated_at": "2026-11-10T18:00:00.000Z",
    "is_hidden": false,
-   "changes": []
+   "changes": [],
+   "properties": {
+    "max_price": 106
+   }
   },
   {
    "wfm_id": "566751d35dcbc186f0536bd6",
@@ -2120,6 +2301,9 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "is_bulk": true
    }
   },
   {
@@ -2147,7 +2331,10 @@
    "created_at": "2026-10-16T18:00:00.000Z",
    "updated_at": "2026-11-11T18:00:00.000Z",
    "is_hidden": false,
-   "changes": []
+   "changes": [],
+   "properties": {
+    "max_price": 83
+   }
   },
   {
    "wfm_id": "60e5b8fe4794450053e9994d",
@@ -2181,6 +2368,9 @@
    "changes": [],
    "sub_type": {
     "rank": 0
+   },
+   "properties": {
+    "min_price": 45
    }
   },
   {
@@ -2208,7 +2398,10 @@
    "created_at": "2026-10-18T18:00:00.000Z",
    "updated_at": "2026-11-12T18:00:00.000Z",
    "is_hidden": false,
-   "changes": []
+   "changes": [],
+   "properties": {
+    "max_price": 110
+   }
   }
  ],
  "transactions": [
@@ -2803,7 +2996,7 @@
    "wfm_id": "56783f24cbfa8f0432dd89b2",
    "name": "Volt Prime Set",
    "price": 138,
-   "group": "set",
+   "group": "item",
    "tags": "set,prime,warframe",
    "created_at": "2026-10-24T18:00:00.000Z",
    "updated_at": "2026-10-24T18:00:00.000Z",
@@ -2813,7 +3006,7 @@
    "wfm_id": "65a7fc5aed5b0d2e3eb462b2",
    "name": "Gauss Prime Set",
    "price": 138,
-   "group": "mod",
+   "group": "item",
    "tags": "prime,warframe,set",
    "created_at": "2026-10-25T18:00:00.000Z",
    "updated_at": "2026-10-25T18:00:00.000Z",
@@ -2833,7 +3026,7 @@
    "wfm_id": "65a7fcc4ed5b0d2e3eb462ce",
    "name": "Acceltra Prime Set",
    "price": 126,
-   "group": "set",
+   "group": "item",
    "tags": "prime,primary,weapon,set",
    "created_at": "2026-10-27T18:00:00.000Z",
    "updated_at": "2026-10-27T18:00:00.000Z",
@@ -2843,7 +3036,7 @@
    "wfm_id": "54c68672e7798913ba044082",
    "name": "Primed Flow",
    "price": 25,
-   "group": "mod",
+   "group": "item",
    "tags": "mod,legendary,warframe",
    "created_at": "2026-10-28T18:00:00.000Z",
    "updated_at": "2026-10-28T18:00:00.000Z",
@@ -2869,7 +3062,7 @@
    "wfm_id": "54a74454e779892d5e5155b7",
    "name": "Transient Fortitude",
    "price": 79,
-   "group": "set",
+   "group": "item",
    "tags": "mod,warframe,rare",
    "created_at": "2026-10-30T18:00:00.000Z",
    "updated_at": "2026-10-30T18:00:00.000Z",
@@ -2882,7 +3075,7 @@
    "wfm_id": "60e5b9014794450053e99961",
    "name": "Galvanized Chamber",
    "price": 12,
-   "group": "mod",
+   "group": "item",
    "tags": "mod,rare,primary,rifle",
    "created_at": "2026-10-31T18:00:00.000Z",
    "updated_at": "2026-10-31T18:00:00.000Z",
@@ -2908,7 +3101,7 @@
    "wfm_id": "62a2baebfbd62c00450b71d9",
    "name": "Molt Augmented",
    "price": 68,
-   "group": "set",
+   "group": "item",
    "tags": "rare,arcane_enhancement",
    "created_at": "2026-11-02T18:00:00.000Z",
    "updated_at": "2026-11-02T18:00:00.000Z",
@@ -2921,13 +3114,147 @@
    "wfm_id": "60e70f7f479445008f27259d",
    "name": "Secondary Deadhead",
    "price": 28,
-   "group": "mod",
+   "group": "item",
    "tags": "arcane_enhancement,rare",
    "created_at": "2026-11-03T18:00:00.000Z",
    "updated_at": "2026-11-03T18:00:00.000Z",
    "properties": null,
    "sub_type": {
     "rank": 0
+   }
+  },
+  {
+   "wfm_id": "custom",
+   "name": "Forma Blueprint x3",
+   "price": 12,
+   "group": "custom",
+   "tags": "forma,blueprint",
+   "created_at": "2026-11-05T18:00:00.000Z",
+   "updated_at": "2026-11-05T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "custom",
+   "name": "Riven slot (Prime)",
+   "price": 20,
+   "group": "custom",
+   "tags": "service",
+   "created_at": "2026-11-06T18:00:00.000Z",
+   "updated_at": "2026-11-06T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "custom",
+   "name": "Eidolon Tridolon carry",
+   "price": 40,
+   "group": "custom",
+   "tags": "service,carry",
+   "created_at": "2026-11-07T18:00:00.000Z",
+   "updated_at": "2026-11-07T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "custom",
+   "name": "Profit-Taker carry",
+   "price": 35,
+   "group": "custom",
+   "tags": "service,carry",
+   "created_at": "2026-11-08T18:00:00.000Z",
+   "updated_at": "2026-11-08T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "custom",
+   "name": "Relic cracking, 4 by 4",
+   "price": 15,
+   "group": "custom",
+   "tags": "service,relic",
+   "created_at": "2026-11-09T18:00:00.000Z",
+   "updated_at": "2026-11-09T18:00:00.000Z",
+   "properties": null
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fd90",
+   "name": "Rubico",
+   "price": 270,
+   "group": "riven",
+   "tags": "interesting,rifle",
+   "created_at": "2026-11-11T18:00:00.000Z",
+   "updated_at": "2026-11-11T18:00:00.000Z",
+   "properties": {
+    "min_price": 320,
+    "potential_profit": 50,
+    "last_updated": "2026-11-17"
+   }
+  },
+  {
+   "wfm_id": "5e41458f7b0275011bc5b7cc",
+   "name": "Kuva Bramma",
+   "price": 120,
+   "group": "riven",
+   "tags": "interesting,rifle",
+   "created_at": "2026-11-12T18:00:00.000Z",
+   "updated_at": "2026-11-12T18:00:00.000Z",
+   "properties": {
+    "min_price": 145,
+    "potential_profit": 25,
+    "last_updated": "2026-11-17"
+   }
+  },
+  {
+   "wfm_id": "5d6e947e7ea27b048cbea8cc",
+   "name": "Acceltra",
+   "price": 220,
+   "group": "riven",
+   "tags": "interesting,rifle",
+   "created_at": "2026-11-13T18:00:00.000Z",
+   "updated_at": "2026-11-13T18:00:00.000Z",
+   "properties": {
+    "min_price": 260,
+    "potential_profit": 40,
+    "last_updated": "2026-11-17"
+   }
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fda0",
+   "name": "Torid",
+   "price": 75,
+   "group": "riven",
+   "tags": "interesting,rifle",
+   "created_at": "2026-11-14T18:00:00.000Z",
+   "updated_at": "2026-11-14T18:00:00.000Z",
+   "properties": {
+    "min_price": 90,
+    "potential_profit": 15,
+    "last_updated": "2026-11-17"
+   }
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fe34",
+   "name": "Nikana",
+   "price": 345,
+   "group": "riven",
+   "tags": "interesting,melee",
+   "created_at": "2026-11-15T18:00:00.000Z",
+   "updated_at": "2026-11-15T18:00:00.000Z",
+   "properties": {
+    "min_price": 410,
+    "potential_profit": 65,
+    "last_updated": "2026-11-17"
+   }
+  },
+  {
+   "wfm_id": "5c5ca81696e8d2003834fe15",
+   "name": "Glaive",
+   "price": 145,
+   "group": "riven",
+   "tags": "interesting,melee",
+   "created_at": "2026-11-16T18:00:00.000Z",
+   "updated_at": "2026-11-16T18:00:00.000Z",
+   "properties": {
+    "min_price": 175,
+    "potential_profit": 30,
+    "last_updated": "2026-11-17"
    }
   }
  ],
@@ -2948,7 +3275,10 @@
    "price_history": [],
    "created_at": "2026-11-10T18:00:00.000Z",
    "updated_at": "2026-11-10T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 12
+   }
   },
   {
    "wfm_id": "54a74455e779892d5e5156b9",
@@ -3002,7 +3332,10 @@
    "price_history": [],
    "created_at": "2026-11-13T18:00:00.000Z",
    "updated_at": "2026-11-13T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 15
+   }
   },
   {
    "wfm_id": "54a74454e779892d5e515645",
@@ -3056,7 +3389,10 @@
    "price_history": [],
    "created_at": "2026-11-16T18:00:00.000Z",
    "updated_at": "2026-11-16T18:00:00.000Z",
-   "changes": []
+   "changes": [],
+   "properties": {
+    "min_price": 18
+   }
   },
   {
    "wfm_id": "54a74455e779892d5e515699",

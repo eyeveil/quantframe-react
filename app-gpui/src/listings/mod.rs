@@ -10,12 +10,16 @@ use std::{collections::BTreeMap, future::Future};
 use gpui::{App, AppContext, Entity, Window};
 use gpui_kit_assets::IconName;
 
+use gpui::AnyElement;
+
 use crate::{
     data::{Backend, DataResult},
     model::{FinancialReport, Paginated, StockItemListParams, StockStatus, SubType},
     theme::Theme,
     ui::{
-        grid::{ChipGroup, ChipSpec, Load, Query, ToolbarItem},
+        cells,
+        form::FormValues,
+        grid::{ChipGroup, ChipSpec, Emit, Load, Query, ToolbarItem},
         page::ListPage,
         screen::TabbedScreen,
     },
@@ -78,6 +82,37 @@ fn load_stock<T: Send + 'static>(
             report: report.await?,
         })
     })
+}
+
+/// The step of the buttons beside a price limit, in platinum.
+const LIMIT_STEP: i64 = 5;
+
+/// A price limit moved by `step`, or `None` when it would drop below zero.
+/// An unset limit counts as 0, and a limit of 0 clears it.
+fn stepped(limit: Option<i64>, step: i64) -> Option<i64> {
+    let next = limit.unwrap_or(0) + step;
+    (next >= 0).then_some(next)
+}
+
+/// A price limit cell with buttons that lower and raise it by `LIMIT_STEP`.
+fn limit_cell<A: Clone + 'static>(
+    id: u64,
+    value: Option<i64>,
+    step: impl Fn(i64) -> A,
+    emit: &Emit<A>,
+    cx: &App,
+) -> AnyElement {
+    cells::stepped_price(id, value, LIMIT_STEP, step(-LIMIT_STEP), step(LIMIT_STEP), emit, cx)
+}
+
+/// A price limit read from an edit dialog. Emptying the field of one row
+/// clears the limit, and an empty field of a bulk edit keeps each row's.
+fn limit_field(values: &FormValues, key: &str, single: bool) -> Option<i64> {
+    match values.number(key) {
+        Some(value) => Some(value),
+        None if single => Some(0),
+        None => None,
+    }
 }
 
 fn market_url(slug: &str) -> String {

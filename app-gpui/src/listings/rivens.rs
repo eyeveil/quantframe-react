@@ -10,18 +10,22 @@ use gpui_component::tooltip::Tooltip;
 use gpui_kit_assets::IconName;
 
 use super::{
-    StockData, bulk_toolbar, every_row, ids, load_stock, slug, status_chips, status_filter,
+    StockData, bulk_toolbar, every_row, ids, limit_cell, limit_field, load_stock, slug,
+    status_chips, status_filter, stepped,
 };
 use crate::{
     data::{DataKind, DataSource},
-    model::{NewStockRiven, RivenAttribute, StockRiven, StockRivenUpdate, StockStatus},
+    model::{
+        MinMax, NewStockRiven, RivenAttribute, RivenFilter, RivenFilterAttribute, RivenStat,
+        RivenWeapon, StockRiven, StockRivenUpdate, StockStatus,
+    },
     theme::{Theme, tabular_figures},
     ui::{
-        IconButton, cells, day_and_time,
+        IconButton, cells, choices, day_and_time,
         form::{Field, FormSpec, FormValues},
         grid::{
             Catalog, ChipGroup, ColumnSpec, Emit, Load, MenuEntry, Outcome, PrimaryAction, Query,
-            Stat, Tone, ToolbarItem, overflow_button,
+            Stat, Tone, ToolbarItem, overflow_button, with_cache,
         },
         number,
         panel::{Fact, PanelAction, PanelModel},
@@ -33,49 +37,8 @@ use crate::{
 const POLARITIES: [&str; 3] = ["madurai", "vazarin", "naramon"];
 const ATTRIBUTE_KEYS: [&str; 4] = ["attribute_1", "attribute_2", "attribute_3", "attribute_4"];
 const VALUE_KEYS: [&str; 4] = ["value_1", "value_2", "value_3", "value_4"];
+const REQUIRED_KEYS: [&str; 4] = ["required_1", "required_2", "required_3", "required_4"];
 const MAX_RANK: i64 = 8;
-
-/// The Warframe Market slugs of the attributes a riven can roll. The backend
-/// cache has this list, and `DataSource` has no method for it yet.
-const ATTRIBUTES: [&str; 37] = [
-    "ammo_maximum",
-    "base_damage_/_melee_damage",
-    "chance_to_gain_combo_count",
-    "chance_to_gain_extra_combo_count",
-    "channeling_damage",
-    "channeling_efficiency",
-    "cold_damage",
-    "combo_duration",
-    "critical_chance",
-    "critical_chance_on_slide_attack",
-    "critical_damage",
-    "damage_vs_corpus",
-    "damage_vs_grineer",
-    "damage_vs_infested",
-    "electric_damage",
-    "finisher_damage",
-    "fire_rate_/_attack_speed",
-    "heat_damage",
-    "impact_damage",
-    "magazine_capacity",
-    "multishot",
-    "projectile_speed",
-    "punch_through",
-    "puncture_damage",
-    "range",
-    "recoil",
-    "reload_speed",
-    "slash_damage",
-    "status_chance",
-    "status_duration",
-    "toxin_damage",
-    "weak_point_critical_chance",
-    "weak_point_damage",
-    "zoom",
-    "ammo_efficiency",
-    "heavy_attack_wind_up_speed",
-    "slam_attack_damage",
-];
 
 /// A slug as words, such as `Critical Chance` for `critical_chance`.
 pub fn words(slug: &str) -> String {
@@ -98,11 +61,12 @@ fn attribute_label(attribute: &RivenAttribute) -> String {
     } else {
         "+"
     };
-    format!(
-        "{sign}{:.1}% {}",
-        attribute.value.abs(),
+    let label = if attribute.label.is_empty() {
         words(&attribute.wfm_url)
-    )
+    } else {
+        attribute.label.clone()
+    };
+    format!("{sign}{:.1}% {label}", attribute.value.abs())
 }
 
 /// Every attribute of a riven as the game writes it.
@@ -165,6 +129,57 @@ pub fn attributes_cell(id: u64, attributes: &[RivenAttribute], cx: &App) -> AnyE
         .into_any_element()
 }
 
+/// The list price, with a mark when the price model set it.
+fn list_price_cell(row: &StockRiven, cx: &App) -> AnyElement {
+    let theme = Theme::global(cx);
+    let colors = theme.colors;
+    let Some(price) = row.list_price else {
+        return cells::amount(None, "Not listed", cx);
+    };
+    div()
+        .id(("list-price", row.id as u64))
+        .size_full()
+        .flex()
+        .items_center()
+        .justify_end()
+        .gap(px(6.))
+        .when(row.properties.is_predicted, |cell| {
+            cell.child(crate::ui::icon(
+                IconName::Bot,
+                theme.metrics.icon - px(2.),
+                colors.text_faint,
+            ))
+            .tooltip(|window, cx| {
+                Tooltip::new("Predicted by the price model, not taken from live auctions")
+                    .build(window, cx)
+            })
+        })
+        .child(
+            div()
+                .font_features(tabular_figures())
+                .text_color(colors.text)
+                .child(number(price)),
+        )
+        .into_any_element()
+}
+
+/// The auction filter in a few words, for the item panel.
+fn filter_summary(filter: &RivenFilter) -> String {
+    if !filter.enabled {
+        return "Off".to_owned();
+    }
+    let required = filter
+        .attributes
+        .iter()
+        .filter(|attribute| attribute.is_required)
+        .count();
+    match required {
+        0 => "On".to_owned(),
+        1 => "On, 1 required attribute".to_owned(),
+        count => format!("On, {count} required attributes"),
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum RivenAction {
     Add,
@@ -174,6 +189,9 @@ pub enum RivenAction {
     SellAtList(u64),
     Edit(Vec<u64>),
     Save { ids: Vec<u64>, update: StockRivenUpdate },
+    StepMinPrice { id: u64, step: i64 },
+    Filter(u64),
+    SaveFilter { id: u64, filter: RivenFilter },
     ToggleHidden(u64),
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
@@ -185,10 +203,19 @@ pub enum RivenAction {
     Export,
 }
 
+/// The cache lists the add dialog chooses from.
+type RivenLists = (Vec<RivenWeapon>, Vec<RivenStat>);
+
 #[derive(Default)]
 pub struct Rivens {
     data: StockData<StockRiven>,
+    /// The cache's riven weapons and stats, loaded once.
+    weapons: Vec<RivenWeapon>,
+    stats: Vec<RivenStat>,
 }
+
+const MIN_MASTERY: i64 = 8;
+const MAX_MASTERY: i64 = 16;
 
 impl Rivens {
     fn riven(&self, id: u64) -> Option<StockRiven> {
@@ -199,14 +226,16 @@ impl Rivens {
             .cloned()
     }
 
-    fn create_prompt() -> FormSpec {
+    fn create_prompt(&self) -> FormSpec {
+        let weapon = if self.weapons.is_empty() {
+            Field::text("weapon", "Weapon", "", "Rubico")
+                .hint("The weapon's name on Warframe Market.")
+        } else {
+            Field::search("weapon", "Weapon", choices::weapons(&self.weapons), None)
+        };
         let mut spec = FormSpec::new("Add riven", "Add riven")
             .width(560.)
-            .field(
-                Field::text("weapon", "Weapon", "", "Rubico")
-                    .hint("The weapon's name on Warframe Market.")
-                    .half(),
-            )
+            .field(weapon.half())
             .field(Field::text("name", "Riven name", "", "Crita-visican").half())
             .field(
                 Field::number("mastery_rank", "Mastery rank", Some(8))
@@ -225,14 +254,15 @@ impl Rivens {
                 .half(),
             )
             .field(Field::platinum("bought", "Bought", Some(0)));
-        let names: Vec<String> = ATTRIBUTES.iter().map(|slug| words(slug)).collect();
+        let stats = choices::stats(&self.stats);
         for (index, (attribute, value)) in ATTRIBUTE_KEYS.into_iter().zip(VALUE_KEYS).enumerate() {
-            let choice = Field::choice(
-                attribute,
-                &format!("Attribute {}", index + 1),
-                names.clone(),
-                None,
-            )
+            let label = format!("Attribute {}", index + 1);
+            let choice = if stats.is_empty() {
+                Field::text(attribute, &label, "", "critical_chance")
+                    .hint("The attribute's slug on Warframe Market.")
+            } else {
+                Field::search(attribute, &label, stats.clone(), None)
+            }
             .half();
             let amount = Field::text(value, "Value in percent", "", "120.5 or -40").half();
             spec = if index < 2 {
@@ -249,18 +279,18 @@ impl Rivens {
             .into_iter()
             .zip(VALUE_KEYS)
             .filter_map(|(attribute, value)| {
-                let name = values.choice(attribute)?;
-                let wfm_url = ATTRIBUTES.iter().find(|slug| words(slug) == name)?;
+                let wfm_url = values
+                    .choice(attribute)
+                    .or_else(|| Some(slug(&values.text(attribute))).filter(|s| !s.is_empty()))?;
                 let value = values.text(value).replace('%', "").parse::<f64>().ok()?;
-                Some(RivenAttribute {
-                    wfm_url: (*wfm_url).to_owned(),
-                    positive: value >= 0.0,
-                    value: value.abs(),
-                })
+                Some(RivenAttribute::new(wfm_url, value >= 0.0, value.abs()))
             })
             .collect();
+        let weapon = values
+            .choice("weapon")
+            .unwrap_or_else(|| slug(&values.text("weapon")));
         Some(RivenAction::Create(NewStockRiven {
-            wfm_weapon_url: slug(&values.text("weapon")),
+            wfm_weapon_url: weapon,
             mod_name: values.text("name"),
             mastery_rank: values.number("mastery_rank")?,
             re_rolls: values.number("re_rolls")?,
@@ -303,8 +333,108 @@ impl Rivens {
                 )
                 .min(8)
                 .half(),
-            )),
+            ))
+            .field(
+                Field::platinum(
+                    "min_price",
+                    "Minimum price",
+                    single.as_ref().and_then(|riven| riven.properties.min_price),
+                )
+                .optional()
+                .hint("The scraper never lists below it. Empty sets no floor."),
+            ),
         )
+    }
+
+    fn filter_prompt(riven: &StockRiven) -> FormSpec {
+        let filter = &riven.filter;
+        let range = |value: Option<MinMax>| (value.map(|v| v.min), value.and_then(|v| v.max));
+        let (rolls_min, rolls_max) = range(filter.re_rolls);
+        let (mastery_min, mastery_max) = range(filter.mastery_rank);
+        let mut spec = FormSpec::new(format!("Auction filter for {}", riven.title()), "Save")
+            .width(520.)
+            .description(
+                "The live scraper prices this riven against the auctions that pass the filter.",
+            )
+            .field(Field::toggle("enabled", "Use the filter", filter.enabled))
+            .field(
+                Field::number("rolls_min", "Re-rolls from", rolls_min)
+                    .optional()
+                    .half(),
+            )
+            .field(Field::number("rolls_max", "Re-rolls to", rolls_max).optional().half())
+            .field(
+                Field::number("mastery_min", "Mastery rank from", mastery_min)
+                    .min(MIN_MASTERY)
+                    .max(MAX_MASTERY)
+                    .optional()
+                    .half(),
+            )
+            .field(
+                Field::number("mastery_max", "Mastery rank to", mastery_max)
+                    .min(MIN_MASTERY)
+                    .max(MAX_MASTERY)
+                    .optional()
+                    .half(),
+            )
+            .field(
+                Field::number(
+                    "similarity",
+                    "Least similarity",
+                    filter.similarity.map(|value| value.round() as i64),
+                )
+                .max(100)
+                .unit("%")
+                .optional()
+                .half(),
+            )
+            .field(Field::toggle(
+                "required_negative",
+                "Needs a negative attribute",
+                filter.required_negative,
+            ));
+        for (index, attribute) in riven.attributes.iter().enumerate().take(ATTRIBUTE_KEYS.len()) {
+            let required = filter
+                .attributes
+                .iter()
+                .any(|entry| entry.wfm_url == attribute.wfm_url && entry.is_required);
+            spec = spec.field(Field::toggle(
+                REQUIRED_KEYS[index],
+                &format!("Require {}", attribute_label(attribute)),
+                required,
+            ));
+        }
+        spec
+    }
+
+    fn filter_saved(riven: &StockRiven, values: &FormValues) -> RivenFilter {
+        let range = |min: &str, max: &str| {
+            values.number(min).map(|low| MinMax {
+                min: low,
+                max: values.number(max),
+            })
+        };
+        RivenFilter {
+            enabled: values.flag("enabled"),
+            mastery_rank: range("mastery_min", "mastery_max"),
+            re_rolls: range("rolls_min", "rolls_max"),
+            polarity: riven.filter.polarity.clone(),
+            similarity: values
+                .number("similarity")
+                .filter(|value| *value > 0)
+                .map(|value| value as f64),
+            required_negative: values.flag("required_negative"),
+            attributes: riven
+                .attributes
+                .iter()
+                .zip(REQUIRED_KEYS)
+                .map(|(attribute, key)| RivenFilterAttribute {
+                    wfm_url: attribute.wfm_url.clone(),
+                    positive: attribute.positive,
+                    is_required: values.flag(key),
+                })
+                .collect(),
+        }
     }
 
     fn message_items(&self, ids: &[u64]) -> Vec<MessageItem> {
@@ -323,7 +453,7 @@ impl Rivens {
 impl Catalog for Rivens {
     type Row = StockRiven;
     type Action = RivenAction;
-    type Data = StockData<StockRiven>;
+    type Data = (StockData<StockRiven>, Option<RivenLists>);
 
     const NOUN: &'static str = "rivens";
     const SEARCH_PLACEHOLDER: &'static str = "Search rivens";
@@ -332,15 +462,27 @@ impl Catalog for Rivens {
     const WATCH: &'static [DataKind] = &[DataKind::StockRivens];
 
     fn load(&self, source: &DataSource) -> Load<Self::Data> {
-        load_stock(
-            source.get_stock_riven_pagination(&every_row()),
-            source.get_stock_riven_status_counts(),
-            source.get_stock_riven_financial_report(),
+        let lists = (self.weapons.is_empty() || self.stats.is_empty()).then(|| {
+            let weapons = source.cache_get_riven_weapons();
+            let stats = source.cache_get_riven_attributes();
+            async move { Ok((weapons.await?, stats.await?)) }
+        });
+        with_cache(
+            load_stock(
+                source.get_stock_riven_pagination(&every_row()),
+                source.get_stock_riven_status_counts(),
+                source.get_stock_riven_financial_report(),
+            ),
+            lists,
         )
     }
 
-    fn apply(&mut self, data: Self::Data) {
+    fn apply(&mut self, (data, lists): Self::Data) {
         self.data = data;
+        if let Some((weapons, stats)) = lists {
+            self.weapons = weapons;
+            self.stats = stats;
+        }
     }
 
     fn columns(&self) -> Vec<ColumnSpec> {
@@ -362,8 +504,11 @@ impl Catalog for Rivens {
             ColumnSpec::new("list_price", "List price", 100.)
                 .end()
                 .sortable(),
+            ColumnSpec::new("min_price", "Min price", 124.)
+                .sortable()
+                .droppable(4),
             ColumnSpec::new("status", "Status", 140.).sortable(),
-            ColumnSpec::new("actions", "", 150.),
+            ColumnSpec::new("actions", "", 178.),
         ]
     }
 
@@ -435,9 +580,14 @@ impl Catalog for Rivens {
 
     fn perform(&mut self, action: RivenAction, source: &DataSource) -> Outcome<RivenAction> {
         match action {
-            RivenAction::Add => Outcome::ask(Self::create_prompt(), Self::created),
+            RivenAction::Add => Outcome::ask(self.create_prompt(), Self::created),
             RivenAction::Create(input) => {
-                let notice = format!("Added {} {} to stock.", input.wfm_weapon_url, input.mod_name);
+                let weapon = self
+                    .weapons
+                    .iter()
+                    .find(|weapon| weapon.wfm_url == input.wfm_weapon_url)
+                    .map_or(input.wfm_weapon_url.clone(), |weapon| weapon.name.clone());
+                let notice = format!("Added {weapon} {} to stock.", input.mod_name);
                 Outcome::run(source.stock_riven_create(input), notice)
             }
             RivenAction::Sell(id) => match self.riven(id) {
@@ -472,12 +622,46 @@ impl Catalog for Rivens {
                             bought: values.number("bought"),
                             re_rolls: values.number("re_rolls"),
                             mastery_rank: values.number("mastery_rank"),
+                            min_price: limit_field(values, "min_price", ids.len() == 1),
                             ..StockRivenUpdate::default()
                         },
                     })
                 }),
                 None => Outcome::Done,
             },
+            RivenAction::StepMinPrice { id, step } => {
+                match self
+                    .riven(id)
+                    .and_then(|riven| Some((riven.id, stepped(riven.properties.min_price, step)?)))
+                {
+                    Some((id, min_price)) => Outcome::run_quietly(source.stock_riven_update(
+                        id,
+                        StockRivenUpdate {
+                            min_price: Some(min_price),
+                            ..StockRivenUpdate::default()
+                        },
+                    )),
+                    None => Outcome::Done,
+                }
+            }
+            RivenAction::Filter(id) => match self.riven(id) {
+                Some(riven) => Outcome::ask(Self::filter_prompt(&riven), move |values| {
+                    Some(RivenAction::SaveFilter {
+                        id,
+                        filter: Self::filter_saved(&riven, values),
+                    })
+                }),
+                None => Outcome::Done,
+            },
+            RivenAction::SaveFilter { id, filter } => {
+                Outcome::run_quietly(source.stock_riven_update(
+                    id as i64,
+                    StockRivenUpdate {
+                        filter: Some(filter),
+                        ..StockRivenUpdate::default()
+                    },
+                ))
+            }
             RivenAction::Save { ids: rows, update } => match rows.as_slice() {
                 [id] => Outcome::run_quietly(source.stock_riven_update(*id as i64, update)),
                 _ => Outcome::run_quietly(source.stock_riven_update_multiple(ids(&rows), update)),
@@ -552,6 +736,7 @@ impl Catalog for Rivens {
             "re_rolls" => a.re_rolls.cmp(&b.re_rolls),
             "bought" => a.bought.cmp(&b.bought),
             "list_price" => a.list_price.cmp(&b.list_price),
+            "min_price" => a.properties.min_price.cmp(&b.properties.min_price),
             "status" => a.status.label().cmp(b.status.label()),
             _ => a.title().cmp(&b.title()),
         }
@@ -572,10 +757,22 @@ impl Catalog for Rivens {
             "mastery" => cells::amount(Some(row.mastery_rank), "", cx),
             "re_rolls" => cells::amount(Some(row.re_rolls), "", cx),
             "bought" => cells::amount(Some(row.bought), "", cx),
-            "list_price" => cells::amount(row.list_price, "Not listed", cx),
+            "list_price" => list_price_cell(row, cx),
+            "min_price" => limit_cell(
+                id,
+                row.properties.min_price,
+                |step| RivenAction::StepMinPrice { id, step },
+                emit,
+                cx,
+            ),
             "status" => cells::status(theme.status_color(row.status), row.status.label(), cx),
             _ => {
                 let menu_row = row.clone();
+                let filter = if row.filter.enabled {
+                    "Auction filter: on"
+                } else {
+                    "Auction filter: off"
+                };
                 cells::actions()
                     .child(
                         div().pr(px(5.)).child(
@@ -583,6 +780,16 @@ impl Catalog for Rivens {
                                 .on_click(emit.on_click(RivenAction::Sell(id))),
                         ),
                     )
+                    .child({
+                        let button = IconButton::new(("filter", id), IconName::Funnel, filter)
+                            .in_row()
+                            .on_click(emit.on_click(RivenAction::Filter(id)));
+                        if row.filter.enabled {
+                            button.tone(theme.colors.accent).hover_tone(theme.colors.accent)
+                        } else {
+                            button
+                        }
+                    })
                     .child(
                         IconButton::new(
                             ("sell-list", id),
@@ -615,7 +822,14 @@ impl Catalog for Rivens {
             "mastery" => Some(number(row.mastery_rank)),
             "re_rolls" => Some(number(row.re_rolls)),
             "bought" => Some(number(row.bought)),
-            "list_price" => row.list_price.map(number),
+            "list_price" => row.list_price.map(|price| {
+                if row.properties.is_predicted {
+                    format!("{}, predicted", number(price))
+                } else {
+                    number(price)
+                }
+            }),
+            "min_price" => row.properties.min_price.map(number),
             "status" => Some(row.status.label().to_owned()),
             _ => None,
         }
@@ -637,6 +851,11 @@ impl Catalog for Rivens {
         }
         menu.extend([
             MenuEntry::new("Edit", IconName::SquarePen, RivenAction::Edit(vec![id])),
+            MenuEntry::new(
+                "Edit the auction filter",
+                IconName::Funnel,
+                RivenAction::Filter(id),
+            ),
             MenuEntry::new(
                 "Show details",
                 IconName::PanelRight,
@@ -693,12 +912,22 @@ impl Catalog for Rivens {
             facts: vec![
                 Fact::new("Bought", number(row.bought)),
                 Fact::amount("List price", row.list_price, "Not listed"),
+                Fact::new(
+                    "Price source",
+                    if row.properties.is_predicted {
+                        "Price model"
+                    } else {
+                        "Live auctions"
+                    },
+                ),
                 match profit {
                     Some(profit) => {
                         Fact::new("Profit", number(profit)).tone(Tone::of_profit(profit))
                     }
                     None => Fact::new("Profit", "Not listed").tone(Tone::Muted),
                 },
+                Fact::amount("Minimum price", row.properties.min_price, "Not set"),
+                Fact::new("Auction filter", filter_summary(&row.filter)),
                 Fact::new("Mastery rank", number(row.mastery_rank)),
                 Fact::new(
                     "Rank",
@@ -718,6 +947,11 @@ impl Catalog for Rivens {
             ],
             secondary: vec![
                 PanelAction::new("Edit", IconName::SquarePen, RivenAction::Edit(vec![id])),
+                PanelAction::new(
+                    "Edit the auction filter",
+                    IconName::Funnel,
+                    RivenAction::Filter(id),
+                ),
                 if row.is_hidden {
                     PanelAction::new(
                         "Show on Warframe Market",

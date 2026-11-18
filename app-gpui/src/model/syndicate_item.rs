@@ -1,4 +1,4 @@
-use super::{PriceHistory, StockStatus, SubType};
+use super::{CoolDownInfo, PriceHistory, StockStatus, SubType};
 
 /// Mirrors `entity::syndicate_item::Model`.
 #[derive(Clone, Debug, PartialEq)]
@@ -17,6 +17,14 @@ pub struct SyndicateItem {
     pub price_history: Vec<PriceHistory>,
     pub updated_at: String,
     pub created_at: String,
+    pub properties: SyndicateItemProperties,
+}
+
+/// The keys the backend allows in a syndicate item's `properties`.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct SyndicateItemProperties {
+    pub min_price: Option<i64>,
+    pub cooldown: Option<CoolDownInfo>,
 }
 
 /// Input of `syndicate_item_create`.
@@ -27,9 +35,11 @@ pub struct NewSyndicateItem {
     pub syndicate_unique_name: String,
 }
 
-/// Input of `syndicate_item_update`. `None` leaves a field unchanged.
+/// Input of `syndicate_item_update`. `None` leaves a field unchanged. The
+/// backend clears a minimum price that is set to 0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct SyndicateItemUpdate {
     pub list_price: Option<i64>,
     pub standing_cost: Option<i64>,
+    pub min_price: Option<i64>,
 }

@@ -270,7 +270,7 @@ for n in range(12):
         "wfm_id": item["id"],
         "name": item["i18n"]["en"]["name"],
         "price": rng.randint(5, 150),
-        "group": ["item", "set", "mod"][n % 3],
+        "group": "item",
         "tags": ",".join(item["tags"]),
         "created_at": ts(25 - n),
         "updated_at": ts(25 - n),
@@ -347,14 +347,130 @@ syndicates["CephalonSudaSyndicate"]["favours"].append(
 )
 write("cache/items/Syndicate.json", list(syndicates.values()))
 
-write("database.json", {
+# BEGIN add_trader_properties
+CUSTOM_ENTRIES = [
+    ("Forma Blueprint x3", 12, "forma,blueprint"),
+    ("Riven slot (Prime)", 20, "service"),
+    ("Eidolon Tridolon carry", 40, "service,carry"),
+    ("Profit-Taker carry", 35, "service,carry"),
+    ("Relic cracking, 4 by 4", 15, "service,relic"),
+]
+RIVEN_MARKET_LOWS = [320, 145, 260, 90, 410, 175]
+
+
+def rust_float(value):
+    text = repr(float(value))
+    return text[:-2] if text.endswith(".0") else text
+
+
+def stock_riven_uuid(riven):
+    """The uuid `stock_riven::Model::uuid` derives, which auctions match on."""
+    import uuid
+    key = f"type:0;weapon:{riven['wfm_weapon_url']};mod_name:{riven['mod_name'].lower()};"
+    key += f"re_rolls:{riven['re_rolls']};mastery:{riven['mastery_rank']};"
+    if riven.get("sub_type"):
+        key += f"mod_rank:{riven['sub_type'].get('rank') or 0};"
+    key += f"polarity:{riven['polarity'].lower()};"
+    for a in sorted(riven["attributes"], key=lambda a: a["wfmUrl"]):
+        key += f"attr:{a['wfmUrl']}:{str(a['positive']).lower()}:{rust_float(a['value'])};"
+    return str(uuid.uuid5(uuid.NAMESPACE_OID, key))
+
+
+def add_trader_properties(db, orders, auctions):
+    """Adds the properties that the live scraper and "Find rivens" store, so
+    the screens show price limits, profits and importable auctions offline.
+    Uses no randomness, so the rest of the output keeps its values."""
+    for n, row in enumerate(db["stock_items"]):
+        props = {}
+        if n % 4 == 1:
+            props["min_price"] = row["bought"] + 5
+        if n % 7 == 3:
+            props["min_profit"] = 10
+            props["min_sma"] = 15
+        if row["wfm_url"].startswith("arcane_") or row["wfm_url"].endswith("_relic"):
+            props["is_bulk"] = n % 2 == 0
+        if props:
+            row["properties"] = props
+    for n, riven in enumerate(db["stock_rivens"]):
+        props = {}
+        if n % 3 == 0:
+            props["min_price"] = riven["bought"] + 40
+        if n % 4 == 1 and riven["list_price"]:
+            props["is_predicted"] = True
+        if props:
+            riven["properties"] = props
+        if n % 5 == 0:
+            riven["filter"] = {
+                "enabled": True,
+                "mastery_rank": {"min": 8, "max": 16},
+                "re_rolls": {"min": 0, "max": 40},
+                "similarity": 60.0,
+                "required_negative": any(not a["positive"] for a in riven["attributes"]),
+                "attributes": [
+                    {"url_name": a["wfmUrl"], "positive": a["positive"], "is_required": a["positive"]}
+                    for a in riven["attributes"]
+                ],
+            }
+    for n, row in enumerate(db["wish_list"]):
+        props = {}
+        if n % 2 == 0:
+            props["max_price"] = row["list_price"] + 12
+        if n % 4 == 1:
+            props["min_price"] = row["list_price"] - 10
+        if row["wfm_url"].startswith("arcane_"):
+            props["is_bulk"] = True
+        if props:
+            row["properties"] = props
+    for n, row in enumerate(db["syndicate_items"]):
+        if n % 3 == 0:
+            row["properties"] = {"min_price": 12 + n}
+    for order in orders["sell_orders"]:
+        order["properties"] = {"closed_avg": round(order["platinum"] * 1.05, 1),
+                               "potential_profit": round(order["platinum"] * 0.25)}
+    for order in orders["buy_orders"]:
+        closed_avg = round(order["platinum"] * 1.3, 1)
+        order["properties"] = {"closed_avg": closed_avg,
+                               "potential_profit": round(closed_avg - order["platinum"])}
+    for n, auction in enumerate(auctions):
+        auction["uuid"] = (stock_riven_uuid(db["stock_rivens"][n]) if n < 3
+                           else f"fixture-auction-{n:02d}")
+    entries = db["trade_entries"]
+    for n, (name, price, tags) in enumerate(CUSTOM_ENTRIES):
+        entries.append({
+            "wfm_id": "custom",
+            "name": name,
+            "price": price,
+            "group": "custom",
+            "tags": tags,
+            "created_at": f"2026-11-{5 + n:02d}T18:00:00.000Z",
+            "updated_at": f"2026-11-{5 + n:02d}T18:00:00.000Z",
+            "properties": None,
+        })
+    for n, low in enumerate(RIVEN_MARKET_LOWS):
+        riven = db["stock_rivens"][n]
+        price = max(5, low * 85 // 100 // 5 * 5)
+        entries.append({
+            "wfm_id": riven["wfm_weapon_id"],
+            "name": riven["weapon_name"],
+            "price": price,
+            "group": "riven",
+            "tags": "interesting," + riven["weapon_type"],
+            "created_at": f"2026-11-{11 + n:02d}T18:00:00.000Z",
+            "updated_at": f"2026-11-{11 + n:02d}T18:00:00.000Z",
+            "properties": {"min_price": low, "potential_profit": low - price,
+                           "last_updated": "2026-11-17"},
+        })
+# END add_trader_properties
+
+
+DATABASE = {
     "stock_items": stock_items,
     "stock_rivens": stock_rivens,
     "wish_list": wish_list,
     "transactions": transactions,
     "trade_entries": trade_entries,
     "syndicate_items": syndicate_items,
-})
+}
 
 order_pool = [i for i in items if any(t in i["tags"] for t in ("set", "mod", "arcane_enhancement"))]
 rng.shuffle(order_pool)
@@ -378,7 +494,7 @@ for n, item in enumerate(order_pool[:60]):
         if "variant" in sub:
             order["subtype"] = sub["variant"]
     orders[f"{kind}_orders"].append(order)
-write("wfm_orders.json", orders)
+# written below, after add_trader_properties
 
 auctions = []
 for n, riven in enumerate(stock_rivens[:5]):
@@ -416,6 +532,9 @@ for n, riven in enumerate(stock_rivens[:5]):
         "name": riven["weapon_name"] + " " + riven["mod_name"],
         "mod_name": riven["mod_name"],
     })
+add_trader_properties(DATABASE, orders, auctions)
+write("database.json", DATABASE)
+write("wfm_orders.json", orders)
 write("wfm_auctions.json", {"auctions": auctions})
 
 ME = "64f0c0ffee0000000000f1a7"
