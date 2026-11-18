@@ -83,7 +83,7 @@ for shot in "${shots[@]}"; do
   if (($# > 0)) && [[ " $* " != *" $name "* ]]; then
     continue
   fi
-  xvfb-run -a -s '-screen 0 1440x900x24' bash -c "
+  timeout -k 5 45 xvfb-run -a -s '-screen 0 1440x900x24' bash -c "
     env QF_FIXTURES='$root/src-tauri/fixtures' QF_PANEL=closed $settings QF_WINDOW_CONTROLS=1 \\
       XDG_CONFIG_HOME='$config' '$binary' &
     app=\$!
@@ -94,7 +94,7 @@ for shot in "${shots[@]}"; do
     done
     sleep 1
     import -window root '$out/$name.png'
-    kill \$app
-  "
+    kill \$app; sleep 1; kill -9 \$app 2>/dev/null || true
+  " || echo "render timed out: $name" >&2
   echo "$out/$name.png"
 done
