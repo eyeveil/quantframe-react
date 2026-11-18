@@ -1,6 +1,3 @@
-//! Settings, user and login, the live scraper, logs and debug info, and the
-//! in-game inventory.
-
 use std::{future::Future, path::PathBuf, sync::Mutex};
 
 use qf_app_lib::{
@@ -115,8 +112,6 @@ impl DataSource {
         self.call(async move { Ok(app::app_get_default_settings().await?) })
     }
 
-    /// Saves the settings and applies them to the log parser and inventory
-    /// source. Returns what the backend stored.
     pub fn app_update_settings(
         &self,
         settings: Settings,
@@ -129,12 +124,10 @@ impl DataSource {
         })
     }
 
-    /// The signed-in user (`auth_me`).
     pub fn user(&self) -> impl Future<Output = DataResult<User>> + Send + 'static {
         self.call(async move { user_model(auth::auth_me(State::get()).await?) })
     }
 
-    /// Signs in to warframe.market and Quantframe. Fixture mode returns an error.
     pub fn auth_login(
         &self,
         email: String,
@@ -149,8 +142,6 @@ impl DataSource {
         self.call(async move { user_model(auth::auth_logout(State::get(), State::get()).await?) })
     }
 
-    /// Sets your warframe.market status over the websocket. Fixture mode
-    /// returns an error.
     pub fn user_set_status(
         &self,
         status: UserStatus,
@@ -166,8 +157,6 @@ impl DataSource {
         self.call(scraper_state())
     }
 
-    /// Starts the live scraper. In fixture mode it is marked running and
-    /// makes no requests.
     pub fn live_scraper_start(
         &self,
     ) -> impl Future<Output = DataResult<LiveScraperState>> + Send + 'static {
@@ -180,7 +169,6 @@ impl DataSource {
         self.call(set_scraper_running(false))
     }
 
-    /// Writes a zip of the logs to the desktop and returns its path.
     pub fn log_export(&self) -> impl Future<Output = DataResult<PathBuf>> + Send + 'static {
         self.call(async move {
             let path = logs::log_export(State::get(), State::get(), State::get()).await?;
@@ -223,7 +211,6 @@ impl DataSource {
         })
     }
 
-    /// Whether a Warframe GDPR export has been loaded into the log parser.
     pub fn wfgdpr_get_state(&self) -> impl Future<Output = DataResult<GdprState>> + Send + 'static {
         self.call(async move {
             let state = warframe_gdpr::wfgdpr_get_state(State::get()).await?;
@@ -257,7 +244,6 @@ impl DataSource {
         })
     }
 
-    /// Reads the inventory again from its source.
     pub fn wf_inventory_update(&self) -> impl Future<Output = DataResult<()>> + Send + 'static {
         self.call(async move { Ok(wf_inventory::wf_inventory_update(State::get()).await?) })
     }

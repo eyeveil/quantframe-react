@@ -1,6 +1,5 @@
 use super::{CoolDownInfo, PriceHistory, StockStatus, SubType};
 
-/// Mirrors `entity::syndicate_item::Model`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SyndicateItem {
     pub id: i64,
@@ -20,14 +19,12 @@ pub struct SyndicateItem {
     pub properties: SyndicateItemProperties,
 }
 
-/// The keys the backend allows in a syndicate item's `properties`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct SyndicateItemProperties {
     pub min_price: Option<i64>,
     pub cooldown: Option<CoolDownInfo>,
 }
 
-/// Input of `syndicate_item_create`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct NewSyndicateItem {
     pub raw: String,
@@ -35,8 +32,6 @@ pub struct NewSyndicateItem {
     pub syndicate_unique_name: String,
 }
 
-/// Input of `syndicate_item_update`. `None` leaves a field unchanged. The
-/// backend clears a minimum price that is set to 0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct SyndicateItemUpdate {
     pub list_price: Option<i64>,

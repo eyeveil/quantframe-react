@@ -1,7 +1,3 @@
-//! The Items, Rivens and Syndicates tabs: price statistics from Quantframe's
-//! server for a date range. One [`Prices`] catalog serves the three lookups,
-//! and a [`PriceKind`] names what differs between them.
-
 use std::{cmp::Ordering, marker::PhantomData, path::PathBuf};
 
 use gpui::{AnyElement, App, IntoElement, ParentElement};
@@ -23,33 +19,27 @@ use crate::{
     },
 };
 
-/// The longest date range the price lookups accept, in days.
 const MAX_RANGE_DAYS: i64 = 90;
 const ROW_CHOICES: [i64; 4] = [100, 250, 500, 1000];
 
-/// A cell of a price row.
 pub enum Cell {
     Text(String),
     Number(f64),
 }
 
-/// What differs between the item, riven and syndicate price lookups.
 pub trait PriceKind: 'static {
     type Row: Clone + Send + 'static;
 
     const NOUN: &'static str;
     const SEARCH_PLACEHOLDER: &'static str;
     const FILE_NAME: &'static str;
-    /// Whether the lookup takes the date range. The syndicate one ignores it.
     const DATED: bool;
-    /// The columns after the name: key, title and width.
     const COLUMNS: &'static [(&'static str, &'static str, f32)];
 
     fn fetch(source: &DataSource, params: &PriceLookupParams) -> Load<Paginated<Self::Row>>;
     fn export(source: &DataSource, params: &PriceLookupParams, path: PathBuf) -> Export;
     fn name(row: &Self::Row) -> String;
     fn value(row: &Self::Row, key: &str) -> Cell;
-    /// The page of the row on warframe.market.
     fn url(row: &Self::Row) -> Option<String>;
 }
 
@@ -132,7 +122,6 @@ impl<K: PriceKind> Prices<K> {
     }
 }
 
-/// True for a calendar date written as `YYYY-MM-DD`.
 fn is_date(text: &str) -> bool {
     let parts: Vec<&str> = text.split('-').collect();
     let number = |index: usize, width: usize| {
@@ -420,7 +409,6 @@ impl<K: PriceKind> Catalog for Prices<K> {
     }
 }
 
-/// Whether a column holds text, so it lines up on the left.
 fn is_text_column(key: &str) -> bool {
     matches!(key, "syndicate" | "rank")
 }

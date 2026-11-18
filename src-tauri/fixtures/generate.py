@@ -1,13 +1,3 @@
-"""Builds the fixture files in this directory.
-
-Inputs are public, unauthenticated warframe.market responses recorded once:
-  curl -H 'Language: en' https://api.warframe.market/v2/items            > items.json
-  curl -H 'Language: en' https://api.warframe.market/v2/riven/weapons    > riven_weapons.json
-  curl -H 'Language: en' https://api.warframe.market/v2/riven/attributes > riven_attributes.json
-
-Usage: python3 -I generate.py <dir with the three recorded files>
-"""
-
 import json
 import random
 import sys
@@ -347,7 +337,6 @@ syndicates["CephalonSudaSyndicate"]["favours"].append(
 )
 write("cache/items/Syndicate.json", list(syndicates.values()))
 
-# BEGIN add_trader_properties
 CUSTOM_ENTRIES = [
     ("Forma Blueprint x3", 12, "forma,blueprint"),
     ("Riven slot (Prime)", 20, "service"),
@@ -364,7 +353,6 @@ def rust_float(value):
 
 
 def stock_riven_uuid(riven):
-    """The uuid `stock_riven::Model::uuid` derives, which auctions match on."""
     import uuid
     key = f"type:0;weapon:{riven['wfm_weapon_url']};mod_name:{riven['mod_name'].lower()};"
     key += f"re_rolls:{riven['re_rolls']};mastery:{riven['mastery_rank']};"
@@ -377,9 +365,6 @@ def stock_riven_uuid(riven):
 
 
 def add_trader_properties(db, orders, auctions):
-    """Adds the properties that the live scraper and "Find rivens" store, so
-    the screens show price limits, profits and importable auctions offline.
-    Uses no randomness, so the rest of the output keeps its values."""
     for n, row in enumerate(db["stock_items"]):
         props = {}
         if n % 4 == 1:
@@ -461,7 +446,6 @@ def add_trader_properties(db, orders, auctions):
             "properties": {"min_price": low, "potential_profit": low - price,
                            "last_updated": "2026-11-17"},
         })
-# END add_trader_properties
 
 
 DATABASE = {
@@ -495,7 +479,6 @@ for n, item in enumerate(order_pool[:60]):
         if "variant" in sub:
             order["subtype"] = sub["variant"]
     orders[f"{kind}_orders"].append(order)
-# written below, after add_trader_properties
 
 auctions = []
 for n, riven in enumerate(stock_rivens[:5]):

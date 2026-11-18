@@ -57,7 +57,6 @@ fn copy_dir(from: &Path, to: &Path) -> Result<(), Error> {
     Ok(())
 }
 
-/// Puts the fixture cache and user into the storage directory before startup reads them.
 pub fn prepare_storage(fixtures: &Path) -> Result<(), Error> {
     let storage = helper::get_app_storage_path();
     let marker = storage.join(FIXTURE_MARKER);
@@ -83,9 +82,6 @@ pub fn prepare_storage(fixtures: &Path) -> Result<(), Error> {
     Ok(())
 }
 
-/// Fills the database and the warframe.market caches. Runs after `setup_manages`.
-/// A database that already has stock items, from an earlier run on the same
-/// `QF_STORAGE_DIR`, keeps its rows, so edits survive a restart.
 pub async fn seed(fixtures: &Path) -> Result<(), Error> {
     let conn = DATABASE.get().expect("Database not initialized");
     let existing = stock_item::Entity::find().count(conn).await.unwrap_or(0);
@@ -101,7 +97,6 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
     seed_market(fixtures).await
 }
 
-/// How far to move a list of fixture dates so the latest lands on `now`.
 fn shift_to(now: DateTime<Utc>, dates: impl Iterator<Item = DateTime<Utc>>) -> chrono::Duration {
     dates
         .max()
@@ -111,9 +106,6 @@ fn shift_to(now: DateTime<Utc>, dates: impl Iterator<Item = DateTime<Utc>>) -> c
 async fn seed_database(fixtures: &Path) -> Result<(), Error> {
     let conn = DATABASE.get().expect("Database not initialized");
     let mut db: Database = read_json_file(&fixtures.join("database.json"))?;
-    // The fixture dates are fixed, so the transactions and trade entries move
-    // to end at the seed time, and the dashboard's "today" and "last 7 days"
-    // charts have data on any day.
     let now = Utc::now();
     let shift = shift_to(now, db.transactions.iter().map(|model| model.created_at));
     for model in &mut db.transactions {
@@ -138,7 +130,6 @@ async fn seed_database(fixtures: &Path) -> Result<(), Error> {
     }
     for model in &db.wish_list {
         let created = WishListMutation::create(conn, model).await?;
-        // `create` starts every wish as pending with no bid.
         let update = wish_list::UpdateWishList::new(created.id)
             .with_list_price(model.list_price)
             .with_status(model.status.clone())
@@ -150,7 +141,6 @@ async fn seed_database(fixtures: &Path) -> Result<(), Error> {
     }
     for model in &db.trade_entries {
         let created = TradeEntryMutation::create(conn, model).await?;
-        // `create` stamps the entry with the current time.
         trade_entry::ActiveModel {
             id: Set(created.id),
             created_at: Set(model.created_at + trade_shift),

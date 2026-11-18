@@ -1,7 +1,3 @@
-//! Calls every `DataSource` method against `src-tauri/fixtures`. The backend
-//! keeps process-wide state, so one test runs every check in order. Run it
-//! under `unshare -rn` to prove fixture mode opens no sockets.
-
 use std::path::PathBuf;
 
 use futures::{StreamExt, executor::block_on};
@@ -37,8 +33,6 @@ fn offline(name: &str, result: DataResult<impl std::fmt::Debug>) {
     );
 }
 
-/// The fixture cache has the riven weapon list but no `Mods.json` upgrade
-/// entries, which come from Quantframe's own cache download.
 fn needs_mod_cache<T: std::fmt::Debug>(name: &str, result: DataResult<T>) {
     if let Err(error) = result {
         assert!(
@@ -52,7 +46,6 @@ fn export_path(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!("qf-gpui-test-{}-{name}.json", std::process::id()))
 }
 
-/// The lists the add dialogs choose from.
 async fn cache_lists(source: &DataSource) {
     let items = ok(
         "cache_get_tradable_items",
@@ -113,7 +106,6 @@ async fn cache_lists(source: &DataSource) {
     assert!(punch.fits("rifle") && !punch.fits("melee"));
 }
 
-/// The properties, profits and flags the trader screens show.
 async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &ListParams) {
     let items = ok(
         "get_stock_item_pagination",

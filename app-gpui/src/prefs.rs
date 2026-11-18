@@ -1,7 +1,3 @@
-//! Interface settings that outlive a session: the appearance setting and
-//! whether the item panel is open. They live in a `key=value` file in the
-//! user's config directory until the backend's settings store takes them.
-
 use std::{fs, path::PathBuf};
 
 use crate::theme::AppearanceChoice;
@@ -46,8 +42,6 @@ pub fn load() -> Prefs {
     prefs
 }
 
-/// Changes the saved settings. A failed write keeps the change for this
-/// session only, so the error goes to stderr and the app carries on.
 pub fn update(change: impl FnOnce(&mut Prefs)) {
     let mut prefs = load();
     change(&mut prefs);

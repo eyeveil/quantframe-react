@@ -33,7 +33,6 @@ use theme::Theme;
 /// 0.875rem, so this rem size puts those labels at the theme's body size.
 const KIT_LABEL_REMS: f32 = 0.875;
 
-/// Shows the backend's startup progress until `app:ready`, then the shell.
 struct AppRoot {
     backend: Entity<Backend>,
     shell: Option<Entity<AppShell>>,

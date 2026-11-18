@@ -1,30 +1,21 @@
-//! What the Settings screen shows: every section, and every field with the
-//! place of its value in the settings JSON that `app_get_settings` returns.
-
 use gpui_kit_assets::IconName;
 
-/// A choice: the value in the settings JSON and the label shown for it.
 pub type Choices = &'static [(&'static str, &'static str)];
 
 #[derive(Clone, Copy, Debug)]
 pub enum Kind {
     Toggle,
-    /// A whole number of `min` or more, with a unit after the box.
     Int { min: i64, unit: &'static str },
     Decimal { unit: &'static str },
     Text { placeholder: &'static str },
-    /// Text over several lines, such as a notification body.
     Long,
     Choice(Choices),
-    /// A list of strings of which any number are on.
     Flags(Choices),
-    /// A list of strings, typed with commas between them.
     Words { placeholder: &'static str },
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Field {
-    /// Keys from the settings root, joined with dots.
     pub path: &'static str,
     pub label: &'static str,
     pub hint: &'static str,
@@ -45,18 +36,15 @@ const fn field(
     }
 }
 
-/// A list of objects in the settings JSON, edited as a table.
 #[derive(Clone, Copy, Debug)]
 pub struct ListSpec {
     pub path: &'static str,
     pub title: &'static str,
     pub hint: &'static str,
-    /// What one entry is called, for "Add" and "Edit".
     pub noun: &'static str,
     pub columns: &'static [Field],
 }
 
-/// The part of a section that is not a plain field.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Extra {
     None,
@@ -70,13 +58,11 @@ pub enum Extra {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Section {
-    /// The `QF_TAB` value that opens the section.
     pub key: &'static str,
     pub group: &'static str,
     pub title: &'static str,
     pub blurb: &'static str,
     pub icon: IconName,
-    /// Fields under an optional heading each.
     pub blocks: &'static [(&'static str, &'static [Field])],
     pub lists: &'static [ListSpec],
     pub extra: Extra,
@@ -86,7 +72,6 @@ const PLATINUM: Kind = Kind::Int {
     min: 0,
     unit: "platinum",
 };
-/// A platinum amount where -1 turns the limit off.
 const PLATINUM_OR_OFF: Kind = Kind::Int {
     min: -1,
     unit: "platinum",
@@ -139,7 +124,6 @@ pub const SOUNDS: Choices = &[
     ("windows_xp_startup.mp3", "Windows XP startup"),
 ];
 
-/// The three ways a notification goes out, for one event.
 macro_rules! notification_blocks {
     ($event:literal, $placeholders:literal) => {
         &[

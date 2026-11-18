@@ -9,12 +9,8 @@ use serde_json::Value;
 
 use super::events::BackendEvent;
 
-/// The backend's view of this app: events go into a channel that `Backend`
-/// drains on the UI thread.
 pub struct GpuiHost {
     events: UnboundedSender<BackendEvent>,
-    /// The path the next `save_file` call returns. Exports set it while they hold
-    /// `DataSource::export_lock`.
     pub(super) export_path: Mutex<Option<PathBuf>>,
 }
 

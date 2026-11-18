@@ -77,7 +77,6 @@ gpui_kit_assets::icon_assets!(
     ]
 );
 
-/// The app's icons and logo, with the gpui-component default icons behind them.
 pub struct Assets;
 
 impl AssetSource for Assets {

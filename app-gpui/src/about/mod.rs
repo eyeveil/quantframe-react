@@ -1,6 +1,3 @@
-//! The About screen: the version, where to get help, the licence and who
-//! made Quantframe.
-
 use gpui::{
     App, Context, Div, Entity, IntoElement, ParentElement, Render, Styled, Window, div, img,
     prelude::*, px,
@@ -16,7 +13,6 @@ use crate::{
     ui::grid::Tone,
 };
 
-/// The places the About screen links to: icon, title, detail and address.
 const LINKS: [(IconName, &str, &str, &str); 5] = [
     (
         IconName::BookOpen,

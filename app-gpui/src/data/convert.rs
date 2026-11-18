@@ -1,5 +1,3 @@
-//! Maps backend types onto the view models in `crate::model`.
-
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex, RwLock},
@@ -158,8 +156,6 @@ pub fn stock_item(model: stock_item::Model) -> StockItem {
 
 static LABELS: RwLock<Option<Arc<HashMap<String, String>>>> = RwLock::new(None);
 
-/// The cache's display label of every riven attribute, by slug. The table is
-/// read once the cache has attributes and kept for the process.
 pub fn attribute_labels() -> Arc<HashMap<String, String>> {
     if let Some(labels) = LABELS.read().ok().and_then(|labels| labels.clone()) {
         return labels;
@@ -180,8 +176,6 @@ pub fn attribute_labels() -> Arc<HashMap<String, String>> {
     labels
 }
 
-/// The label for an attribute slug, or the slug as words when the cache
-/// doesn't know it.
 fn attribute_label(labels: &HashMap<String, String>, slug: &str) -> String {
     labels.get(slug).cloned().unwrap_or_else(|| {
         slug.split('_')
@@ -224,7 +218,6 @@ fn riven_filter(filter: MatchRivenStruct) -> RivenFilter {
     }
 }
 
-/// The backend form of a riven filter, as `stock_riven_update` reads it.
 pub fn backend_riven_filter(filter: &RivenFilter) -> Value {
     let min_max =
         |value: &Option<MinMax>| value.map(|value| json!({ "min": value.min, "max": value.max }));
@@ -392,7 +385,6 @@ pub fn trade_entry(model: trade_entry::Model) -> TradeEntry {
     }
 }
 
-/// The JSON `trade_entry_create` stores, without the keys left unset.
 pub fn backend_trade_properties(properties: &TradeEntryProperties) -> Option<Value> {
     let mut map = serde_json::Map::new();
     if let Some(price) = properties.min_price {
@@ -661,7 +653,6 @@ fn chart(value: &Value) -> Chart {
     }
 }
 
-/// Reads a serialized `entity::dto::FinancialReport`, which has no `Deserialize`.
 fn report_value(value: &Value) -> FinancialReport {
     let int = |key: &str| value[key].as_f64().unwrap_or(0.0).round() as i64;
     let float = |key: &str| value[key].as_f64().unwrap_or(0.0);
@@ -685,7 +676,6 @@ fn report_value(value: &Value) -> FinancialReport {
     }
 }
 
-/// Reads a key that `FinancialReport::with_properties` stored.
 fn text(value: &Value, key: &str) -> String {
     value["properties"][key]
         .as_str()
@@ -772,9 +762,6 @@ pub fn wfm_debug_state(value: &Value) -> WfmDebugState {
     }
 }
 
-/// Reads `wf_inventory_get_rivens`. `WFInvItemRiven` flattens its
-/// `ItemRivenBase` into the riven object, and `ItemRivenBase` flattens its
-/// `Properties`, which keep the `is_in_stock` flag under `properties`.
 pub fn inventory_rivens(value: &Value) -> Paginated<InventoryRiven> {
     paginated_value(value, |riven| {
         let base = riven;

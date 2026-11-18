@@ -1,5 +1,3 @@
-//! The Transactions tab: the ledger of sales and purchases.
-
 use std::cmp::Ordering;
 
 use gpui::{AnyElement, App, IntoElement, ParentElement, Styled};
@@ -52,7 +50,6 @@ pub struct Transactions {
     data: TransactionsData,
 }
 
-/// Every transaction, newest first.
 pub fn all_transactions() -> TransactionListParams {
     TransactionListParams {
         list: ListParams {

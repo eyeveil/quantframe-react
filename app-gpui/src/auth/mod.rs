@@ -1,6 +1,3 @@
-//! Signing in, and the two states that replace the app: a suspended
-//! account and an error the app can't work past.
-
 use gpui::{
     App, ClickEvent, Context, Div, Entity, EventEmitter, Focusable, IntoElement, ParentElement,
     Render, Styled, Subscription, Window, div, img, prelude::*, px,
@@ -22,7 +19,6 @@ use crate::{
     ui::{day_and_time, icon, text_button},
 };
 
-/// Sent when the backend has signed the user in.
 pub struct SignedIn;
 
 pub struct LoginView {
@@ -119,7 +115,6 @@ impl LoginView {
     }
 }
 
-/// A centred column on the window colour, for a state that replaces the app.
 fn stage(cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -210,7 +205,6 @@ impl Render for LoginView {
     }
 }
 
-/// The state of an account that warframe.market or Quantframe suspended.
 pub fn banned(
     ban: &Ban,
     on_sign_out: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
@@ -271,7 +265,6 @@ pub fn banned(
     )
 }
 
-/// The state of an error the app can't work past, with one way out.
 pub fn error_page(
     heading: &str,
     reason: &str,

@@ -1,12 +1,9 @@
-/// The payload of `live_scraper_get_state` plus the last
-/// `LiveScraper:OnMessage` event.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct LiveScraperState {
     pub is_running: bool,
     pub message: Option<LiveScraperMessage>,
 }
 
-/// The progress messages under `live_scraper_control` in `public/lang/en.json`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LiveScraperMessage {
     CheckingItem {

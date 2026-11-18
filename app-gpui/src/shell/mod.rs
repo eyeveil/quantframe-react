@@ -1,6 +1,3 @@
-//! The window frame around every screen: sidebar, title bar, live scraper
-//! control and status bar.
-
 mod nav;
 
 use gpui::{
@@ -34,7 +31,6 @@ use crate::{
 };
 use nav::{Screen, ScreenGroup};
 
-/// A state that replaces the whole app until it ends.
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum Gate {
     SignIn,
@@ -43,7 +39,6 @@ enum Gate {
 }
 
 impl Gate {
-    /// The gate a `QF_SCREEN` value names, so a script can render each one.
     fn preview(key: &str) -> Option<Self> {
         match key {
             "login" => Some(Self::SignIn),
@@ -68,7 +63,6 @@ pub struct AppShell {
     listings: Entity<TabbedScreen>,
     orders: Entity<TabbedScreen>,
     trade_messages: Entity<TabbedScreen>,
-    /// The other screens are built the first time they open.
     analytics: Option<Entity<TabbedScreen>>,
     inventory: Option<Entity<TabbedScreen>>,
     debug: Option<Entity<TabbedScreen>>,
@@ -77,21 +71,15 @@ pub struct AppShell {
     settings: Option<Entity<SettingsView>>,
     about: Option<Entity<AboutView>>,
     login: Entity<LoginView>,
-    /// A gate forced by `QF_SCREEN`, shown whatever the account's state is.
     preview: Option<Gate>,
-    /// The backend's current `App:Error`, shown above the screen.
     app_error: Option<String>,
     scraper: LiveScraperState,
-    /// The message to show again when the scraper restarts.
     last_message: Option<LiveScraperMessage>,
     user: User,
     live_orders: usize,
     _subscriptions: Vec<Subscription>,
 }
 
-/// Where the app opens, read from the environment so a script can render any
-/// screen: `QF_SCREEN`, `QF_TAB`, `QF_ROW` (a row to select) and `QF_DIALOG`
-/// (the label of the button whose prompt to open).
 struct Startup {
     screen: Option<Screen>,
     preview: Option<Gate>,
@@ -175,7 +163,6 @@ impl AppShell {
         shell
     }
 
-    /// Reads the user, the live scraper state and the live order count again.
     fn refresh(&mut self, cx: &mut Context<Self>) {
         let source = self.source.clone();
         cx.spawn(async move |shell, cx| {
@@ -225,7 +212,6 @@ impl AppShell {
         }
     }
 
-    /// Builds the current screen's view when this is its first opening.
     fn ensure_built(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         let backend = self.backend.clone();
         match self.screen {
@@ -261,7 +247,6 @@ impl AppShell {
         }
     }
 
-    /// The view of the current screen, when the screen is made of tabs.
     fn built_screen(&self) -> Option<&Entity<TabbedScreen>> {
         match self.screen {
             Screen::Listings => Some(&self.listings),
@@ -291,7 +276,6 @@ impl AppShell {
         cx.notify();
     }
 
-    /// The state that replaces the app, if the account is in one.
     fn gate(&self) -> Option<Gate> {
         if self.preview.is_some() {
             return self.preview.clone();
@@ -346,7 +330,6 @@ impl AppShell {
         .detach();
     }
 
-    /// The name to show for the account. An anonymous user has none.
     fn account_name(&self) -> Option<&str> {
         let name = self.user.wfm_username.trim();
         (!self.user.anonymous && !name.is_empty()).then_some(name)
@@ -535,8 +518,6 @@ impl AppShell {
         button.on_click(cx.listener(|shell, _, _, cx| shell.toggle_scraper(cx)))
     }
 
-    /// The button that opens the appearance choices: match the system, light
-    /// or dark.
     fn appearance_button(&self, cx: &App) -> impl IntoElement + use<> {
         let theme = Theme::global(cx);
         let current = theme.choice;
@@ -559,7 +540,6 @@ impl AppShell {
         })
     }
 
-    /// The live scraper's running state and its current step.
     fn scraper_state(&self, cx: &App) -> Div {
         let theme = Theme::global(cx);
         let colors = theme.colors;
@@ -669,8 +649,6 @@ impl AppShell {
             .child(self.account_state(cx))
     }
 
-    /// The bar at the top. While a gate is up it carries only the app's
-    /// name, the appearance button and the window buttons.
     fn title_bar(
         &self,
         gated: bool,
@@ -736,7 +714,6 @@ impl AppShell {
         })
     }
 
-    /// The backend's current error, on one line above the screen.
     fn error_banner(&self, error: &str, cx: &mut Context<Self>) -> Div {
         let theme = Theme::global(cx).clone();
         let colors = theme.colors;

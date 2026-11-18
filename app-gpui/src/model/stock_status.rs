@@ -1,5 +1,3 @@
-/// Mirrors `entity::enums::StockStatus`. Labels and details follow
-/// `enums.stock_status` in `public/lang/en.json`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum StockStatus {
     Error,
@@ -36,7 +34,6 @@ impl StockStatus {
         Self::InsufficientStanding,
     ];
 
-    /// Reads the backend's serialized name. Names this app doesn't know map to `Unknown`.
     pub fn parse(name: &str) -> Self {
         Self::ALL
             .into_iter()

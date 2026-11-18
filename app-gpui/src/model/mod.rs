@@ -1,7 +1,3 @@
-//! View models for the screens. Field names follow the backend types in
-//! `src-tauri/entity`, `src-tauri/utils` and `wf_market`, and `data/convert.rs`
-//! fills them.
-
 mod analytics;
 mod app;
 mod cache;
@@ -53,5 +49,4 @@ pub use wfm::{
 };
 pub use wish_list::{WishListItem, WishListProperties, WishListUpdate};
 
-/// The full settings tree, edited in place and saved with `app_update_settings`.
 pub type Settings = qf_app_lib::app::Settings;

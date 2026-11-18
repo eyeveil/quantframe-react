@@ -1,6 +1,3 @@
-//! Trade messages, the transaction ledger, the home dashboard and trading
-//! analytics.
-
 use std::{future::Future, path::PathBuf};
 
 use qf_app_lib::{
@@ -213,7 +210,6 @@ impl DataSource {
         self.call(async move { Ok(transaction::transaction_delete_bulk(ids).await?) })
     }
 
-    /// Fills in the trade tax of every transaction from the item cache.
     pub fn transaction_calculate_tax(
         &self,
     ) -> impl Future<Output = DataResult<()>> + Send + 'static {
@@ -240,7 +236,6 @@ impl DataSource {
         })
     }
 
-    /// Quantframe's item price statistics. Fixture mode returns an error.
     pub fn item_prices_lookup(
         &self,
         params: &PriceLookupParams,
@@ -252,7 +247,6 @@ impl DataSource {
         })
     }
 
-    /// Quantframe's riven price statistics. Fixture mode returns an error.
     pub fn riven_prices_lookup(
         &self,
         params: &PriceLookupParams,
@@ -264,7 +258,6 @@ impl DataSource {
         })
     }
 
-    /// Quantframe's syndicate item price statistics. Fixture mode returns an error.
     pub fn syndicate_item_prices_lookup(
         &self,
         params: &PriceLookupParams,
@@ -314,8 +307,6 @@ impl DataSource {
         })
     }
 
-    /// Daily Quantframe users between two RFC 3339 dates. Fixture mode
-    /// returns an error.
     pub fn get_user_activity(
         &self,
         from_date: String,

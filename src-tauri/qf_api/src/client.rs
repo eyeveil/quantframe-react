@@ -207,7 +207,6 @@ impl Client {
         self
     }
 
-    /// An offline client refuses every request without opening a connection.
     pub fn with_offline(mut self, offline: bool) -> Self {
         self.offline = offline;
         self

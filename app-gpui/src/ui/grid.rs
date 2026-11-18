@@ -1,7 +1,3 @@
-//! The table every list screen uses. A screen describes its rows with a
-//! [`Catalog`], and [`Grid`] draws them with the shared row states, selection
-//! boxes, sorting, row menu and empty, loading and error states.
-
 use std::{
     cmp::Ordering, collections::HashSet, future::Future, marker::PhantomData, path::PathBuf,
     pin::Pin, rc::Rc,
@@ -27,7 +23,6 @@ use crate::{
     theme::Theme,
 };
 
-/// What a table sends back to the screen that owns it.
 #[derive(Clone)]
 pub enum Signal<A> {
     Action(A),
@@ -37,7 +32,6 @@ pub enum Signal<A> {
 
 type SignalHandler<A> = Rc<dyn Fn(Signal<A>, &mut Window, &mut App)>;
 
-/// The callback a table and an item panel use to reach their screen.
 pub struct Emit<A>(SignalHandler<A>);
 
 impl<A> Clone for Emit<A> {
@@ -55,8 +49,6 @@ impl<A: Clone + 'static> Emit<A> {
         (self.0)(signal, window, cx);
     }
 
-    /// A click listener that sends `action`. It stops the click there, so a
-    /// button inside a row doesn't also select the row.
     pub fn on_click(&self, action: A) -> impl Fn(&ClickEvent, &mut Window, &mut App) + 'static {
         let emit = self.clone();
         move |_, window, cx| {
@@ -71,12 +63,9 @@ pub struct ColumnSpec {
     pub key: &'static str,
     pub title: &'static str,
     pub width: f32,
-    /// The one column that takes the width the fixed columns leave over.
     pub flex: bool,
     pub align_end: bool,
     pub sortable: bool,
-    /// When the table is narrower than its columns, the column with the
-    /// highest number goes first. Zero keeps the column at any width.
     pub drop_order: u8,
 }
 
@@ -93,8 +82,6 @@ impl ColumnSpec {
         }
     }
 
-    /// Lets the table drop this column when it runs out of width. The item
-    /// panel shows the same value for the selected row.
     pub const fn droppable(mut self, order: u8) -> Self {
         self.drop_order = order;
         self
@@ -116,8 +103,6 @@ impl ColumnSpec {
     }
 }
 
-/// One entry of a row's menu, shown on right-click and under the row's
-/// overflow button.
 pub struct MenuEntry<A> {
     pub label: SharedString,
     pub icon: IconName,
@@ -135,14 +120,12 @@ impl<A> MenuEntry<A> {
         }
     }
 
-    /// Draws a separator above this entry.
     pub fn separated(mut self) -> Self {
         self.separated = true;
         self
     }
 }
 
-/// A filter chip above the table.
 pub struct ChipSpec {
     pub key: String,
     pub label: String,
@@ -151,13 +134,11 @@ pub struct ChipSpec {
     pub tooltip: String,
 }
 
-/// Chips of which one at a time filters the table.
 pub struct ChipGroup {
     pub id: &'static str,
     pub chips: Vec<ChipSpec>,
 }
 
-/// One of the totals panels above the table.
 pub struct Stat {
     pub label: &'static str,
     pub value: String,
@@ -185,7 +166,6 @@ impl Tone {
         }
     }
 
-    /// Green for a gain, red for a loss.
     pub fn of_profit(profit: i64) -> Self {
         match profit {
             0 => Self::Plain,
@@ -195,8 +175,6 @@ impl Tone {
     }
 }
 
-/// An icon button in the toolbar. `action` is `None` while the button has
-/// nothing to act on, for example a bulk action with no row checked.
 pub struct ToolbarItem<A> {
     pub id: &'static str,
     pub icon: IconName,
@@ -205,14 +183,12 @@ pub struct ToolbarItem<A> {
     pub danger: bool,
 }
 
-/// The labelled button at the right of the toolbar.
 pub struct PrimaryAction<A> {
     pub label: &'static str,
     pub icon: IconName,
     pub action: A,
 }
 
-/// The search text and the selected chip of each chip group.
 #[derive(Clone, Debug, Default)]
 pub struct Query {
     pub text: String,
@@ -227,7 +203,6 @@ impl Query {
             .map(|(_, key)| key.as_str())
     }
 
-    /// True when `haystack` contains the search text, ignoring case.
     pub fn matches(&self, haystack: &str) -> bool {
         let needle = self.text.trim().to_lowercase();
         needle.is_empty() || haystack.to_lowercase().contains(&needle)
@@ -238,22 +213,14 @@ impl Query {
     }
 }
 
-/// Turns a submitted form into the action that applies it.
 pub type FormMap<A> = Rc<dyn Fn(&FormValues) -> Option<A>>;
 
-/// A backend call in flight. It resolves to the notice to show, or to an
-/// empty string when the reloaded list says enough.
 pub type Command = Pin<Box<dyn Future<Output = DataResult<String>> + Send>>;
 
-/// An export in flight. It resolves to the file it wrote.
 pub type Export = Pin<Box<dyn Future<Output = DataResult<PathBuf>> + Send>>;
 
-/// A load of everything a catalog shows.
 pub type Load<D> = Pin<Box<dyn Future<Output = DataResult<D>> + Send>>;
 
-/// Adds a cache list to a load. `fetch` is `None` once the catalog has the
-/// list. A failed fetch leaves the list out, so the rows still show and the
-/// add dialog falls back to a typed name.
 pub fn with_cache<T: Send + 'static, C: Send + 'static>(
     load: Load<T>,
     fetch: Option<impl Future<Output = DataResult<C>> + Send + 'static>,
@@ -268,25 +235,17 @@ pub fn with_cache<T: Send + 'static, C: Send + 'static>(
     })
 }
 
-/// What the screen does after a catalog has handled an action.
 pub enum Outcome<A> {
-    /// Nothing is left to do.
     Done,
-    /// Ask the user for values, then perform the mapped action.
     Ask(FormSpec, FormMap<A>),
-    /// Wait for the backend, then load the list again.
     Run(Command),
-    /// Ask where to save a file, then run the export to that path.
     Export {
         file_name: String,
         run: Box<dyn FnOnce(PathBuf) -> Command>,
     },
-    /// Select the row and open the item panel on it.
     ShowPanel(u64),
-    /// Copy the text and say so.
     Copy { text: String, what: String },
     OpenUrl(String),
-    /// Tell the user something in a notification.
     Notice(String),
 }
 
@@ -295,7 +254,6 @@ impl<A> Outcome<A> {
         Self::Ask(spec, Rc::new(map))
     }
 
-    /// Runs a backend call and shows `notice` when it succeeds.
     pub fn run<T>(
         call: impl Future<Output = DataResult<T>> + Send + 'static,
         notice: impl Into<String>,
@@ -304,12 +262,10 @@ impl<A> Outcome<A> {
         Self::Run(Box::pin(async move { call.await.map(|_| notice) }))
     }
 
-    /// Runs a backend call whose result needs no notice.
     pub fn run_quietly<T>(call: impl Future<Output = DataResult<T>> + Send + 'static) -> Self {
         Self::run(call, String::new())
     }
 
-    /// Asks for a file to save to, then runs the export `call` builds.
     pub fn export(file_name: &str, call: impl FnOnce(PathBuf) -> Export + 'static) -> Self {
         Self::Export {
             file_name: file_name.to_owned(),
@@ -325,23 +281,15 @@ impl<A> Outcome<A> {
     }
 }
 
-/// The rows of one list screen and everything a trader can do with them.
-/// The catalog keeps what the backend last sent and filters it for the
-/// table, so a search needs no round trip.
 pub trait Catalog: Sized + 'static {
     type Row: Clone + 'static;
     type Action: Clone + 'static;
-    /// Everything one load fetches. The default is the empty list.
     type Data: Default + Send + 'static;
 
-    /// The plural noun for the rows, such as "stock items".
     const NOUN: &'static str;
     const SEARCH_PLACEHOLDER: &'static str;
-    /// The line shown when the list has no rows at all.
     const EMPTY_HINT: &'static str;
-    /// Whether rows carry a selection box for bulk actions.
     const CHECKABLE: bool = true;
-    /// The backend lists whose change loads this catalog again.
     const WATCH: &'static [DataKind];
 
     fn load(&self, source: &DataSource) -> Load<Self::Data>;
@@ -358,12 +306,10 @@ pub trait Catalog: Sized + 'static {
     fn row_id(row: &Self::Row) -> u64;
     fn compare(key: &str, a: &Self::Row, b: &Self::Row) -> Ordering;
     fn cell(row: &Self::Row, key: &str, emit: &Emit<Self::Action>, cx: &App) -> AnyElement;
-    /// The cell as plain text, for assistive technology.
     fn cell_text(row: &Self::Row, key: &str) -> Option<String>;
     fn row_menu(row: &Self::Row) -> Vec<MenuEntry<Self::Action>>;
     fn panel(row: &Self::Row, cx: &App) -> PanelModel<Self::Action>;
 
-    /// Rows drawn at reduced opacity, such as hidden stock.
     fn dimmed(_row: &Self::Row) -> bool {
         false
     }
@@ -380,14 +326,11 @@ pub enum LoadState {
 const SELECT_KEY: &str = "select";
 
 pub struct Grid<C: Catalog> {
-    /// Every column the catalog describes.
     all_specs: Vec<ColumnSpec>,
-    /// The columns that fit the available width, and their widths.
     specs: Vec<ColumnSpec>,
     widths: Vec<Pixels>,
     rows: Vec<C::Row>,
     checked: HashSet<u64>,
-    /// The id of the highlighted row, so a sort or a reload can find it again.
     selected_id: Option<u64>,
     state: LoadState,
     filtered: bool,
@@ -460,14 +403,12 @@ impl<C: Catalog> Grid<C> {
         self.rows.len()
     }
 
-    /// Checks the row's selection box, or clears it when it is checked.
     pub fn toggle_checked(&mut self, id: u64) {
         if C::CHECKABLE && !self.checked.remove(&id) {
             self.checked.insert(id);
         }
     }
 
-    /// The checked row ids, in the order the rows are shown.
     pub fn checked(&self) -> Vec<u64> {
         self.rows
             .iter()
@@ -485,8 +426,6 @@ impl<C: Catalog> Grid<C> {
         self.layout_columns();
     }
 
-    /// Drops columns until the rest fit, then gives the flex column the
-    /// width the fixed columns leave over.
     fn layout_columns(&mut self) {
         let mut specs = self.all_specs.clone();
         let needed = |specs: &[ColumnSpec]| px(specs.iter().map(|spec| spec.width).sum());
@@ -543,7 +482,6 @@ impl<C: Catalog> Grid<C> {
     }
 }
 
-/// The overflow button at the end of a row. It opens the row's menu.
 pub fn overflow_button<A: Clone + 'static>(
     id: u64,
     entries: impl Fn() -> Vec<MenuEntry<A>> + 'static,
@@ -573,7 +511,6 @@ pub fn overflow_button<A: Clone + 'static>(
 
 impl DropdownMenu for IconButton {}
 
-/// Fills the cell and centres its content on the row's height.
 pub fn centered(content: impl IntoElement) -> AnyElement {
     div()
         .size_full()
@@ -606,8 +543,6 @@ impl<C: Catalog> TableDelegate for Grid<C> {
             .paddings(Edges {
                 top: px(0.),
                 bottom: px(0.),
-                // Without selection boxes the first column starts at the
-                // page gutter, in line with the tabs above the table.
                 left: if col_ix == 0 && !C::CHECKABLE {
                     metrics.gutter
                 } else {
@@ -735,8 +670,6 @@ impl<C: Catalog> TableDelegate for Grid<C> {
         let table = cx.entity();
         let id = C::row_id(row);
         centered(
-            // Space checks the selected row, so the boxes stay out of the
-            // Tab order and Tab leaves the table in one press.
             Checkbox::new(("select", id))
                 .small()
                 .tab_stop(false)

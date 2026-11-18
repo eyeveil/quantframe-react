@@ -26,17 +26,12 @@ impl Series {
 }
 
 const AXIS_WIDTH: f32 = 46.;
-/// The most labels the horizontal axis shows before it skips some.
 const MAX_LABELS: usize = 12;
 
-/// The step that leaves at most [`MAX_LABELS`] of `count` labels.
 fn label_step(count: usize) -> usize {
     count.div_ceil(MAX_LABELS).max(1)
 }
 
-/// One group of bars per label, one bar per series that has a value there.
-/// Values below zero hang under the zero line. Each group shows its values
-/// in a tooltip.
 pub fn bars(
     id: &'static str,
     labels: &[String],
@@ -209,7 +204,6 @@ pub fn bars(
         })
 }
 
-/// A dot and a name per series.
 pub fn legend(entries: impl IntoIterator<Item = (&'static str, Hsla)>, cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -229,7 +223,6 @@ pub fn legend(entries: impl IntoIterator<Item = (&'static str, Hsla)>, cx: &App)
         }))
 }
 
-/// The line shown in place of a chart that has no values.
 pub fn empty(text: &'static str, height: f32, cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()

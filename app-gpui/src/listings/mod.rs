@@ -1,5 +1,3 @@
-//! The listings screen: what the live scraper sells and buys, in four tabs.
-
 mod items;
 mod rivens;
 mod syndicates;
@@ -46,7 +44,6 @@ pub fn screen(
     })
 }
 
-/// What one load of a live scraper list fetches.
 pub struct StockData<T> {
     pub rows: Vec<T>,
     pub counts: BTreeMap<StockStatus, usize>,
@@ -63,7 +60,6 @@ impl<T> Default for StockData<T> {
     }
 }
 
-/// The query for every row of a list. The table filters and sorts them.
 fn every_row() -> StockItemListParams {
     StockItemListParams {
         limit: -1,
@@ -71,9 +67,6 @@ fn every_row() -> StockItemListParams {
     }
 }
 
-/// Joins the three backend calls of a live scraper list into one load. The
-/// calls already run on the backend runtime, so the order of the awaits
-/// doesn't make them wait on each other.
 fn load_stock<T: Send + 'static>(
     rows: impl Future<Output = DataResult<Paginated<T>>> + Send + 'static,
     counts: impl Future<Output = DataResult<BTreeMap<StockStatus, usize>>> + Send + 'static,
@@ -88,17 +81,13 @@ fn load_stock<T: Send + 'static>(
     })
 }
 
-/// The step of the buttons beside a price limit, in platinum.
 const LIMIT_STEP: i64 = 5;
 
-/// A price limit moved by `step`, or `None` when it would drop below zero.
-/// An unset limit counts as 0, and a limit of 0 clears it.
 fn stepped(limit: Option<i64>, step: i64) -> Option<i64> {
     let next = limit.unwrap_or(0) + step;
     (next >= 0).then_some(next)
 }
 
-/// A price limit cell with buttons that lower and raise it by `LIMIT_STEP`.
 fn limit_cell<A: Clone + 'static>(
     id: u64,
     value: Option<i64>,
@@ -117,8 +106,6 @@ fn limit_cell<A: Clone + 'static>(
     )
 }
 
-/// A price limit read from an edit dialog. Emptying the field of one row
-/// clears the limit, and an empty field of a bulk edit keeps each row's.
 fn limit_field(values: &FormValues, key: &str, single: bool) -> Option<i64> {
     match values.number(key) {
         Some(value) => Some(value),
@@ -131,7 +118,6 @@ fn market_url(slug: &str) -> String {
     format!("https://warframe.market/items/{slug}")
 }
 
-/// A typed item name as the slug Warframe Market uses for it.
 fn slug(name: &str) -> String {
     name.trim().to_lowercase().replace(' ', "_")
 }
@@ -144,7 +130,6 @@ fn ids(rows: &[u64]) -> Vec<i64> {
     rows.iter().map(|id| *id as i64).collect()
 }
 
-/// One chip per status that has rows, coloured like the status dots.
 fn status_chips(counts: &BTreeMap<StockStatus, usize>, cx: &App) -> ChipGroup {
     let theme = Theme::global(cx);
     ChipGroup {
@@ -163,13 +148,10 @@ fn status_chips(counts: &BTreeMap<StockStatus, usize>, cx: &App) -> ChipGroup {
     }
 }
 
-/// The status the selected status chip stands for.
 fn status_filter(query: &Query) -> Option<StockStatus> {
     query.filter("status").map(StockStatus::parse)
 }
 
-/// The toolbar buttons every listings tab has: export, and edit, message
-/// and delete for the checked rows.
 fn bulk_toolbar<A>(
     checked: &[u64],
     noun: &str,

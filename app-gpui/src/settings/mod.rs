@@ -1,7 +1,3 @@
-//! The Settings screen. It edits a draft of the backend's settings as JSON,
-//! field by field from the table in [`schema`], and saves the draft with
-//! `app_update_settings` when the user confirms.
-
 mod schema;
 
 use std::collections::HashMap;
@@ -37,12 +33,9 @@ use schema::{Choices, Extra, Field, Kind, ListSpec, SECTIONS, Section};
 
 const NAV_WIDTH: f32 = 232.;
 const CONTENT_WIDTH: f32 = 760.;
-/// The key of the inventory source's text box among the editors.
 const SOURCE_DETAIL: &str = "wf_inventory.source#detail";
 const SOURCE_PATH: &str = "wf_inventory.source";
 
-/// The inventory sources: the backend's variant name, the label, and the
-/// label and key of the text the variant carries.
 const SOURCES: [(&str, &str, &str, &str); 4] = [
     ("None", "None", "", ""),
     ("Profile", "Warframe profile", "Player id", "id"),
@@ -84,7 +77,6 @@ pub struct SettingsView {
     draft: Value,
     section: usize,
     editors: HashMap<&'static str, Editor>,
-    /// Why the text in an editor can't be saved, by field path.
     errors: HashMap<&'static str, String>,
     user: User,
     saving: bool,
@@ -115,13 +107,11 @@ fn strings(value: &Value) -> Vec<String> {
         .unwrap_or_default()
 }
 
-/// A decimal with up to three places and no trailing zeros.
 fn plain_decimal(value: f64) -> String {
     let text = format!("{value:.3}");
     text.trim_end_matches('0').trim_end_matches('.').to_owned()
 }
 
-/// The text an editor shows for a value.
 fn editor_text(kind: Kind, value: &Value) -> String {
     match kind {
         Kind::Int { .. } => value
@@ -134,7 +124,6 @@ fn editor_text(kind: Kind, value: &Value) -> String {
     }
 }
 
-/// The value an editor's text stands for, or why it stands for none.
 fn parse(kind: Kind, text: &str) -> Result<Value, String> {
     match kind {
         Kind::Int { min, .. } => match text.trim().parse::<i64>() {
@@ -163,7 +152,6 @@ fn choice_label(choices: Choices, value: &str) -> String {
         .map_or_else(|| value.to_owned(), |(_, label)| (*label).to_owned())
 }
 
-/// The text of a list cell.
 fn cell_text(kind: Kind, value: &Value) -> String {
     match kind {
         Kind::Toggle => if value.as_bool().unwrap_or(false) {
@@ -191,7 +179,6 @@ fn cell_text(kind: Kind, value: &Value) -> String {
     }
 }
 
-/// The variant name and the text of an inventory source.
 fn source_parts(value: &Value) -> (&'static str, String) {
     SOURCES
         .iter()
@@ -259,7 +246,6 @@ impl SettingsView {
         view
     }
 
-    /// Opens the section a `QF_TAB` value names.
     pub fn open_section(&mut self, key: &str, cx: &mut Context<Self>) {
         if let Some(index) = SECTIONS.iter().position(|section| section.key == key) {
             self.section = index;
@@ -297,7 +283,6 @@ impl SettingsView {
         .detach();
     }
 
-    /// Takes what the backend holds as both the saved state and the draft.
     fn stored(
         &mut self,
         settings: Result<Settings, String>,
@@ -325,7 +310,6 @@ impl SettingsView {
             .flat_map(|(_, fields)| fields.iter().copied())
     }
 
-    /// Creates the text boxes that are missing and shows the draft in all.
     fn sync_editors(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         for field in Self::fields() {
             let placeholder = match field.kind {
@@ -387,8 +371,6 @@ impl SettingsView {
         self.editors.insert(key, editor);
     }
 
-    /// Moves the text of an editor into the draft when it stands for a value
-    /// other than the one the draft holds.
     fn edited(&mut self, key: &'static str, field: Option<Field>, cx: &mut Context<Self>) {
         let Some(text) = self.editors.get(key).map(|editor| editor.text(cx)) else {
             return;
@@ -529,7 +511,6 @@ impl SettingsView {
         .detach();
     }
 
-    /// Waits for a backend call and reports how it went.
     fn run<T: 'static>(
         &mut self,
         call: impl Future<Output = crate::data::DataResult<T>> + Send + 'static,
@@ -555,7 +536,6 @@ impl SettingsView {
         .detach();
     }
 
-    /// A button that shows the current choice and opens the others.
     fn popup(
         &self,
         id: impl Into<gpui::ElementId>,
@@ -696,7 +676,6 @@ impl SettingsView {
         }
     }
 
-    /// Rows in a card, with a hairline between them.
     fn group(title: &str, rows: Vec<Div>, cx: &App) -> Div {
         let mut card = kit::card(cx);
         for (index, row) in rows.into_iter().enumerate() {
@@ -715,7 +694,6 @@ impl SettingsView {
             .child(card)
     }
 
-    /// A row with a label, a line of detail and a control at the right.
     fn plain_row(label: &str, detail: &str, control: impl IntoElement, cx: &App) -> Div {
         let colors = Theme::global(cx).colors;
         div()
@@ -804,7 +782,6 @@ impl SettingsView {
         form
     }
 
-    /// The entry a submitted list form stands for, over what it had before.
     fn list_entry(spec: &ListSpec, mut entry: Value, values: &FormValues) -> Value {
         if !entry.is_object() {
             entry = json!({});

@@ -1,6 +1,3 @@
-//! warframe.market conversations: the room list, the messages of one room
-//! and the box to write a message.
-
 use gpui::{
     App, Context, Div, Entity, Focusable, Hsla, IntoElement, ParentElement, Render, ScrollHandle,
     Stateful, Styled, Subscription, Window, div, prelude::*, px,
@@ -25,25 +22,20 @@ use crate::{
     },
 };
 
-/// The longest message warframe.market accepts.
 const MESSAGE_LIMIT: usize = 400;
 const LIST_WIDTH: f32 = 320.;
 
 pub struct ChatView {
     source: DataSource,
-    /// The signed-in user's warframe.market id, to tell sent from received.
     me: String,
     chats: Loaded<Vec<Chat>>,
     active: Option<String>,
-    /// The messages of the active chat, oldest first.
     messages: Loaded<Vec<ChatMessage>>,
     search: Entity<InputState>,
     composer: Entity<InputState>,
     sending: bool,
     scroll: ScrollHandle,
-    /// The row to open and the action to run once the chats have loaded.
     on_load: Option<(Option<usize>, Option<String>)>,
-    /// Set by a scripted screenshot: write a sample message and send it.
     send_sample: bool,
     _subscriptions: Vec<Subscription>,
 }
@@ -64,7 +56,6 @@ fn status_color(status: &str, theme: &Theme) -> Hsla {
     }
 }
 
-/// The other people in a chat.
 fn partners<'a>(chat: &'a Chat, me: &'a str) -> impl Iterator<Item = &'a ChatUser> {
     chat.chat_with.iter().filter(move |user| user.id != me)
 }
@@ -114,8 +105,6 @@ impl ChatView {
         view
     }
 
-    /// Opens a chat and runs an action once the chats have loaded. Scripted
-    /// screenshots use it: `send` writes a message and sends it.
     pub fn on_load(&mut self, row: Option<usize>, action: Option<String>) {
         self.on_load = Some((row, action));
     }
@@ -124,12 +113,10 @@ impl ChatView {
         self.composer.focus_handle(cx).focus(window, cx);
     }
 
-    /// Tells the backend no chat is on screen, so new messages count as unread.
     pub fn leave(&self, cx: &mut App) {
         cx.background_spawn(self.source.chat_set_active(None)).detach();
     }
 
-    /// Tells the backend which chat is on screen again.
     pub fn enter(&self, cx: &mut App) {
         cx.background_spawn(self.source.chat_set_active(self.active.clone()))
             .detach();
@@ -692,7 +679,6 @@ impl ChatView {
     }
 }
 
-/// A circle with the first letter of a name and a status dot.
 fn avatar(name: &str, status: Hsla, size: gpui::Pixels, cx: &App) -> Div {
     let theme = Theme::global(cx);
     let colors = theme.colors;

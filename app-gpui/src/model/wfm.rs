@@ -1,5 +1,3 @@
-//! warframe.market orders, auctions and chats, from the `wf_market` crate types.
-
 use super::SubType;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -17,7 +15,6 @@ impl OrderType {
     }
 }
 
-/// Mirrors `wf_market::types::Order` with the item name the backend adds.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WfmOrder {
     pub id: String,
@@ -32,23 +29,17 @@ pub struct WfmOrder {
     pub visible: bool,
     pub created_at: String,
     pub updated_at: String,
-    /// What one unit earns over the recent closing average, from the
-    /// backend's price data. `None` when the backend has no price for it.
     pub potential_profit: Option<i64>,
-    /// The recent closing average price.
     pub closed_avg: Option<f64>,
 }
 
-/// One row of `get_wfm_orders_status_counts`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct OrderTotals {
     pub count: usize,
-    /// Platinum times quantity, summed.
     pub platinum: i64,
     pub potential_profit: f64,
 }
 
-/// Mirrors `wf_market::types::Auction`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WfmAuction {
     pub id: String,
@@ -71,21 +62,16 @@ pub struct WfmAuction {
     pub note: String,
     pub created: String,
     pub updated: String,
-    /// A direct-sell auction with no stock riven behind it, which the
-    /// backend can import into stock.
     pub can_import: bool,
 }
 
-/// The payload of `get_wfm_auctions_overview`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct AuctionOverview {
     pub count: i64,
-    /// Starting prices of the direct-sell auctions, summed.
     pub revenue: i64,
     pub potential_profit: i64,
 }
 
-/// Mirrors `wf_market::types::Chat`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Chat {
     pub id: String,
@@ -96,7 +82,6 @@ pub struct Chat {
     pub last_message: Option<ChatMessage>,
 }
 
-/// Mirrors `wf_market::types::UserShort`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ChatUser {
     pub id: String,
@@ -105,7 +90,6 @@ pub struct ChatUser {
     pub status: String,
 }
 
-/// Mirrors `wf_market::types::ChatMessage`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChatMessage {
     pub id: String,

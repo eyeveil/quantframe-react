@@ -1,6 +1,3 @@
-//! The Inventory screen: the rivens and syndicate standing Quantframe reads
-//! from the game, through AlecaFrame, the public profile or a file.
-
 use std::cmp::Ordering;
 
 use gpui::{AnyElement, App, AppContext, Entity, IntoElement, ParentElement, Window};
@@ -40,7 +37,6 @@ pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> E
     })
 }
 
-/// A row id from a uuid or a name, for tables that key rows by `u64`.
 fn row_key(text: &str) -> u64 {
     text.bytes().fold(0xcbf2_9ce4_8422_2325, |hash, byte| {
         (hash ^ u64::from(byte)).wrapping_mul(0x0100_0000_01b3)
@@ -80,7 +76,6 @@ fn riven_title(row: &InventoryRiven) -> String {
     }
 }
 
-/// The backend's riven states as the trader reads them.
 fn state_label(state: &str) -> &'static str {
     match state {
         "veiled" => "Veiled",
@@ -90,7 +85,6 @@ fn state_label(state: &str) -> &'static str {
     }
 }
 
-/// The React app adds only the rivens the backend calls `veiled` to stock.
 fn can_add(row: &InventoryRiven) -> bool {
     row.riven_type == "veiled" && !row.is_in_stock
 }

@@ -1,5 +1,3 @@
-//! The item cache lists the add dialogs choose from.
-
 use std::future::Future;
 
 use qf_app_lib::{State, commands::cache};
@@ -10,7 +8,6 @@ use crate::{
 };
 
 impl DataSource {
-    /// Every item Warframe Market trades, sorted by name.
     pub fn cache_get_tradable_items(
         &self,
     ) -> impl Future<Output = DataResult<Vec<TradableItem>>> + Send + 'static {
@@ -25,7 +22,6 @@ impl DataSource {
         })
     }
 
-    /// Every weapon that has rivens, sorted by name.
     pub fn cache_get_riven_weapons(
         &self,
     ) -> impl Future<Output = DataResult<Vec<RivenWeapon>>> + Send + 'static {
@@ -40,7 +36,6 @@ impl DataSource {
         })
     }
 
-    /// Every stat a riven can roll, with its display label, sorted by label.
     pub fn cache_get_riven_attributes(
         &self,
     ) -> impl Future<Output = DataResult<Vec<RivenStat>>> + Send + 'static {

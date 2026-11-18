@@ -1,5 +1,3 @@
-//! warframe.market orders, auctions and chats.
-
 use std::{collections::BTreeMap, future::Future};
 
 use qf_app_lib::{
@@ -78,7 +76,6 @@ impl DataSource {
         })
     }
 
-    /// Reloads your orders from warframe.market. Fixture mode returns an error.
     pub fn order_refresh(&self) -> impl Future<Output = DataResult<()>> + Send + 'static {
         self.call(async move { Ok(order::order_refresh(State::get(), State::get()).await?) })
     }
@@ -147,7 +144,6 @@ impl DataSource {
         })
     }
 
-    /// Reloads your auctions from warframe.market. Fixture mode returns an error.
     pub fn auction_refresh(&self) -> impl Future<Output = DataResult<()>> + Send + 'static {
         self.call(async move { Ok(auction::auction_refresh(State::get(), State::get()).await?) })
     }
@@ -163,7 +159,6 @@ impl DataSource {
         self.call(async move { Ok(auction::auction_delete_by_id(id, State::get()).await?) })
     }
 
-    /// Adds one of your warframe.market auctions to the stock rivens.
     pub fn auction_import_by_id(
         &self,
         id: String,
@@ -216,7 +211,6 @@ impl DataSource {
         self.call(async move { Ok(chat::chat_refresh(State::get()).await?) })
     }
 
-    /// Marks the chat on screen, so its new messages don't count as unread.
     pub fn chat_set_active(
         &self,
         id: Option<String>,
