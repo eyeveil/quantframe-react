@@ -1,4 +1,4 @@
-//! The window frame around every screen: navigation, title bar, live scraper
+//! The window frame around every screen: sidebar, title bar, live scraper
 //! control and status bar.
 
 mod nav;
@@ -6,48 +6,142 @@ mod nav;
 use std::rc::Rc;
 
 use gpui::{
-    AnyElement, App, Context, Decorations, Div, Entity, IntoElement, ParentElement, Pixels, Render,
-    Stateful, Styled, Window, div, img, prelude::*, px,
+    AnyElement, App, Context, Decorations, Div, Entity, IntoElement, ParentElement, Render,
+    Stateful, Styled, Subscription, Window, div, img, prelude::*, px,
 };
-use gpui_component::{Icon, TitleBar, button::ButtonVariants};
+use gpui_component::{
+    Icon, TitleBar,
+    button::ButtonVariants,
+    menu::{DropdownMenu, PopupMenuItem},
+    tooltip::Tooltip,
+};
 use gpui_kit_assets::IconName;
 
 use crate::{
     assets::APP_ICON,
     data::DataSource,
-    listings::ListingsView,
-    model::{LiveScraperState, StockStatus, User, UserStatus},
-    theme::{Navigation, Theme, Variant},
-    ui::{dot, icon, label_text, number, text_button},
+    listings,
+    model::{LiveScraperMessage, LiveScraperState, StockStatus, User, UserStatus},
+    orders,
+    theme::{Appearance, AppearanceChoice, Theme, tabular_figures},
+    trade_messages,
+    ui::{
+        IconButton, dot, focus_ring, icon, number,
+        page::{self, PreviewState},
+        placeholder,
+        screen::TabbedScreen,
+        text_button,
+    },
 };
 use nav::{Screen, ScreenGroup};
 
 pub struct AppShell {
     screen: Screen,
-    listings: Entity<ListingsView>,
+    listings: Entity<TabbedScreen>,
+    orders: Entity<TabbedScreen>,
+    trade_messages: Entity<TabbedScreen>,
     scraper: LiveScraperState,
     /// The message to show again when the scraper restarts.
-    last_message: Option<crate::model::LiveScraperMessage>,
+    last_message: Option<LiveScraperMessage>,
     user: User,
     live_orders: usize,
+    _subscriptions: Vec<Subscription>,
+}
+
+/// Where the app opens, read from the environment so a script can render any
+/// screen: `QF_SCREEN`, `QF_TAB`, `QF_ROW` (a row to select) and `QF_DIALOG`
+/// (the label of the button whose prompt to open).
+struct Startup {
+    screen: Option<Screen>,
+    tab: Option<String>,
+    row: Option<usize>,
+    dialog: Option<String>,
+}
+
+impl Startup {
+    fn from_env() -> Self {
+        let var = |name: &str| std::env::var(name).ok().filter(|value| !value.is_empty());
+        Self {
+            screen: var("QF_SCREEN").and_then(|key| Screen::from_key(&key)),
+            tab: var("QF_TAB"),
+            row: var("QF_ROW").and_then(|row| row.parse().ok()),
+            dialog: var("QF_DIALOG"),
+        }
+    }
 }
 
 impl AppShell {
     pub fn new(source: Rc<dyn DataSource>, window: &mut Window, cx: &mut Context<Self>) -> Self {
+        page::init(cx);
+        Theme::follow_system(window.appearance(), cx);
         let scraper = source.live_scraper_get_state();
         let live_orders = source
             .get_stock_item_status_counts()
             .get(&StockStatus::Live)
             .copied()
             .unwrap_or(0);
-        Self {
-            screen: Screen::Listings,
-            user: source.user(),
+        let user = source.user();
+        let state = PreviewState::from_env();
+        let startup = Startup::from_env();
+        let shell = Self {
+            screen: startup.screen.unwrap_or(Screen::Listings),
+            listings: listings::screen(&source, state, window, cx),
+            orders: orders::screen(&user, state, window, cx),
+            trade_messages: trade_messages::screen(state, window, cx),
             last_message: scraper.message.clone(),
             scraper,
+            user,
             live_orders,
-            listings: cx.new(|cx| ListingsView::new(source, window, cx)),
+            _subscriptions: vec![cx.observe_window_appearance(window, |_, window, cx| {
+                Theme::follow_system(window.appearance(), cx);
+            })],
+        };
+        cx.defer_in(window, move |shell, window, cx| {
+            shell.apply_startup(&startup, window, cx);
+        });
+        shell
+    }
+
+    fn apply_startup(&mut self, startup: &Startup, window: &mut Window, cx: &mut Context<Self>) {
+        let Some(screen) = self.built_screen().cloned() else {
+            return;
+        };
+        screen.update(cx, |screen, cx| {
+            if let Some(tab) = &startup.tab {
+                screen.open_tab(tab, window, cx);
+            }
+            let page = screen.page();
+            page.focus(window, cx);
+            if let Some(row) = startup.row {
+                page.select_row(row, cx);
+            }
+            if let Some(label) = &startup.dialog {
+                page.run_labelled(label, window, cx);
+            }
+        });
+    }
+
+    /// The view of the current screen, when the screen is built.
+    fn built_screen(&self) -> Option<&Entity<TabbedScreen>> {
+        match self.screen {
+            Screen::Listings => Some(&self.listings),
+            Screen::Orders => Some(&self.orders),
+            Screen::TradeMessages => Some(&self.trade_messages),
+            Screen::Home
+            | Screen::Chat
+            | Screen::Analytics
+            | Screen::Inventory
+            | Screen::Settings
+            | Screen::About => None,
         }
+    }
+
+    fn open_screen(&mut self, screen: Screen, window: &mut Window, cx: &mut Context<Self>) {
+        self.screen = screen;
+        if let Some(view) = self.built_screen().cloned() {
+            view.update(cx, |view, cx| view.page().focus(window, cx));
+        }
+        cx.notify();
     }
 
     fn toggle_scraper(&mut self, cx: &mut Context<Self>) {
@@ -66,111 +160,57 @@ impl AppShell {
         let active = screen == self.screen;
         let badge = (screen == Screen::Chat && self.user.unread_messages > 0)
             .then_some(self.user.unread_messages);
-        let item = div()
+        let ring = focus_ring(&theme);
+        div()
             .id(screen.label())
             .flex()
+            .flex_shrink_0()
             .items_center()
+            .gap(px(9.))
+            .h(px(30.))
+            .px(px(9.))
+            .rounded(theme.metrics.radius)
+            .text_size(theme.type_scale.body)
             .cursor_pointer()
-            .on_click(cx.listener(move |shell, _, _, cx| {
-                shell.screen = screen;
-                cx.notify();
-            }));
-        match theme.layout.navigation {
-            Navigation::Sidebar { .. } => item
-                .gap(px(9.))
-                .h(px(30.))
-                .px(px(9.))
-                .rounded(theme.metrics.radius)
-                .text_size(theme.type_scale.body)
-                .map(|item| {
-                    if active {
-                        item.bg(colors.row_selected)
-                            .text_color(colors.text)
-                            .font_weight(theme.type_scale.label_weight)
-                    } else {
-                        item.text_color(colors.text_muted)
-                            .hover(|item| item.bg(colors.control_hover).text_color(colors.text))
-                    }
-                })
-                .child(icon(
-                    screen.icon(),
-                    theme.metrics.icon + px(1.),
-                    if active {
-                        colors.accent
-                    } else {
-                        colors.text_muted
-                    },
-                ))
-                .child(div().flex_1().child(screen.label()))
-                .children(badge.map(|count| {
-                    div()
-                        .px(px(6.))
-                        .h(px(17.))
-                        .flex()
-                        .items_center()
-                        .rounded(px(9.))
-                        .bg(colors.accent)
-                        .text_size(theme.type_scale.caption)
+            .tab_index(0)
+            .focus_visible(move |style| style.shadow(ring))
+            .on_click(cx.listener(move |shell, _, window, cx| {
+                shell.open_screen(screen, window, cx);
+            }))
+            .map(|item| {
+                if active {
+                    item.bg(colors.row_selected)
+                        .text_color(colors.text)
                         .font_weight(theme.type_scale.label_weight)
-                        .text_color(colors.on_accent)
-                        .child(number(count))
-                })),
-            Navigation::TopBar => item
-                .gap(px(6.))
-                .h_full()
-                .px(px(10.))
-                .border_b_2()
-                .text_size(theme.type_scale.body)
-                .font_weight(theme.type_scale.label_weight)
-                .map(|item| {
-                    if active {
-                        item.border_color(colors.accent).text_color(colors.text)
-                    } else {
-                        item.border_color(colors.accent.opacity(0.))
-                            .text_color(colors.text_muted)
-                            .hover(|item| item.text_color(colors.text))
-                    }
-                })
-                .child(screen.label())
-                .children(badge.map(|count| {
-                    div()
-                        .font_family(theme.type_scale.numeric_family.clone())
-                        .text_size(theme.type_scale.caption)
-                        .text_color(colors.accent)
-                        .child(number(count))
-                })),
-            Navigation::Rail { .. } => item
-                .relative()
-                .justify_center()
-                .size(px(40.))
-                .rounded(theme.metrics.radius_large)
-                .map(|item| {
-                    if active {
-                        item.bg(colors.row_selected)
-                    } else {
-                        item.hover(|item| item.bg(colors.control_hover))
-                    }
-                })
-                .tooltip(move |window, cx| {
-                    gpui_component::tooltip::Tooltip::new(screen.label()).build(window, cx)
-                })
-                .child(icon(
-                    screen.icon(),
-                    px(19.),
-                    if active {
-                        colors.accent
-                    } else {
-                        colors.text_muted
-                    },
-                ))
-                .children(badge.map(|_| {
-                    div()
-                        .absolute()
-                        .top(px(7.))
-                        .right(px(7.))
-                        .child(dot(colors.accent, px(7.)))
-                })),
-        }
+                } else {
+                    item.text_color(colors.text_muted)
+                        .hover(|item| item.bg(colors.control_hover).text_color(colors.text))
+                }
+            })
+            .child(icon(
+                screen.icon(),
+                theme.metrics.icon + px(1.),
+                if active {
+                    colors.accent
+                } else {
+                    colors.text_muted
+                },
+            ))
+            .child(div().flex_1().child(screen.label()))
+            .children(badge.map(|count| {
+                div()
+                    .px(px(6.))
+                    .h(px(17.))
+                    .flex()
+                    .items_center()
+                    .rounded(px(9.))
+                    .bg(colors.accent)
+                    .text_size(theme.type_scale.caption)
+                    .font_weight(theme.type_scale.label_weight)
+                    .font_features(tabular_figures())
+                    .text_color(colors.on_accent)
+                    .child(number(count))
+            }))
     }
 
     fn nav_group(&self, group: ScreenGroup, cx: &mut Context<Self>) -> Vec<Stateful<Div>> {
@@ -181,10 +221,10 @@ impl AppShell {
             .collect()
     }
 
-    fn sidebar(&self, width: Pixels, cx: &mut Context<Self>) -> Div {
+    fn sidebar(&self, cx: &mut Context<Self>) -> Div {
         let theme = Theme::global(cx).clone();
         let colors = theme.colors;
-        let group_label = |text: &str| {
+        let group_label = |text: &'static str| {
             div()
                 .px(px(9.))
                 .pt(px(14.))
@@ -192,10 +232,10 @@ impl AppShell {
                 .text_size(theme.type_scale.caption)
                 .font_weight(theme.type_scale.label_weight)
                 .text_color(colors.text_faint)
-                .child(label_text(&theme, text))
+                .child(text)
         };
         div()
-            .w(width)
+            .w(theme.metrics.sidebar_width)
             .flex_shrink_0()
             .h_full()
             .flex()
@@ -275,45 +315,6 @@ impl AppShell {
             )
     }
 
-    fn rail(&self, width: Pixels, cx: &mut Context<Self>) -> Div {
-        let theme = Theme::global(cx).clone();
-        let colors = theme.colors;
-        div()
-            .w(width)
-            .flex_shrink_0()
-            .h_full()
-            .flex()
-            .flex_col()
-            .items_center()
-            .gap(px(4.))
-            .pb(px(12.))
-            .bg(colors.chrome)
-            .border_r_1()
-            .border_color(colors.border)
-            .child(
-                div()
-                    .flex()
-                    .flex_shrink_0()
-                    .items_center()
-                    .justify_center()
-                    .h(theme.metrics.title_bar_height)
-                    .when(cfg!(target_os = "macos"), |brand| brand.pt(px(28.)))
-                    .child(img(APP_ICON).size(px(30.)).rounded(px(7.))),
-            )
-            .children(self.nav_group(ScreenGroup::Trading, cx))
-            .child(
-                div()
-                    .my(px(6.))
-                    .w(px(24.))
-                    .h(px(1.))
-                    .flex_shrink_0()
-                    .bg(colors.border),
-            )
-            .children(self.nav_group(ScreenGroup::Overview, cx))
-            .child(div().flex_1())
-            .children(self.nav_group(ScreenGroup::App, cx))
-    }
-
     fn user_status_color(&self, theme: &Theme) -> gpui::Hsla {
         match self.user.wfm_status {
             UserStatus::InGame => theme.colors.accent,
@@ -325,28 +326,43 @@ impl AppShell {
     fn scraper_button(&self, cx: &mut Context<Self>) -> impl IntoElement + use<> {
         let theme = Theme::global(cx);
         let size = theme.metrics.icon - px(2.);
-        let short = theme.variant == Variant::B;
         let button = if self.scraper.is_running {
-            text_button(
-                "scraper-toggle",
-                if short { "Stop" } else { "Stop live scraper" },
-                cx,
-            )
-            .icon(Icon::new(IconName::Square).size(size))
+            text_button("scraper-toggle", "Stop live scraper", cx)
+                .icon(Icon::new(IconName::Square).size(size))
         } else {
-            text_button(
-                "scraper-toggle",
-                if short { "Start" } else { "Start live scraper" },
-                cx,
-            )
-            .primary()
-            .icon(Icon::new(IconName::Play).size(size))
+            text_button("scraper-toggle", "Start live scraper", cx)
+                .primary()
+                .icon(Icon::new(IconName::Play).size(size))
         };
         button.on_click(cx.listener(|shell, _, _, cx| shell.toggle_scraper(cx)))
     }
 
+    /// The button that opens the appearance choices: match the system, light
+    /// or dark.
+    fn appearance_button(&self, cx: &App) -> impl IntoElement + use<> {
+        let theme = Theme::global(cx);
+        let current = theme.choice;
+        let name = match (current, theme.appearance) {
+            (AppearanceChoice::System, _) => IconName::SunMoon,
+            (_, Appearance::Light) => IconName::Sun,
+            (_, Appearance::Dark) => IconName::Moon,
+        };
+        IconButton::new("appearance", name, "Appearance").dropdown_menu(move |mut menu, _, _| {
+            for choice in AppearanceChoice::ALL {
+                menu = menu.item(
+                    PopupMenuItem::new(choice.label())
+                        .checked(choice == current)
+                        .on_click(move |_, window, cx| {
+                            Theme::set_choice(choice, window.appearance(), cx);
+                        }),
+                );
+            }
+            menu
+        })
+    }
+
     /// The live scraper's running state and its current step.
-    fn scraper_state(&self, with_progress: bool, cx: &App) -> Div {
+    fn scraper_state(&self, cx: &App) -> Div {
         let theme = Theme::global(cx);
         let colors = theme.colors;
         let running = self.scraper.is_running;
@@ -384,7 +400,6 @@ impl AppShell {
             .children(
                 message
                     .and_then(|message| message.progress())
-                    .filter(|_| with_progress)
                     .map(|(current, total)| {
                         let width = 120.;
                         let done = width * current as f32 / total.max(1) as f32;
@@ -404,6 +419,7 @@ impl AppShell {
         let colors = theme.colors;
         div()
             .flex()
+            .flex_shrink_0()
             .items_center()
             .gap(px(14.))
             .child(
@@ -438,7 +454,7 @@ impl AppShell {
     fn status_bar(&self, cx: &App) -> Div {
         let theme = Theme::global(cx);
         let colors = theme.colors;
-        let bar = div()
+        div()
             .flex()
             .flex_shrink_0()
             .items_center()
@@ -450,127 +466,61 @@ impl AppShell {
             .border_color(colors.border)
             .bg(colors.chrome)
             .text_size(theme.type_scale.caption + px(1.))
-            .text_color(colors.text_muted);
-        match theme.variant {
-            Variant::A => bar
-                .child(self.scraper_state(true, cx))
-                .child(self.account_state(cx)),
-            Variant::B | Variant::C => bar.child(self.account_state(cx)).child(
-                div()
-                    .text_color(colors.text_faint)
-                    .child(concat!("Quantframe ", env!("CARGO_PKG_VERSION"))),
-            ),
-        }
+            .text_color(colors.text_muted)
+            .child(self.scraper_state(cx))
+            .child(self.account_state(cx))
     }
 
     fn title_bar(&self, window: &Window, cx: &mut Context<Self>) -> impl IntoElement + use<> {
         let theme = Theme::global(cx).clone();
         let colors = theme.colors;
-        let content: AnyElement = match theme.layout.navigation {
-            Navigation::Sidebar { .. } => div()
-                .flex()
-                .flex_1()
-                .items_center()
-                .justify_between()
-                .px(theme.metrics.gutter)
-                .child(
-                    div()
-                        .text_size(theme.type_scale.title)
-                        .font_weight(theme.type_scale.title_weight)
-                        .text_color(colors.text)
-                        .child(self.screen.label()),
-                )
-                .child(self.scraper_button(cx))
-                .into_any_element(),
-            Navigation::TopBar => div()
-                .flex()
-                .flex_1()
-                .h_full()
-                .items_center()
-                .gap(px(4.))
-                .pl(if cfg!(target_os = "macos") {
-                    px(82.)
-                } else {
-                    theme.metrics.gutter
-                })
-                .pr(theme.metrics.gutter)
-                .child(img(APP_ICON).size(px(20.)).rounded(px(4.)))
-                .child(div().w(px(6.)))
-                .children(self.nav_group(ScreenGroup::Trading, cx))
-                .children(self.nav_group(ScreenGroup::Overview, cx))
-                .children(self.nav_group(ScreenGroup::App, cx))
-                .child(div().flex_1())
-                .child(
-                    div()
-                        .flex()
-                        .items_center()
-                        .gap(px(12.))
-                        .text_size(theme.type_scale.body)
-                        .child(self.scraper_state(true, cx))
-                        .child(self.scraper_button(cx)),
-                )
-                .into_any_element(),
-            Navigation::Rail { .. } => div()
-                .flex()
-                .flex_1()
-                .items_center()
-                .justify_between()
-                .gap(px(24.))
-                .px(theme.metrics.gutter)
-                .child(
-                    div()
-                        .text_size(theme.type_scale.title)
-                        .font_weight(theme.type_scale.title_weight)
-                        .text_color(colors.text)
-                        .child(self.screen.label()),
-                )
-                .child(
-                    div()
-                        .flex()
-                        .items_center()
-                        .gap(px(16.))
-                        .min_w_0()
-                        .text_size(theme.type_scale.body)
-                        .child(self.scraper_state(false, cx))
-                        .child(self.scraper_button(cx)),
-                )
-                .into_any_element(),
-        };
-        let bordered = theme.variant == Variant::B;
         TitleBar::new()
             .h(theme.metrics.title_bar_height)
             .pl(px(0.))
-            .bg(if bordered {
-                colors.chrome
-            } else {
-                colors.surface
-            })
-            .border_color(if bordered {
-                colors.border
-            } else {
-                colors.surface
-            })
-            .child(content)
+            .bg(colors.surface)
+            .border_color(colors.surface)
+            .child(
+                div()
+                    .flex()
+                    .flex_1()
+                    .items_center()
+                    .justify_between()
+                    .px(theme.metrics.gutter)
+                    .child(
+                        div()
+                            .text_size(theme.type_scale.title)
+                            .font_weight(theme.type_scale.title_weight)
+                            .text_color(colors.text)
+                            .child(self.screen.label()),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(8.))
+                            .child(self.appearance_button(cx))
+                            .child(self.scraper_button(cx)),
+                    ),
+            )
             .when(draws_own_window_controls(window), |bar| {
                 bar.child(window_controls(cx))
             })
     }
 
     fn content(&self, cx: &App) -> AnyElement {
-        if self.screen == Screen::Listings {
-            return self.listings.clone().into_any_element();
+        match self.built_screen() {
+            Some(screen) => screen.clone().into_any_element(),
+            None => div()
+                .size_full()
+                .bg(Theme::global(cx).colors.surface)
+                .child(placeholder(
+                    self.screen.icon(),
+                    &format!("{} is not built yet", self.screen.label()),
+                    "Use the Tauri app for this screen until the GPUI app has it.",
+                    cx,
+                ))
+                .into_any_element(),
         }
-        let theme = Theme::global(cx);
-        div()
-            .size_full()
-            .flex()
-            .items_center()
-            .justify_center()
-            .bg(theme.colors.surface)
-            .text_size(theme.type_scale.body)
-            .text_color(theme.colors.text_muted)
-            .child(format!("{} is not built yet.", self.screen.label()))
-            .into_any_element()
     }
 }
 
@@ -587,7 +537,7 @@ fn window_controls(cx: &App) -> Div {
     use gpui_component::IconName as KitIcon;
     let theme = Theme::global(cx);
     let colors = theme.colors;
-    let control = |id: &'static str, name: KitIcon| {
+    let control = |id: &'static str, name: KitIcon, tooltip: &'static str| {
         div()
             .id(id)
             .flex()
@@ -597,6 +547,7 @@ fn window_controls(cx: &App) -> Div {
             .h_full()
             .text_color(colors.text_muted)
             .hover(|control| control.bg(colors.control_hover).text_color(colors.text))
+            .tooltip(move |window, cx| Tooltip::new(tooltip).build(window, cx))
             .child(Icon::new(name).size(px(15.)))
     };
     div()
@@ -604,15 +555,15 @@ fn window_controls(cx: &App) -> Div {
         .flex_shrink_0()
         .h_full()
         .child(
-            control("window-minimize", KitIcon::WindowMinimize)
+            control("window-minimize", KitIcon::WindowMinimize, "Minimise")
                 .on_click(|_, window, _| window.minimize_window()),
         )
         .child(
-            control("window-maximize", KitIcon::WindowMaximize)
+            control("window-maximize", KitIcon::WindowMaximize, "Maximise")
                 .on_click(|_, window, _| window.zoom_window()),
         )
         .child(
-            control("window-close", KitIcon::WindowClose)
+            control("window-close", KitIcon::WindowClose, "Close")
                 .hover(|control| control.bg(colors.negative).text_color(colors.on_accent))
                 .on_click(|_, window, _| window.remove_window()),
         )
@@ -621,26 +572,24 @@ fn window_controls(cx: &App) -> Div {
 impl Render for AppShell {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = Theme::global(cx).clone();
-        let main = div()
-            .flex_1()
-            .min_w_0()
-            .h_full()
-            .flex()
-            .flex_col()
-            .child(self.title_bar(window, cx))
-            .child(div().flex_1().min_h_0().child(self.content(cx)))
-            .child(self.status_bar(cx));
-        let frame = div()
+        div()
             .size_full()
             .flex()
             .bg(theme.colors.window)
             .font_family(theme.type_scale.family.clone())
             .text_size(theme.type_scale.body)
-            .text_color(theme.colors.text);
-        match theme.layout.navigation {
-            Navigation::Sidebar { width } => frame.child(self.sidebar(width, cx)).child(main),
-            Navigation::Rail { width } => frame.child(self.rail(width, cx)).child(main),
-            Navigation::TopBar => frame.child(main),
-        }
+            .text_color(theme.colors.text)
+            .child(self.sidebar(cx))
+            .child(
+                div()
+                    .flex_1()
+                    .min_w_0()
+                    .h_full()
+                    .flex()
+                    .flex_col()
+                    .child(self.title_bar(window, cx))
+                    .child(div().flex_1().min_h_0().child(self.content(cx)))
+                    .child(self.status_bar(cx)),
+            )
     }
 }

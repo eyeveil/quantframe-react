@@ -2,8 +2,12 @@ mod assets;
 mod data;
 mod listings;
 mod model;
+mod orders;
+mod prefs;
+mod preview;
 mod shell;
 mod theme;
+mod trade_messages;
 mod ui;
 
 use std::rc::Rc;
@@ -13,7 +17,7 @@ use gpui_component::{Root, TitleBar};
 
 use data::{DataSource, FixtureSource};
 use shell::AppShell;
-use theme::{Theme, Variant};
+use theme::Theme;
 
 /// gpui-component sizes its controls in rems and draws their labels at
 /// 0.875rem, so this rem size puts those labels at the theme's body size.
@@ -27,7 +31,7 @@ fn main() {
             if let Err(error) = assets::load_fonts(cx) {
                 eprintln!("Could not load the bundled fonts: {error}");
             }
-            Theme::for_variant(Variant::from_env()).install(cx);
+            Theme::init(cx);
 
             let source: Rc<dyn DataSource> = Rc::new(FixtureSource::new());
             let bounds = Bounds::centered(None, size(px(1440.), px(900.)), cx);

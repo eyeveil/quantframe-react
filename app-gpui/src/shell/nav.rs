@@ -34,6 +34,13 @@ impl Screen {
         Self::About,
     ];
 
+    /// The screen named by a `QF_SCREEN` value, such as `trade-messages`.
+    pub fn from_key(key: &str) -> Option<Self> {
+        Self::ALL
+            .into_iter()
+            .find(|screen| screen.label().to_lowercase().replace(' ', "-") == key)
+    }
+
     pub const fn label(self) -> &'static str {
         match self {
             Self::Listings => "Listings",
