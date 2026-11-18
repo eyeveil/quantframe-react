@@ -1,12 +1,8 @@
-//! Backend events, typed. `GpuiHost` parses what the backend emits and
-//! `Backend` re-emits it to the views that subscribe.
-
 use serde_json::Value;
 
 use super::convert;
 use crate::model::{ChatMessage, LiveScraperMessage};
 
-/// A list the backend changed. Views showing that list fetch it again.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum DataKind {
     StockItems,
@@ -24,24 +20,19 @@ pub enum DataKind {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum BackendEvent {
-    /// A startup step, as an i18n key such as `wfm.refresh`.
     StartingUp(String),
-    /// `app:ready`. Every `DataSource` method works from here on.
     Ready,
     StartupFailed(String),
-    /// `App:Error`. `None` clears the error.
     Error(Option<String>),
     Changed(DataKind),
     LiveScraperRunning(bool),
     LiveScraperMessage(LiveScraperMessage),
-    /// `App:OnNotify`, an in-app toast.
     Notify {
         i18n_key: String,
         color: String,
         values: Value,
     },
     ChatMessage(ChatMessage),
-    /// `Host::notify`, an OS notification.
     SystemNotification {
         title: String,
         body: String,
@@ -50,9 +41,7 @@ pub enum BackendEvent {
         file: String,
         volume: f32,
     },
-    /// The log parser saw a completed in-game trade.
     TradeDetected(Trade),
-    /// An event this app doesn't handle yet.
     Other(String),
 }
 
@@ -79,7 +68,6 @@ fn int(value: &Value, keys: &[&str]) -> i64 {
 }
 
 impl BackendEvent {
-    /// Parses one `Host::emit` call.
     pub fn parse(event: &str, payload: &Value) -> Self {
         match event {
             "app:ready" => Self::Ready,

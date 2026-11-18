@@ -1,4 +1,3 @@
-/// Mirrors `utils::SubType`.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SubType {
     pub rank: Option<i64>,
@@ -31,8 +30,6 @@ impl SubType {
         }
     }
 
-    /// The text of the rank column: a mod or arcane rank, a relic refinement,
-    /// or the socketed stars of an Ayatan sculpture.
     pub fn label(&self) -> Option<String> {
         if let Some(rank) = self.rank {
             return Some(format!("Rank {rank}"));

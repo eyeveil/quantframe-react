@@ -1,6 +1,3 @@
-//! The Users tab: how many people used Quantframe per day, from
-//! Quantframe's server.
-
 use gpui::{
     AnyElement, App, Context, Div, Entity, IntoElement, ParentElement, Pixels, Styled, Window,
     div, px,
@@ -23,7 +20,6 @@ pub struct Users {
     source: DataSource,
     range: usize,
     activity: Loaded<UserActivity>,
-    /// Counts the loads, so a slow answer never replaces a newer one.
     generation: u64,
 }
 

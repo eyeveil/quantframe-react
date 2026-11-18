@@ -56,7 +56,6 @@ pub fn get_sounds_path() -> PathBuf {
     sounds_path
 }
 
-/// The desktop, or the app storage directory on systems without one.
 pub fn get_desktop_path() -> PathBuf {
     dirs::desktop_dir().unwrap_or_else(get_app_storage_path)
 }

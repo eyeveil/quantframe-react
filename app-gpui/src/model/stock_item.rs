@@ -1,6 +1,5 @@
 use super::{PriceHistory, StockStatus, SubType};
 
-/// Mirrors `entity::stock_item::Model`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct StockItem {
     pub id: i64,
@@ -9,7 +8,6 @@ pub struct StockItem {
     pub item_name: String,
     pub item_unique_name: String,
     pub sub_type: Option<SubType>,
-    /// Average platinum paid per unit.
     pub bought: i64,
     pub list_price: Option<i64>,
     pub owned: i64,
@@ -21,8 +19,6 @@ pub struct StockItem {
     pub properties: StockItemProperties,
 }
 
-/// The keys the backend allows in a stock item's `properties`
-/// (`ALLOWED_PROPERTIES_FIELDS`), typed as in `StockEntryPropertiesBase`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct StockItemProperties {
     pub min_price: Option<i64>,
@@ -45,7 +41,6 @@ impl StockItem {
         self.sub_type.as_ref().and_then(SubType::label)
     }
 
-    /// An override of the scraper's global profit or moving-average settings.
     pub fn has_override(&self) -> bool {
         self.properties.min_sma.is_some() || self.properties.min_profit.is_some()
     }
@@ -55,8 +50,6 @@ impl StockItem {
     }
 }
 
-/// Input of `stock_item_create` and `wish_list_create`. `raw` is a
-/// warframe.market slug, id or unique name.
 #[derive(Clone, Debug, PartialEq)]
 pub struct NewStockItem {
     pub raw: String,
@@ -65,8 +58,6 @@ pub struct NewStockItem {
     pub bought: i64,
 }
 
-/// Input of `stock_item_update`. `None` leaves a field unchanged. The
-/// backend clears a price limit that is set to 0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct StockItemUpdate {
     pub owned: Option<i64>,

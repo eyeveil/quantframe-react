@@ -1,18 +1,11 @@
-//! The prompts several screens open: sold, bought, delete and the trade chat
-//! message.
-
 use super::form::{Field, FormSpec, FormValues, Preview};
 
-/// The longest message Warframe's trade chat accepts.
 pub const CHAT_LIMIT: usize = 180;
 
-/// Asks how many units sold and for how much. `max_quantity` is `None` for
-/// things that sell one at a time, such as a riven.
 pub fn sold(name: &str, max_quantity: Option<i64>, total: Option<i64>) -> FormSpec {
     traded("Sell", "Record sale", name, max_quantity, total)
 }
 
-/// Asks how many units were bought and for how much.
 pub fn bought(name: &str, max_quantity: Option<i64>, total: Option<i64>) -> FormSpec {
     traded("Buy", "Record purchase", name, max_quantity, total)
 }
@@ -42,7 +35,6 @@ fn traded(
     }
 }
 
-/// Asks before deleting `count` rows. `singular` and `plural` name the rows.
 pub fn delete(count: usize, singular: &str, plural: &str) -> FormSpec {
     let (title, text) = if count == 1 {
         (
@@ -58,7 +50,6 @@ pub fn delete(count: usize, singular: &str, plural: &str) -> FormSpec {
     FormSpec::confirm_danger(title, text, "Delete")
 }
 
-/// One item of a trade chat message.
 #[derive(Clone, Debug)]
 pub struct MessageItem {
     pub name: String,
@@ -68,8 +59,6 @@ pub struct MessageItem {
 
 const DEFAULT_TEMPLATE: &str = "[<name>] <rank> <price>p";
 
-/// Asks for the wording of a trade chat message and previews it. The
-/// submitted values go to [`compose_message`].
 pub fn message(prefix: &str, items: Vec<MessageItem>) -> FormSpec {
     let count = items.len();
     FormSpec::new(
@@ -101,7 +90,6 @@ pub fn message(prefix: &str, items: Vec<MessageItem>) -> FormSpec {
     })
 }
 
-/// Builds the message from the prompt's values, adding items while they fit.
 pub fn compose_message(values: &FormValues, items: &[MessageItem]) -> String {
     let prefix = values.text("prefix");
     let suffix = values.text("suffix");

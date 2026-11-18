@@ -1,6 +1,3 @@
-//! The dashboard: profit totals, three profit charts, the latest
-//! transactions and the totals per item category.
-
 use gpui::{
     App, Context, Div, Entity, IntoElement, ParentElement, Render, Styled, Subscription, Window,
     div, prelude::*, px,
@@ -20,8 +17,6 @@ use crate::{
 };
 
 const CHART_HEIGHT: f32 = 150.;
-/// The room a chart card gives its plot: the bars, the labels under them
-/// and a legend.
 const PLOT_HEIGHT: f32 = CHART_HEIGHT + 34.;
 const MONTHS: [&str; 12] = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -66,7 +61,6 @@ impl HomeView {
     }
 }
 
-/// Sales, purchases and margin of a report, as the line under a total.
 fn trades_line(report: &FinancialReport) -> String {
     format!(
         "{} sales, {} purchases, {}% margin",
@@ -113,7 +107,6 @@ fn totals(summary: &DashboardSummary, cx: &App) -> Div {
         ))
 }
 
-/// Revenue, expenses, trades and average profit under a chart.
 fn report_strip(report: &FinancialReport, cx: &App) -> Div {
     let theme = Theme::global(cx);
     let colors = theme.colors;

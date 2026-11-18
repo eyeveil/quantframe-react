@@ -1,5 +1,3 @@
-//! Pieces shared by the shell and the screens.
-
 pub mod cells;
 pub mod choices;
 pub mod form;
@@ -28,7 +26,6 @@ pub fn icon(name: IconName, size: Pixels, color: Hsla) -> Icon {
     Icon::new(name).size(size).text_color(color)
 }
 
-/// Formats a platinum amount or a count with thousands separators.
 pub fn number(value: i64) -> String {
     let digits = value.unsigned_abs().to_string();
     let mut grouped = String::with_capacity(digits.len() + digits.len() / 3 + 1);
@@ -44,7 +41,6 @@ pub fn number(value: i64) -> String {
     grouped
 }
 
-/// The day and time of an RFC 3339 timestamp, as `17 Nov, 09:42`.
 pub fn day_and_time(timestamp: &str) -> String {
     const MONTHS: [&str; 12] = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -78,7 +74,6 @@ fn ring(theme: &Theme, inset: bool) -> Vec<BoxShadow> {
     }]
 }
 
-/// A labelled button at the theme's control height.
 pub fn text_button(id: impl Into<ElementId>, label: &str, cx: &App) -> Button {
     let theme = Theme::global(cx);
     Button::new(id)
@@ -87,7 +82,6 @@ pub fn text_button(id: impl Into<ElementId>, label: &str, cx: &App) -> Button {
         .h(theme.metrics.control_height)
 }
 
-/// A labelled button that fits inside a table row.
 pub fn row_button(id: impl Into<ElementId>, label: &str, cx: &App) -> Button {
     let theme = Theme::global(cx);
     Button::new(id)
@@ -97,7 +91,6 @@ pub fn row_button(id: impl Into<ElementId>, label: &str, cx: &App) -> Button {
         .tab_stop(false)
 }
 
-/// A square icon button with a tooltip, for row and toolbar actions.
 #[derive(IntoElement)]
 pub struct IconButton {
     id: ElementId,
@@ -131,13 +124,11 @@ impl IconButton {
         }
     }
 
-    /// The icon colour at rest. The default is the muted text colour.
     pub fn tone(mut self, tone: Hsla) -> Self {
         self.tone = Some(tone);
         self
     }
 
-    /// The icon colour under the pointer. The default is the text colour.
     pub fn hover_tone(mut self, tone: Hsla) -> Self {
         self.hover_tone = Some(tone);
         self
@@ -156,8 +147,6 @@ impl IconButton {
         self
     }
 
-    /// Leaves the button out of the Tab order. A table repeats its row
-    /// buttons on every row, and the row menu reaches the same actions.
     pub fn in_row(mut self) -> Self {
         self.tab_stop = false;
         self
@@ -195,7 +184,6 @@ impl RenderOnce for IconButton {
         let colors = theme.colors;
         let ring = focus_ring(theme);
         let tooltip = self.tooltip;
-        // A disabled button drops the listeners its caller attached.
         let base = if self.disabled {
             div().id(self.id)
         } else {
@@ -230,7 +218,6 @@ impl RenderOnce for IconButton {
     }
 }
 
-/// A clickable filter chip. The selected chip takes the accent colours.
 pub fn chip(id: impl Into<ElementId>, selected: bool, cx: &App) -> Stateful<Div> {
     let theme = Theme::global(cx);
     let colors = theme.colors;
@@ -266,7 +253,6 @@ pub fn dot(color: Hsla, size: Pixels) -> Div {
     div().flex_shrink_0().size(size).rounded(size).bg(color)
 }
 
-/// A coloured dot and a label, for a status in a row or the item panel.
 pub fn dot_label(color: Hsla, label: impl Into<SharedString>) -> Div {
     div()
         .flex()
@@ -277,7 +263,6 @@ pub fn dot_label(color: Hsla, label: impl Into<SharedString>) -> Div {
         .child(div().truncate().child(label.into()))
 }
 
-/// A vertical hairline between groups in a toolbar.
 pub fn divider(cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -287,7 +272,6 @@ pub fn divider(cx: &App) -> Div {
         .bg(theme.colors.border)
 }
 
-/// A number set in fixed-width digits and pushed to the right edge of its cell.
 pub fn numeric(text: impl Into<SharedString>) -> Div {
     div()
         .size_full()
@@ -298,13 +282,11 @@ pub fn numeric(text: impl Into<SharedString>) -> Div {
         .child(text.into())
 }
 
-/// One choice in a [`segmented`] control.
 pub struct Segment {
     pub label: &'static str,
     pub count: Option<usize>,
 }
 
-/// A row of mutually exclusive choices, for the tabs of a screen.
 pub fn segmented(
     id: &'static str,
     segments: Vec<Segment>,
@@ -407,8 +389,6 @@ pub fn search_field(
         )
 }
 
-/// A centred icon, title and line of detail, for a screen or table with
-/// nothing to show.
 pub fn placeholder(name: IconName, title: &str, detail: &str, cx: &App) -> Div {
     let theme = Theme::global(cx);
     let colors = theme.colors;

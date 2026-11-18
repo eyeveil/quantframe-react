@@ -1,6 +1,5 @@
 use gpui_kit_assets::IconName;
 
-/// The app's screens, in the trader's order of use.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Screen {
     Listings,
@@ -36,7 +35,6 @@ impl Screen {
         Self::About,
     ];
 
-    /// The screen named by a `QF_SCREEN` value, such as `trade-messages`.
     pub fn from_key(key: &str) -> Option<Self> {
         Self::ALL
             .into_iter()

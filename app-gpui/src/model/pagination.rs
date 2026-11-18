@@ -1,6 +1,5 @@
 use super::StockStatus;
 
-/// Mirrors `entity::dto::PaginatedResult`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Paginated<T> {
     pub total: i64,
@@ -17,7 +16,6 @@ pub enum SortDirection {
     Desc,
 }
 
-/// Mirrors `StockItemControllerGetListParams`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StockItemListParams {
     pub page: i64,
@@ -41,8 +39,6 @@ impl Default for StockItemListParams {
     }
 }
 
-/// Paging, sorting and search shared by the warframe.market, chat, trade
-/// message, transaction and inventory lists.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ListParams {
     pub page: i64,
@@ -64,22 +60,18 @@ impl Default for ListParams {
     }
 }
 
-/// Mirrors `SyndicateItemPaginationQueryDto`.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SyndicateItemListParams {
     pub stock: StockItemListParams,
-    /// A syndicate name such as `Steel Meridian`.
     pub syndicate: Option<String>,
 }
 
-/// Mirrors `WfmOrderPaginationQueryDto`.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct OrderListParams {
     pub list: ListParams,
     pub order_type: Option<super::OrderType>,
 }
 
-/// Mirrors `TradeEntryPaginationQueryDto`.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TradeEntryListParams {
     pub list: ListParams,
@@ -87,7 +79,6 @@ pub struct TradeEntryListParams {
     pub tags: Vec<String>,
 }
 
-/// Mirrors `TransactionPaginationQueryDto`. Dates are RFC 3339.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TransactionListParams {
     pub list: ListParams,

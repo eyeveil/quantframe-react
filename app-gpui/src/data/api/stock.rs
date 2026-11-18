@@ -1,6 +1,3 @@
-//! The four live scraper lists: stock items, stock rivens, wish list and
-//! syndicate items.
-
 use std::{collections::BTreeMap, future::Future, path::PathBuf};
 
 use qf_app_lib::{
@@ -448,7 +445,6 @@ impl DataSource {
         })
     }
 
-    /// Item count per syndicate name.
     pub fn get_syndicate_item_syndicate_counts(
         &self,
     ) -> impl Future<Output = DataResult<BTreeMap<String, usize>>> + Send + 'static {
@@ -541,8 +537,6 @@ impl DataSource {
         self.call(async move { Ok(syndicate_item::syndicate_item_delete_multiple(ids).await?) })
     }
 
-    /// Imports the syndicate items the Quantframe API rates as profitable.
-    /// Needs the network, so fixture mode returns an error.
     pub fn syndicate_item_import_items(
         &self,
     ) -> impl Future<Output = DataResult<i64>> + Send + 'static {

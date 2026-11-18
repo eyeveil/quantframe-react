@@ -1,4 +1,3 @@
-/// Mirrors `app::types::User` without the tokens.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct User {
     pub anonymous: bool,
@@ -28,7 +27,6 @@ pub enum BanService {
     Quantframe,
 }
 
-/// Mirrors the `user_status` enum of warframe.market.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum UserStatus {
     Online,

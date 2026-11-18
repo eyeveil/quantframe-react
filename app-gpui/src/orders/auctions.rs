@@ -1,5 +1,3 @@
-//! The Auctions tab: riven auctions on Warframe Market.
-
 use std::cmp::Ordering;
 
 use gpui::{AnyElement, App, IntoElement, ParentElement, prelude::FluentBuilder};
@@ -50,9 +48,6 @@ pub struct Auctions {
     data: AuctionsData,
 }
 
-/// The weapon and the riven's own name, such as `Rubico Crita-visican`.
-/// Warframe Market sends the riven's name in lower case, and the weapon's
-/// slug stands in when the backend has no display name for it.
 fn title(auction: &WfmAuction) -> String {
     let weapon = if auction.name == auction.weapon_url {
         words(&auction.name)

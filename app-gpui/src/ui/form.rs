@@ -1,6 +1,3 @@
-//! Dialogs built from a list of fields: the sell, buy, edit, create and
-//! confirm prompts of every screen.
-
 use std::{cell::Cell, rc::Rc};
 
 use gpui::{
@@ -40,7 +37,6 @@ pub enum FieldKind {
     },
 }
 
-/// One entry of a select: the text shown and the value the form returns.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Choice {
     label: SharedString,
@@ -89,7 +85,6 @@ impl Field {
         }
     }
 
-    /// A whole number of zero or more.
     pub fn number(key: &'static str, label: &str, value: Option<i64>) -> Self {
         Self::new(
             key,
@@ -103,7 +98,6 @@ impl Field {
         )
     }
 
-    /// A platinum amount of zero or more.
     pub fn platinum(key: &'static str, label: &str, value: Option<i64>) -> Self {
         Self::number(key, label, value).unit("platinum")
     }
@@ -119,8 +113,6 @@ impl Field {
         )
     }
 
-    /// A select whose entries are their own values. More than eight entries
-    /// get a search box.
     pub fn choice(
         key: &'static str,
         label: &str,
@@ -143,8 +135,6 @@ impl Field {
         )
     }
 
-    /// A select with a search box over a long list, such as every tradable
-    /// item. The form returns the chosen entry's value.
     pub fn search(
         key: &'static str,
         label: &str,
@@ -187,7 +177,6 @@ impl Field {
         self
     }
 
-    /// Lets the field stay empty.
     pub fn optional(mut self) -> Self {
         self.optional = true;
         self
@@ -198,18 +187,15 @@ impl Field {
         self
     }
 
-    /// Takes half the dialog's width, so two fields share a line.
     pub fn half(mut self) -> Self {
         self.half = true;
         self
     }
 }
 
-/// Text computed from the current values, shown under the fields.
 pub struct Preview {
     pub label: &'static str,
     pub text: String,
-    /// The longest text the destination accepts.
     pub limit: Option<usize>,
 }
 
@@ -238,7 +224,6 @@ impl FormSpec {
         }
     }
 
-    /// A prompt with no fields that asks before a destructive change.
     pub fn confirm_danger(
         title: impl Into<String>,
         description: impl Into<String>,
@@ -278,7 +263,6 @@ enum Value {
     Flag(bool),
 }
 
-/// The values of a submitted form, by field key.
 #[derive(Clone, Debug, Default)]
 pub struct FormValues(Vec<(&'static str, Value)>);
 
@@ -315,7 +299,6 @@ impl FormValues {
         matches!(self.get(key), Some(Value::Flag(true)))
     }
 
-    /// The comma-separated entries of a text field, without blanks.
     pub fn list(&self, key: &str) -> Vec<String> {
         self.text(key)
             .split(',')
@@ -391,8 +374,6 @@ impl Form {
         }
     }
 
-    /// Reads every field. A field that fails its check keeps its last good
-    /// reading out of the result, and `strict` records why it failed.
     fn read(&mut self, strict: bool, cx: &App) -> Option<FormValues> {
         let mut values = Vec::with_capacity(self.controls.len());
         let mut valid = true;
@@ -625,8 +606,6 @@ enum Submitted {
     Invalid,
 }
 
-/// Opens a dialog for `spec`. `on_submit` runs once, with the checked
-/// values, when the user confirms.
 pub fn open(
     spec: FormSpec,
     on_submit: impl Fn(&FormValues, &mut Window, &mut App) + 'static,

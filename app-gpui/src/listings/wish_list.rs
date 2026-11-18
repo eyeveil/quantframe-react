@@ -1,5 +1,3 @@
-//! The Wish list tab: the items the live scraper keeps buy orders up for.
-
 use std::cmp::Ordering;
 
 use gpui::{AnyElement, App, IntoElement, ParentElement, Styled, div, px};
@@ -63,7 +61,6 @@ pub enum WishAction {
 #[derive(Default)]
 pub struct WishList {
     data: StockData<WishListItem>,
-    /// The cache's tradable items for the add dialog, loaded once.
     catalog: Vec<TradableItem>,
 }
 

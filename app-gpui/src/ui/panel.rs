@@ -1,6 +1,3 @@
-//! The item panel beside a table. It shows the selected row in full and
-//! holds the actions a row has no room for.
-
 use gpui::{
     App, ClickEvent, Div, Hsla, ParentElement, Stateful, Styled, Window, div, prelude::*, px,
 };
@@ -19,12 +16,9 @@ pub struct PanelModel<A> {
     pub subtitle: String,
     pub status: Option<(String, Hsla)>,
     pub note: Option<String>,
-    /// Price checks, oldest first. An empty list hides the chart.
     pub history: Vec<i64>,
-    /// Free lines under a heading, such as the attributes of a riven.
     pub lines: Option<(&'static str, Vec<(String, Tone)>)>,
     pub facts: Vec<Fact>,
-    /// Full-width buttons. The first one takes the accent colour.
     pub primary: Vec<PanelAction<A>>,
     pub secondary: Vec<PanelAction<A>>,
 }
@@ -49,7 +43,6 @@ impl Fact {
         self
     }
 
-    /// A platinum amount, or `empty` in the faint colour when there is none.
     pub fn amount(label: &'static str, value: Option<i64>, empty: &str) -> Self {
         match value {
             Some(value) => Self::new(label, number(value)),
@@ -61,7 +54,6 @@ impl Fact {
 pub struct PanelAction<A> {
     pub label: String,
     pub icon: IconName,
-    /// `None` draws the action disabled.
     pub action: Option<A>,
     pub danger: bool,
 }
@@ -321,7 +313,6 @@ fn heading(theme: &Theme, text: String) -> Div {
         .child(text)
 }
 
-/// One bar per price check, scaled between the lowest and highest price.
 fn price_bars(prices: &[i64], theme: &Theme) -> Div {
     const HEIGHT: f32 = 52.;
     let colors = theme.colors;

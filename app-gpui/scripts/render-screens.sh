@@ -1,19 +1,7 @@
 #!/usr/bin/env bash
-# Renders every built screen under Xvfb and saves one PNG per shot.
-# Run inside `nix develop` from the repo root, after `cargo build --release --locked`
-# in app-gpui.
-#
-#   bash app-gpui/scripts/render-screens.sh [output dir] [shot name ...]
-#
-# With no shot names it renders them all. The app runs the backend on
-# src-tauri/fixtures, which it copies to a fresh temporary directory, so a
-# render makes no network request and changes no data. Xvfb has no window
-# manager, so QF_WINDOW_CONTROLS makes the app draw its own window buttons.
-# The pointer starts at the screen centre, over the table, so it steps down
-# to the status bar before the capture and no row shows its hover colour. One
-# long jump leaves the hover colour in place.
-# The app reads its settings from a temporary XDG_CONFIG_HOME, so a render
-# never changes the user's saved appearance or item panel setting.
+# Xvfb has no window manager, so QF_WINDOW_CONTROLS makes the app draw its own
+# window buttons. One long pointer jump leaves a row's hover colour in place, so
+# the pointer steps down to the status bar before the capture.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -22,7 +10,6 @@ out="${1:-$root/docs/screenshots}"
 shift || true
 mkdir -p "$out"
 
-# Each shot is a file name, then the environment the app starts with.
 shots=(
   "listings-items-dark|QF_SCREEN=listings QF_TAB=items QF_THEME=dark"
   "listings-items-light|QF_SCREEN=listings QF_TAB=items QF_THEME=light"

@@ -1,6 +1,5 @@
 use super::{FinancialReport, Transaction};
 
-/// The payload of `dashboard_summary`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct DashboardSummary {
     pub total: FinancialReport,
@@ -13,14 +12,12 @@ pub struct DashboardSummary {
     pub recent_transactions: Vec<Transaction>,
 }
 
-/// A report and its chart, as built by `generate_transaction_summary`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct PeriodSummary {
     pub summary: FinancialReport,
     pub chart: Chart,
 }
 
-/// Mirrors `entity::dto::FinancialGraph<i64>`: profit per label.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Chart {
     pub labels: Vec<String>,

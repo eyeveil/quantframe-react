@@ -1,6 +1,3 @@
-//! Pieces the dashboard, chat, settings, about and sign-in screens share.
-//! The list screens take theirs from `ui/`.
-
 use gpui::{
     App, ClickEvent, Div, ElementId, Hsla, ParentElement, SharedString, Stateful, Styled, Window,
     div, prelude::*, px,
@@ -14,7 +11,6 @@ use crate::{
     ui::{focus_ring, grid::Tone, icon, placeholder, text_button},
 };
 
-/// A backend error as one sentence for a notification or an error state.
 pub fn describe(error: &DataError) -> String {
     if error.cause.is_empty() {
         error.message.clone()
@@ -23,7 +19,6 @@ pub fn describe(error: &DataError) -> String {
     }
 }
 
-/// What a view knows about data it fetched from the backend.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum Loaded<T> {
     #[default]
@@ -48,7 +43,6 @@ impl<T> Loaded<T> {
     }
 }
 
-/// A number with up to two decimals and no trailing zeros, such as `12.5`.
 pub fn decimal(value: f64) -> String {
     let text = format!("{value:.2}");
     let text = text.trim_end_matches('0').trim_end_matches('.');
@@ -66,7 +60,6 @@ pub fn decimal(value: f64) -> String {
     }
 }
 
-/// A bordered panel on the chrome colour.
 pub fn card(cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -79,7 +72,6 @@ pub fn card(cx: &App) -> Div {
         .bg(theme.colors.chrome)
 }
 
-/// The title line of a card or a section.
 pub fn heading(text: impl Into<SharedString>, cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -89,7 +81,6 @@ pub fn heading(text: impl Into<SharedString>, cx: &App) -> Div {
         .child(text.into())
 }
 
-/// A small label above a group of rows.
 pub fn overline(text: impl Into<SharedString>, cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -99,7 +90,6 @@ pub fn overline(text: impl Into<SharedString>, cx: &App) -> Div {
         .child(text.into())
 }
 
-/// Secondary text under a title or beside a control.
 pub fn note(text: impl Into<SharedString>, cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -109,7 +99,6 @@ pub fn note(text: impl Into<SharedString>, cx: &App) -> Div {
         .child(text.into())
 }
 
-/// A screen body that scrolls when its content is taller than the window.
 pub fn scroll_page(id: impl Into<ElementId>, cx: &App) -> Stateful<Div> {
     let theme = Theme::global(cx);
     div()
@@ -125,7 +114,6 @@ pub fn scroll_page(id: impl Into<ElementId>, cx: &App) -> Stateful<Div> {
         .text_color(theme.colors.text)
 }
 
-/// A figure with its label and a line of detail, as the list screens' totals.
 pub fn stat(
     label: impl Into<SharedString>,
     value: impl Into<SharedString>,
@@ -163,7 +151,6 @@ pub fn stat(
         )
 }
 
-/// A label and its value on one line.
 pub fn fact(
     label: impl Into<SharedString>,
     value: impl Into<SharedString>,
@@ -192,7 +179,6 @@ pub fn fact(
         )
 }
 
-/// The state of a view whose data failed to load, with a button to try again.
 pub fn failed(
     title: &str,
     reason: &str,
@@ -208,8 +194,6 @@ pub fn failed(
     )
 }
 
-/// A clickable line with an icon, a title and a line of detail. A list of
-/// them is a menu of places to go, such as the links on the About screen.
 pub fn link_row(
     id: impl Into<ElementId>,
     name: IconName,
@@ -261,7 +245,6 @@ pub fn link_row(
         ))
 }
 
-/// A hairline between the rows of a card.
 pub fn rule(cx: &App) -> Div {
     div()
         .flex_shrink_0()
@@ -270,7 +253,6 @@ pub fn rule(cx: &App) -> Div {
         .bg(Theme::global(cx).colors.border)
 }
 
-/// A line of text behind an icon in one colour, such as an error under a form.
 pub fn notice(name: IconName, tone: Hsla, text: impl Into<SharedString>, cx: &App) -> Div {
     let theme = Theme::global(cx);
     div()
@@ -288,7 +270,6 @@ pub fn notice(name: IconName, tone: Hsla, text: impl Into<SharedString>, cx: &Ap
         )
 }
 
-/// The calendar date `days` days before today in UTC, as `YYYY-MM-DD`.
 pub fn date_days_ago(days: i64) -> String {
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -296,7 +277,6 @@ pub fn date_days_ago(days: i64) -> String {
     civil_date(now.div_euclid(86_400) - days)
 }
 
-/// A Unix time in milliseconds as `YYYY-MM-DD HH:MM:SS` in UTC.
 pub fn utc_date_time(millis: i64) -> String {
     let seconds = millis.div_euclid(1000);
     let time = seconds.rem_euclid(86_400);
@@ -309,8 +289,6 @@ pub fn utc_date_time(millis: i64) -> String {
     )
 }
 
-/// The date of a day counted from 1970-01-01, by Howard Hinnant's
-/// `civil_from_days`.
 fn civil_date(day: i64) -> String {
     let shifted = day + 719_468;
     let era = shifted.div_euclid(146_097);

@@ -1,6 +1,3 @@
-//! The Debug screen: what the app and its warframe.market session hold right
-//! now, and the lines of Warframe's own log.
-
 use std::cmp::Ordering;
 
 use gpui::{
@@ -29,7 +26,6 @@ use crate::{
     },
 };
 
-/// How many lines of Warframe's log one load reads.
 const LOG_LINES: i64 = 1000;
 
 pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> Entity<TabbedScreen> {
@@ -228,8 +224,6 @@ impl StateView {
     }
 }
 
-/// A small read-only table in a card. A column of width zero takes the room
-/// the others leave, and the others line up on the right.
 fn table(
     title: &'static str,
     empty: &'static str,
@@ -356,7 +350,6 @@ pub enum LogAction {
     CopyLine(u64),
 }
 
-/// Warframe's `EE.log`, which the backend reads to see trades.
 pub struct GameLog {
     lines: Vec<EeLogLine>,
     total: i64,

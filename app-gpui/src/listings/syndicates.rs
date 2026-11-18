@@ -1,6 +1,3 @@
-//! The Syndicates tab: what the syndicates sell for standing, listed on
-//! Warframe Market by the live scraper.
-
 use std::{cmp::Ordering, collections::BTreeMap};
 
 use gpui::{AnyElement, App, Hsla, IntoElement, ParentElement, Styled, div, px, rgb};
@@ -56,7 +53,6 @@ pub enum SyndicateAction {
 #[derive(Default)]
 pub struct SyndicateData {
     stock: StockData<SyndicateItem>,
-    /// Item count per syndicate name.
     syndicates: BTreeMap<String, usize>,
 }
 
@@ -65,7 +61,6 @@ pub struct Syndicates {
     data: SyndicateData,
 }
 
-/// The colour each syndicate flies in the game.
 fn syndicate_color(name: &str) -> Hsla {
     let hex = match name {
         "Steel Meridian" => 0xc4622d,
@@ -79,7 +74,6 @@ fn syndicate_color(name: &str) -> Hsla {
     rgb(hex).into()
 }
 
-/// Platinum earned per 1,000 standing spent, at the list price.
 fn rate(item: &SyndicateItem) -> Option<f64> {
     let price = item.list_price?;
     (item.standing_cost > 0).then(|| price as f64 * 1000.0 / item.standing_cost as f64)

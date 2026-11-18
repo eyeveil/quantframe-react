@@ -1,4 +1,3 @@
-/// Mirrors `entity::dto::FinancialReport`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct FinancialReport {
     pub total_transactions: i64,

@@ -152,7 +152,6 @@ impl CacheState {
         }
     }
 
-    /// Loads the cache already on disk without contacting the Quantframe API.
     pub fn new_offline(lang: impl Into<String>) -> Result<Self, Error> {
         let version =
             CacheVersion::load().expect("Failed to load cache version from cache_version.json");

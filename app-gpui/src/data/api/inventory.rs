@@ -1,6 +1,3 @@
-//! The in-game rivens with every field the Inventory screen shows, and the
-//! call that copies one into stock.
-
 use std::future::Future;
 
 use qf_app_lib::{
@@ -15,15 +12,12 @@ use crate::{
     model::{InventoryRiven, StockRiven},
 };
 
-/// Every riven of `wf_inventory_get_rivens`, as the backend serialises it.
 async fn raw_rivens() -> DataResult<Vec<Value>> {
     let query = dto(json!({ "page": 1, "limit": -1 }))?;
     let value = wf_inventory::wf_inventory_get_rivens(query, State::get()).await?;
     Ok(value["results"].as_array().cloned().unwrap_or_default())
 }
 
-/// `WFInvItemRiven` flattens `ItemRivenBase` and its properties into the
-/// riven's own JSON object, so every field sits at the top level.
 fn riven(value: &Value) -> InventoryRiven {
     let text = |key: &str| value[key].as_str().unwrap_or_default().to_owned();
     InventoryRiven {
@@ -41,15 +35,12 @@ fn riven(value: &Value) -> InventoryRiven {
 }
 
 impl DataSource {
-    /// Every riven in the in-game inventory.
     pub fn wf_inventory_list_rivens(
         &self,
     ) -> impl Future<Output = DataResult<Vec<InventoryRiven>>> + Send + 'static {
         self.call(async move { Ok(raw_rivens().await?.iter().map(riven).collect()) })
     }
 
-    /// Adds the inventory riven with this uuid to the stock rivens, bought
-    /// for `bought` platinum.
     pub fn wf_inventory_stock_riven(
         &self,
         uuid: String,

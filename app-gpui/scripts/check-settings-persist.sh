@@ -1,15 +1,4 @@
 #!/usr/bin/env bash
-# Checks that a settings change survives a restart of the app.
-# Run inside `nix develop` from the repo root, after `cargo build --release --locked`
-# in app-gpui.
-#
-#   bash app-gpui/scripts/check-settings-persist.sh [output dir]
-#
-# The app runs twice on src-tauri/fixtures with one storage directory. The
-# first run opens Settings, Trading, switches "Delete orders of other trade
-# modes" on with xdotool and clicks "Save changes". The second run opens the
-# same section. The script fails unless the backend's settings.json holds the
-# new value after each run, and it saves a screenshot of both runs.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -21,7 +10,6 @@ storage="$(mktemp -d)"
 config="$(mktemp -d)"
 trap 'rm -rf "$storage" "$config"' EXIT
 
-# The centre of the switch and of the Save button in a 1440x900 window.
 switch="1200 496"
 save="1375 846"
 

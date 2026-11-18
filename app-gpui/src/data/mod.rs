@@ -1,13 +1,3 @@
-//! The data layer: one `DataSource` over the Rust backend in `src-tauri`, in
-//! live mode or the backend's own fixture mode.
-//!
-//! The backend runs on a tokio runtime that this module owns. Every method
-//! spawns the backend command on that runtime and returns a future that waits
-//! on its `JoinHandle`. A tokio `JoinHandle` can be awaited from any executor,
-//! so views await these futures in `cx.spawn` tasks on gpui's executor, and
-//! tests await them with `futures::executor::block_on`. The UI thread never
-//! runs database or network I/O.
-
 mod api;
 mod backend;
 mod convert;
@@ -32,7 +22,6 @@ use host::GpuiHost;
 pub struct DataError {
     pub component: String,
     pub message: String,
-    /// The underlying error, such as a refused or failed request.
     pub cause: String,
 }
 
@@ -76,20 +65,15 @@ impl From<serde_json::Error> for DataError {
 
 pub type DataResult<T> = Result<T, DataError>;
 
-/// Where the backend reads its data.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct StartOptions {
-    /// A fixture directory such as `src-tauri/fixtures`. `None` is live mode.
     pub fixtures: Option<PathBuf>,
     pub storage_dir: Option<PathBuf>,
 }
 
-/// The fixture directory debug builds use when no other source is named.
 const DEBUG_FIXTURES: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../src-tauri/fixtures");
 
 impl StartOptions {
-    /// `--fixtures <dir>` wins, then `QF_FIXTURES` and `QF_STORAGE_DIR`. Debug
-    /// builds fall back to `src-tauri/fixtures` unless `--live` is passed.
     pub fn from_env() -> Self {
         let args: Vec<String> = std::env::args().skip(1).collect();
         let flag = args
@@ -119,7 +103,6 @@ impl StartOptions {
 static RUNTIME: OnceLock<Runtime> = OnceLock::new();
 static HOST: OnceLock<Arc<GpuiHost>> = OnceLock::new();
 
-/// Typed access to every backend command. Cheap to clone.
 #[derive(Clone)]
 pub struct DataSource {
     runtime: Handle,
@@ -129,10 +112,6 @@ pub struct DataSource {
 }
 
 impl DataSource {
-    /// Starts the backend on its own runtime and returns at once. The backend
-    /// sends `BackendEvent::Ready` or `BackendEvent::StartupFailed` on the
-    /// returned channel. The backend keeps process-wide state, so a second call
-    /// returns an error.
     pub fn start(options: StartOptions) -> DataResult<(Self, UnboundedReceiver<BackendEvent>)> {
         let (sender, receiver) = unbounded();
         let host = Arc::new(GpuiHost::new(sender));
@@ -176,7 +155,6 @@ impl DataSource {
         ))
     }
 
-    /// The backend runs on fixtures and refuses network requests.
     pub fn fixture_mode(&self) -> bool {
         self.fixture_mode
     }
@@ -201,8 +179,6 @@ impl DataSource {
         }
     }
 
-    /// Runs an export command, which asks the host for a target path, and
-    /// answers that request with `path`.
     fn export<F>(
         &self,
         path: PathBuf,

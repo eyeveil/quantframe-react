@@ -1,6 +1,3 @@
-//! The design tokens every view reads. Views take colours and sizes from
-//! [`Theme`] and never hard-code them.
-
 use std::sync::Arc;
 
 use gpui::{
@@ -17,7 +14,6 @@ pub enum Appearance {
     Light,
 }
 
-/// The user's appearance setting: follow the system, or keep one appearance.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum AppearanceChoice {
     #[default]
@@ -132,7 +128,6 @@ fn hex(value: u32) -> Hsla {
     rgb(value).into()
 }
 
-/// Fixed-width digits, so prices and quantities line up in a column.
 pub fn tabular_figures() -> FontFeatures {
     FontFeatures(Arc::new(vec![("tnum".to_owned(), 1)]))
 }
@@ -142,8 +137,6 @@ impl Theme {
         cx.global::<Self>()
     }
 
-    /// Installs the theme for the saved appearance setting. `QF_THEME`
-    /// (`system`, `light` or `dark`) takes precedence over the saved setting.
     pub fn init(cx: &mut App) {
         let choice = std::env::var("QF_THEME")
             .ok()
@@ -153,13 +146,11 @@ impl Theme {
         Self::with_choice(choice, cx.window_appearance()).install(cx);
     }
 
-    /// Saves the appearance setting and applies it.
     pub fn set_choice(choice: AppearanceChoice, system: WindowAppearance, cx: &mut App) {
         prefs::update(|prefs| prefs.appearance = choice);
         Self::with_choice(choice, system).install(cx);
     }
 
-    /// Applies a change of the system appearance when the setting follows it.
     pub fn follow_system(system: WindowAppearance, cx: &mut App) {
         let choice = Self::global(cx).choice;
         if choice == AppearanceChoice::System {
@@ -220,9 +211,6 @@ impl Theme {
         }
     }
 
-    /// Installs these tokens as the app theme and maps them onto the
-    /// gpui-component theme, so its inputs, buttons, table, menus and dialogs
-    /// match the views drawn here.
     pub fn install(self, cx: &mut App) {
         let mode = match self.appearance {
             Appearance::Dark => ThemeMode::Dark,
@@ -314,7 +302,6 @@ impl Theme {
 }
 
 impl Palette {
-    /// Neutral graphite with a blue accent, for the dark appearance.
     fn graphite() -> Self {
         let text = hex(0xf2f2f4);
         let accent = hex(0x0a84ff);
@@ -343,7 +330,6 @@ impl Palette {
         }
     }
 
-    /// White surfaces with a blue accent, for the light appearance.
     fn paper() -> Self {
         let text = hex(0x1d1d1f);
         let accent = hex(0x0071e3);

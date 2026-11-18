@@ -1,6 +1,3 @@
-//! A screen made of tabs, each a list page. It draws the tabs and the active
-//! page's toolbar on one line, and the page below.
-
 use gpui::{
     Context, Entity, InteractiveElement, IntoElement, ParentElement, Render, Styled, Subscription,
     Window, div, px,
@@ -53,7 +50,6 @@ impl TabbedScreen {
         });
     }
 
-    /// Adds a tab that is not a list page, such as a chart.
     pub fn add_view<V: 'static>(
         &mut self,
         key: &'static str,
@@ -72,12 +68,10 @@ impl TabbedScreen {
         });
     }
 
-    /// The active tab's page.
     pub fn page(&self) -> &dyn PageHandle {
         self.tabs[self.active].page.as_ref()
     }
 
-    /// Opens the tab with this key. An unknown key keeps the current tab.
     pub fn open_tab(&mut self, key: &str, window: &mut Window, cx: &mut Context<Self>) {
         if let Some(index) = self.tabs.iter().position(|tab| tab.key == key) {
             self.select(index, window, cx);

@@ -1,5 +1,3 @@
-//! Table cells the list screens share.
-
 use gpui::{AnyElement, App, Div, IntoElement, ParentElement, SharedString, Styled, div, prelude::*, px};
 use gpui_kit_assets::IconName;
 
@@ -10,8 +8,6 @@ use super::{
 };
 use crate::theme::{Theme, tabular_figures};
 
-/// The name of a row in the text colour, with small icons for its flags.
-/// Each flag is an icon and the tooltip that explains it.
 pub fn name(text: impl Into<SharedString>, flags: &[(IconName, &'static str)], cx: &App) -> AnyElement {
     let theme = Theme::global(cx);
     let colors = theme.colors;
@@ -41,12 +37,10 @@ pub fn name(text: impl Into<SharedString>, flags: &[(IconName, &'static str)], c
         .into_any_element()
 }
 
-/// Plain text in the muted row colour.
 pub fn text(text: impl Into<SharedString>) -> AnyElement {
     centered(div().truncate().child(text.into()))
 }
 
-/// A right-aligned amount, or `empty` in the faint colour when there is none.
 pub fn amount(value: Option<i64>, empty: &'static str, cx: &App) -> AnyElement {
     let colors = Theme::global(cx).colors;
     match value {
@@ -56,12 +50,10 @@ pub fn amount(value: Option<i64>, empty: &'static str, cx: &App) -> AnyElement {
     .into_any_element()
 }
 
-/// A coloured dot and a label.
 pub fn status(color: gpui::Hsla, label: impl Into<SharedString>, cx: &App) -> AnyElement {
     centered(dot_label(color, label).text_color(Theme::global(cx).colors.text))
 }
 
-/// A price limit with buttons that lower and raise it by `step` platinum.
 pub fn stepped_price<A: Clone + 'static>(
     id: u64,
     value: Option<i64>,
@@ -106,7 +98,6 @@ pub fn stepped_price<A: Clone + 'static>(
         .into_any_element()
 }
 
-/// The buttons at the end of a row, pushed to the right edge.
 pub fn actions() -> Div {
     div()
         .size_full()
@@ -116,7 +107,6 @@ pub fn actions() -> Div {
         .gap(px(1.))
 }
 
-/// Small rounded labels, such as the tags of a trade message.
 pub fn tags(tags: &[String], cx: &App) -> AnyElement {
     let theme = Theme::global(cx);
     let colors = theme.colors;

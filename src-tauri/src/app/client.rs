@@ -12,7 +12,6 @@ use crate::{emit_startup, SENSITIVE_FIELDS};
 use crate::{emit_update_user, helper};
 
 impl AppState {
-    /// With `offline`, no request reaches warframe.market or the Quantframe API.
     pub async fn new(
         use_temp_db: bool,
         is_pre_release: bool,

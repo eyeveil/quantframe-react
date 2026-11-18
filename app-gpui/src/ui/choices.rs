@@ -1,9 +1,6 @@
-//! Select entries built from the backend's cache lists.
-
 use super::form::Choice;
 use crate::model::{RivenStat, RivenWeapon, TradableItem};
 
-/// Every tradable item by name. The value is its Warframe Market slug.
 pub fn items(items: &[TradableItem]) -> Vec<Choice> {
     items
         .iter()
@@ -11,7 +8,6 @@ pub fn items(items: &[TradableItem]) -> Vec<Choice> {
         .collect()
 }
 
-/// Every riven weapon by name. The value is its riven slug.
 pub fn weapons(weapons: &[RivenWeapon]) -> Vec<Choice> {
     weapons
         .iter()
@@ -19,7 +15,6 @@ pub fn weapons(weapons: &[RivenWeapon]) -> Vec<Choice> {
         .collect()
 }
 
-/// Every riven stat by its label. The value is its slug.
 pub fn stats(stats: &[RivenStat]) -> Vec<Choice> {
     stats
         .iter()

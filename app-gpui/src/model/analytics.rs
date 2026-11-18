@@ -1,8 +1,5 @@
-//! Trading analytics: Quantframe price lookups and the market activity chart.
-
 use super::SubType;
 
-/// Mirrors `qf_api::types::ItemPrice`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ItemPrice {
     pub wfm_id: String,
@@ -16,7 +13,6 @@ pub struct ItemPrice {
     pub demand: f64,
 }
 
-/// Mirrors `qf_api::types::RivenPrice`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RivenPrice {
     pub wfm_url: String,
@@ -27,7 +23,6 @@ pub struct RivenPrice {
     pub avg_price: f64,
 }
 
-/// Mirrors `qf_api::types::SyndicateItemPrice`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SyndicateItemPrice {
     pub wfm_id: String,
@@ -39,7 +34,6 @@ pub struct SyndicateItemPrice {
     pub volume: f64,
 }
 
-/// Mirrors `qf_api::types::UserActivityDto`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct UserActivity {
     pub labels: Vec<String>,
@@ -47,8 +41,6 @@ pub struct UserActivity {
     pub total_users: Vec<f64>,
 }
 
-/// Query of the three price lookups. Dates are `YYYY-MM-DD`. The item and
-/// riven lookups need them, and the syndicate lookup ignores them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PriceLookupParams {
     pub page: i64,

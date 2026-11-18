@@ -5,14 +5,11 @@ use super::{BackendEvent, DataSource};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum BackendStatus {
-    /// The last startup step, as an i18n key, if one was reported.
     Starting(Option<String>),
     Ready,
     Failed(String),
 }
 
-/// The backend as a gpui entity. Views read `source` and `status`, and
-/// subscribe to it for `BackendEvent`s.
 pub struct Backend {
     pub source: DataSource,
     pub status: BackendStatus,

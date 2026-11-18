@@ -152,7 +152,6 @@ async fn setup_manages(use_temp_db: bool, offline: bool) -> Result<(), Error> {
     Ok(())
 }
 
-/// Hands Tauri a reference to every state slot that setup filled.
 #[cfg(feature = "tauri")]
 fn manage_in_tauri(app: &tauri::AppHandle) {
     use tauri::Manager;

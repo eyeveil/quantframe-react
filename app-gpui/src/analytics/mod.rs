@@ -1,7 +1,3 @@
-//! The Analytics screen: the transaction ledger and its chart, Quantframe's
-//! price statistics for items, rivens and syndicate items, and the number of
-//! Quantframe users per day.
-
 mod prices;
 mod transactions;
 mod users;
@@ -53,24 +49,20 @@ pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> E
     })
 }
 
-/// The periods the transaction chart covers. `None` is every transaction.
 const RANGES: [(&str, Option<i64>); 4] = [
     ("30 days", Some(30)),
     ("90 days", Some(90)),
     ("1 year", Some(365)),
     ("All", None),
 ];
-/// A range longer than this many days draws one bar group per month.
 const DAILY_LIMIT: i64 = 120;
 const MONTHS: [&str; 12] = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-/// The Transactions tab: the list, or a chart of the same ledger.
 pub struct Ledger {
     list: Entity<ListPage<Transactions>>,
     source: DataSource,
-    /// Whether the chart replaces the list. `QF_VIEW=chart` opens it.
     chart: bool,
     range: usize,
     rows: Loaded<Vec<Transaction>>,
@@ -259,7 +251,6 @@ impl Ledger {
     }
 }
 
-/// `2026-11-17` as `17 Nov`, and `2026-11` as `Nov 2026`.
 fn bucket_label(key: &str) -> String {
     let month = key
         .get(5..7)
@@ -273,7 +264,6 @@ fn bucket_label(key: &str) -> String {
     }
 }
 
-/// The choices in a tab's toolbar, drawn as a segmented control.
 fn choices(
     id: &'static str,
     labels: impl IntoIterator<Item = &'static str>,

@@ -1,7 +1,3 @@
-//! One list screen: a toolbar, totals, filter chips, the table and the item
-//! panel, all driven by a [`Catalog`]. The screen that owns the page draws
-//! [`PageHandle::toolbar`] beside its tabs and [`PageHandle::body`] below.
-
 use std::path::PathBuf;
 
 use gpui::{
@@ -31,7 +27,6 @@ use crate::{
     theme::{Theme, tabular_figures},
 };
 
-/// A backend error as one sentence for a notification or the table.
 fn describe(error: &DataError) -> String {
     if error.cause.is_empty() {
         error.message.clone()
@@ -49,13 +44,10 @@ pub const PAGE_CONTEXT: &str = "ListPage";
 /// The key context gpui-component gives a focused table.
 const TABLE_CONTEXT: &str = "DataTable";
 
-/// Whether the item panel is open. Every list screen shares the setting.
 struct ItemPanelOpen(bool);
 
 impl Global for ItemPanelOpen {}
 
-/// Registers the list shortcuts and restores the item panel setting.
-/// `QF_PANEL` (`open` or `closed`) takes precedence over the saved setting.
 pub fn init(cx: &mut App) {
     let (search, panel) = if cfg!(target_os = "macos") {
         ("cmd-f", "cmd-i")
@@ -93,8 +85,6 @@ fn set_panel_open(open: bool, cx: &mut App) {
     }
 }
 
-/// A table state forced from the environment, so each one can be rendered
-/// and checked: `QF_STATE` is `loading`, `error` or `empty`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum ForcedState {
     Loading,
@@ -113,7 +103,6 @@ impl ForcedState {
     }
 }
 
-/// The key that pairs with a letter in a shortcut, as the platform names it.
 const fn shortcut_modifier() -> &'static str {
     if cfg!(target_os = "macos") {
         "Command"
@@ -122,7 +111,6 @@ const fn shortcut_modifier() -> &'static str {
     }
 }
 
-/// What a script asked the page to do once its rows have loaded.
 #[derive(Default)]
 struct OnLoad {
     row: Option<usize>,
@@ -136,7 +124,6 @@ pub struct ListPage<C: Catalog> {
     table: Entity<TableState<Grid<C>>>,
     filters: Vec<(&'static str, String)>,
     emit: Emit<C::Action>,
-    /// Counts the loads, so a slow answer never replaces a newer one.
     load_generation: u64,
     forced: Option<ForcedState>,
     on_load: Option<OnLoad>,
@@ -233,8 +220,6 @@ impl<C: Catalog> ListPage<C> {
         cx.notify();
     }
 
-    /// Fetches the catalog's data on the backend runtime and shows it when
-    /// it arrives. The table keeps its rows while a later load runs.
     fn load(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         match self.forced {
             Some(ForcedState::Loading) => return,
@@ -289,8 +274,6 @@ impl<C: Catalog> ListPage<C> {
         }
     }
 
-    /// Filters the loaded rows again and keeps the same row selected when it
-    /// survives.
     fn refresh_rows(&mut self, cx: &mut Context<Self>) {
         let groups = self.catalog.chips(cx);
         self.filters.retain(|(group, key)| {
@@ -386,7 +369,6 @@ impl<C: Catalog> ListPage<C> {
         }
     }
 
-    /// Waits for a backend call, reports how it went and loads the list again.
     fn run(&mut self, command: Command, window: &mut Window, cx: &mut Context<Self>) {
         cx.spawn_in(window, async move |page, cx| {
             let result = command.await;
@@ -525,7 +507,6 @@ impl<C: Catalog> ListPage<C> {
             .into_any_element()
     }
 
-    /// The totals panels. While the rows load, bars stand in for the values.
     fn summary(stats: Vec<Stat>, loading: bool, cx: &App) -> Div {
         let theme = Theme::global(cx);
         let colors = theme.colors;
@@ -745,9 +726,6 @@ impl<C: Catalog> ListPage<C> {
             .into_any_element()
     }
 
-    /// Performs the action behind a button label, for scripted screenshots:
-    /// the toolbar's labelled button, or an entry of a row's menu. The row is
-    /// the selected one, or the first.
     fn run_labelled(&mut self, label: &str, window: &mut Window, cx: &mut Context<Self>) {
         let matches = |candidate: &str| candidate.eq_ignore_ascii_case(label.trim());
         let action = match self.catalog.primary() {
@@ -769,16 +747,12 @@ impl<C: Catalog> ListPage<C> {
     }
 }
 
-/// What a screen needs from one of its pages, whatever its catalog.
 pub trait PageHandle {
     fn toolbar(&self, window: &mut Window, cx: &mut App) -> AnyElement;
     fn body(&self, width: Pixels, window: &mut Window, cx: &mut App) -> AnyElement;
-    /// The number of rows before any search or filter, once they have loaded.
     fn count(&self, cx: &App) -> Option<usize>;
     fn focus(&self, window: &mut Window, cx: &mut App);
     fn focus_search(&self, window: &mut Window, cx: &mut App);
-    /// Selects a row and opens the prompt behind a button label once the
-    /// rows have loaded. Scripted screenshots use it.
     fn on_load(&self, row: Option<usize>, dialog: Option<String>, cx: &mut App);
 }
 

@@ -1,8 +1,5 @@
-//! Trade messages (`trade_entry`) and the transaction ledger.
-
 use super::SubType;
 
-/// Mirrors `entity::trade_entry::Model`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct TradeEntry {
     pub id: i64,
@@ -17,18 +14,13 @@ pub struct TradeEntry {
     pub properties: TradeEntryProperties,
 }
 
-/// What "Find rivens" stores on a riven entry.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct TradeEntryProperties {
-    /// The lowest price on the market when the entry was priced.
     pub min_price: Option<i64>,
-    /// The market low minus the entry's price.
     pub potential_profit: Option<i64>,
-    /// The day the market low is from, `YYYY-MM-DD`.
     pub last_updated: Option<String>,
 }
 
-/// Input of `trade_entry_create`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct NewTradeEntry {
     pub raw: String,
@@ -36,7 +28,6 @@ pub struct NewTradeEntry {
     pub price: i64,
     pub group: TradeEntryGroup,
     pub tags: Vec<String>,
-    /// Reprices an existing entry for the same item instead of failing.
     pub override_existing: bool,
     pub properties: TradeEntryProperties,
 }
@@ -55,8 +46,6 @@ impl NewTradeEntry {
     }
 }
 
-/// A tag as words with a capital first letter, such as "Arcane enhancement"
-/// for `arcane_enhancement`.
 pub fn tag_label(tag: &str) -> String {
     let words = tag.trim().replace(['_', '-'], " ");
     let mut chars = words.chars();
@@ -66,8 +55,6 @@ pub fn tag_label(tag: &str) -> String {
     }
 }
 
-/// The groups `trade_entry_create` accepts. `raw` is a warframe.market item
-/// for `Item`, a riven weapon for `Riven`, and free text for `Custom`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TradeEntryGroup {
     Item,
@@ -85,7 +72,6 @@ impl TradeEntryGroup {
     }
 }
 
-/// Input of `trade_entry_update`. `None` leaves a field unchanged.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct TradeEntryUpdate {
     pub price: Option<i64>,
@@ -104,7 +90,6 @@ pub enum TransactionItemType {
     Riven,
 }
 
-/// Mirrors `entity::transaction::Model`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Transaction {
     pub id: i64,
@@ -125,7 +110,6 @@ pub struct Transaction {
     pub created_at: String,
 }
 
-/// Input of `transaction_update`. `None` leaves a field unchanged.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct TransactionUpdate {
     pub price: Option<i64>,

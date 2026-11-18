@@ -1,6 +1,3 @@
-//! The Trade messages screen: priced lists of items, custom entries and
-//! rivens that become trade chat messages.
-
 use std::{
     cmp::Ordering,
     collections::BTreeMap,
@@ -38,7 +35,6 @@ use crate::{
     },
 };
 
-/// The step of the buttons beside a price, in platinum.
 const PRICE_STEP: i64 = 5;
 
 const GROUPS: [(TradeEntryGroup, &str); 3] = [
@@ -73,7 +69,6 @@ pub fn screen(
     })
 }
 
-/// The settings of "Find rivens".
 #[derive(Clone, Debug)]
 pub struct RivenSearch {
     min_price: i64,
@@ -111,11 +106,9 @@ pub enum TradeAction {
 pub struct TradeEntries {
     rows: Vec<TradeEntry>,
     group: TradeEntryGroup,
-    /// What the add dialog chooses from, loaded once.
     lookup: Lookup,
 }
 
-/// The cache list behind a group's add dialog.
 pub enum Lookup {
     None,
     Items(Vec<TradableItem>),
@@ -124,7 +117,6 @@ pub enum Lookup {
 
 type LookupLoad = Pin<Box<dyn Future<Output = DataResult<Lookup>> + Send>>;
 
-/// Today's UTC date as `YYYY-MM-DD`, from the days since the Unix epoch.
 fn today() -> String {
     let seconds = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -177,7 +169,6 @@ impl TradeEntries {
         }
     }
 
-    /// Rivens are bought, items and custom entries are sold.
     const fn prefix(&self) -> &'static str {
         match self.group {
             TradeEntryGroup::Riven => "WTB",
@@ -185,7 +176,6 @@ impl TradeEntries {
         }
     }
 
-    /// Riven entries give two of the tag column's width to the market columns.
     const fn tags_width(&self) -> f32 {
         match self.group {
             TradeEntryGroup::Riven => 200.,
@@ -319,8 +309,6 @@ impl TradeEntries {
             .collect()
     }
 
-    /// Looks up today's riven prices and adds a discounted entry for every
-    /// weapon that passes the limits.
     fn find_rivens(&self, search: RivenSearch, source: &DataSource) -> Outcome<TradeAction> {
         let source = source.clone();
         let existing = self.rows.clone();
@@ -376,8 +364,6 @@ impl Catalog for TradeEntries {
     const SEARCH_PLACEHOLDER: &'static str = "Search entries";
     const EMPTY_HINT: &'static str =
         "Add what you trade with a price, then write a trade chat message from the list.";
-    /// The backend sends no event for trade entries. The page loads the list
-    /// again after each change it makes.
     const WATCH: &'static [DataKind] = &[];
 
     fn load(&self, source: &DataSource) -> Load<Self::Data> {

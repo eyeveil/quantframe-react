@@ -1,5 +1,3 @@
-//! The Items tab: the stock the live scraper sells.
-
 use std::cmp::Ordering;
 
 use gpui::{AnyElement, App, IntoElement, ParentElement, Styled, div, px};
@@ -61,12 +59,9 @@ pub enum ItemAction {
 #[derive(Default)]
 pub struct Items {
     data: StockData<StockItem>,
-    /// The cache's tradable items for the add dialog, loaded once.
     catalog: Vec<TradableItem>,
 }
 
-/// An item's add dialog: a select over the cache's items, or a typed name
-/// when the cache list is missing.
 pub(super) fn item_field(catalog: &[TradableItem], example: &'static str) -> Field {
     if catalog.is_empty() {
         Field::text("name", "Item", "", example).hint("The item's name on Warframe Market.")
@@ -75,7 +70,6 @@ pub(super) fn item_field(catalog: &[TradableItem], example: &'static str) -> Fie
     }
 }
 
-/// The Warframe Market slug an add dialog chose or the user typed.
 pub(super) fn chosen_item(values: &FormValues) -> Option<String> {
     match values.choice("item") {
         Some(slug) => Some(slug),

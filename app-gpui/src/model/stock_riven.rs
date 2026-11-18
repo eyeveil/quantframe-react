@@ -1,6 +1,5 @@
 use super::{PriceHistory, StockStatus};
 
-/// Mirrors `entity::stock_riven::Model`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct StockRiven {
     pub id: i64,
@@ -28,22 +27,17 @@ pub struct StockRiven {
     pub filter: RivenFilter,
 }
 
-/// The keys the backend allows in a stock riven's `properties`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct StockRivenProperties {
     pub min_price: Option<i64>,
-    /// The list price came from the price model, not from live auctions.
     pub is_predicted: bool,
 }
 
-/// Mirrors `entity::stock_riven::RivenAttribute`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RivenAttribute {
     pub wfm_url: String,
     pub positive: bool,
     pub value: f64,
-    /// The cache's display label, such as "Critical Chance". The data layer
-    /// fills it, and input ignores it.
     pub label: String,
 }
 
@@ -58,15 +52,12 @@ impl RivenAttribute {
     }
 }
 
-/// Mirrors `entity::stock_riven::MatchRivenStruct`: the auctions the live
-/// scraper compares a riven with when it prices it.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct RivenFilter {
     pub enabled: bool,
     pub mastery_rank: Option<MinMax>,
     pub re_rolls: Option<MinMax>,
     pub polarity: Option<String>,
-    /// The least similarity in percent.
     pub similarity: Option<f64>,
     pub required_negative: bool,
     pub attributes: Vec<RivenFilterAttribute>,
@@ -91,7 +82,6 @@ impl StockRiven {
     }
 }
 
-/// Input of `stock_riven_create`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct NewStockRiven {
     pub wfm_weapon_url: String,
@@ -104,8 +94,6 @@ pub struct NewStockRiven {
     pub bought: i64,
 }
 
-/// Input of `stock_riven_update`. `None` leaves a field unchanged. The
-/// backend clears a minimum price that is set to 0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct StockRivenUpdate {
     pub bought: Option<i64>,

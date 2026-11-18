@@ -1,6 +1,3 @@
-//! `DataSource` methods, one file per group of screens. Method names follow
-//! the Tauri commands in `src-tauri/src/commands`.
-
 mod app;
 mod cache;
 mod inventory;
@@ -16,8 +13,6 @@ use crate::model::{
     ListParams, SortDirection, StockItemListParams, StockStatus, SyndicateItemListParams,
 };
 
-/// Builds a backend query or update DTO. Fields left out keep their
-/// `FieldChange::Ignore` default.
 fn dto<T: DeserializeOwned>(value: Value) -> DataResult<T> {
     serde_json::from_value(value)
         .map_err(|error| DataError::new("DataSource:Encode", error.to_string()))
@@ -100,14 +95,10 @@ fn status_counts(
     out
 }
 
-/// Sets each `Some` field of an update on the DTO's JSON.
 fn changes(id: i64, fields: &[(&str, Option<Value>)]) -> Value {
     with_properties(id, fields, &[])
 }
 
-/// Sets each `Some` field of an update on the DTO's JSON, and each `Some`
-/// property under `properties`, which the backend merges into the stored
-/// ones.
 fn with_properties(
     id: i64,
     fields: &[(&str, Option<Value>)],

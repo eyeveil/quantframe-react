@@ -1,5 +1,3 @@
-//! The Rivens tab: the riven mods the live scraper sells as auctions.
-
 use std::cmp::Ordering;
 
 use gpui::{
@@ -40,7 +38,6 @@ const VALUE_KEYS: [&str; 4] = ["value_1", "value_2", "value_3", "value_4"];
 const REQUIRED_KEYS: [&str; 4] = ["required_1", "required_2", "required_3", "required_4"];
 const MAX_RANK: i64 = 8;
 
-/// A slug as words, such as `Critical Chance` for `critical_chance`.
 pub fn words(slug: &str) -> String {
     slug.split('_')
         .map(|word| {
@@ -54,7 +51,6 @@ pub fn words(slug: &str) -> String {
         .join(" ")
 }
 
-/// The attribute as the game writes it, such as `+172.4% Critical Chance`.
 fn attribute_label(attribute: &RivenAttribute) -> String {
     let sign = if attribute.value < 0.0 || !attribute.positive {
         "-"
@@ -69,12 +65,10 @@ fn attribute_label(attribute: &RivenAttribute) -> String {
     format!("{sign}{:.1}% {label}", attribute.value.abs())
 }
 
-/// Every attribute of a riven as the game writes it.
 pub fn attributes_text(attributes: &[RivenAttribute]) -> Vec<String> {
     attributes.iter().map(attribute_label).collect()
 }
 
-/// The attributes as item panel lines, with the negative ones in red.
 pub fn attribute_lines(attributes: &[RivenAttribute]) -> Vec<(String, Tone)> {
     attributes
         .iter()
@@ -89,9 +83,6 @@ pub fn attribute_lines(attributes: &[RivenAttribute]) -> Vec<(String, Tone)> {
         .collect()
 }
 
-/// The attributes of a riven on one line, with the negative ones in red.
-/// A line too long for the cell ends in an ellipsis, and the tooltip has
-/// every attribute.
 pub fn attributes_cell(id: u64, attributes: &[RivenAttribute], cx: &App) -> AnyElement {
     let colors = Theme::global(cx).colors;
     let mut line = String::new();
@@ -129,7 +120,6 @@ pub fn attributes_cell(id: u64, attributes: &[RivenAttribute], cx: &App) -> AnyE
         .into_any_element()
 }
 
-/// The list price, with a mark when the price model set it.
 fn list_price_cell(row: &StockRiven, cx: &App) -> AnyElement {
     let theme = Theme::global(cx);
     let colors = theme.colors;
@@ -163,7 +153,6 @@ fn list_price_cell(row: &StockRiven, cx: &App) -> AnyElement {
         .into_any_element()
 }
 
-/// The auction filter in a few words, for the item panel.
 fn filter_summary(filter: &RivenFilter) -> String {
     if !filter.enabled {
         return "Off".to_owned();
@@ -215,13 +204,11 @@ pub enum RivenAction {
     Export,
 }
 
-/// The cache lists the add dialog chooses from.
 type RivenLists = (Vec<RivenWeapon>, Vec<RivenStat>);
 
 #[derive(Default)]
 pub struct Rivens {
     data: StockData<StockRiven>,
-    /// The cache's riven weapons and stats, loaded once.
     weapons: Vec<RivenWeapon>,
     stats: Vec<RivenStat>,
 }

@@ -1,6 +1,5 @@
 use super::{CoolDownInfo, PriceHistory, StockStatus, SubType};
 
-/// Mirrors `entity::wish_list::Model`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct WishListItem {
     pub id: i64,
@@ -19,18 +18,14 @@ pub struct WishListItem {
     pub properties: WishListProperties,
 }
 
-/// The keys the backend allows in a wish list entry's `properties`.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct WishListProperties {
     pub min_price: Option<i64>,
-    /// The highest bid the live scraper places.
     pub max_price: Option<i64>,
     pub is_bulk: bool,
     pub cooldown: Option<CoolDownInfo>,
 }
 
-/// Input of `wish_list_update`. `None` leaves a field unchanged. The backend
-/// clears a price limit that is set to 0.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct WishListUpdate {
     pub quantity: Option<i64>,

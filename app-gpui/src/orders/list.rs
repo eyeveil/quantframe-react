@@ -1,5 +1,3 @@
-//! The Orders tab: buy and sell orders on Warframe Market.
-
 use std::{cmp::Ordering, collections::BTreeMap};
 
 use crate::ui::numeric;
@@ -26,7 +24,6 @@ use crate::{
 };
 
 const DELETE_CHOICES: [&str; 3] = ["All orders", "Sell orders", "Buy orders"];
-/// The live scraper modes a blacklisted item is kept out of.
 const BLACKLIST_MODES: [&str; 3] = ["buy", "sell", "wishlist"];
 
 #[derive(Clone, Debug)]
@@ -72,7 +69,6 @@ fn type_color(order_type: OrderType, theme: &Theme) -> Hsla {
     }
 }
 
-/// The word for an order that traded: a sell order sold, a buy order bought.
 const fn traded_word(order_type: OrderType) -> &'static str {
     match order_type {
         OrderType::Sell => "Sold",
@@ -95,7 +91,6 @@ fn total(order: &WfmOrder) -> i64 {
     order.platinum * order.quantity
 }
 
-/// The estimated profit of every unit of the order, as the totals count it.
 fn profit(order: &WfmOrder) -> Option<i64> {
     order.potential_profit.map(|profit| profit * order.quantity)
 }
@@ -341,8 +336,6 @@ impl Catalog for Orders {
                         order.item_name,
                         number(total)
                     );
-                    // A filled sell order takes the units out of stock, and a
-                    // filled buy order adds them to stock at the price paid.
                     match order.order_type {
                         OrderType::Sell => Outcome::run(
                             source.stock_item_sell(order.item_url, order.sub_type, quantity, total),
