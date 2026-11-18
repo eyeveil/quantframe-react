@@ -37,12 +37,11 @@ fn offline(name: &str, result: DataResult<impl std::fmt::Debug>) {
     );
 }
 
-/// The fixture cache has no riven weapon list, so riven details fail with a
-/// weapon lookup error until `src-tauri/fixtures` gains one.
-fn needs_weapon_cache<T: std::fmt::Debug>(name: &str, result: DataResult<T>) {
-    match result {
-        Ok(_) => {}
-        Err(error) => assert!(error.message.contains("Weapon"), "{name} failed: {error}"),
+/// The fixture cache has the riven weapon list but no `Mods.json` upgrade
+/// entries, which come from Quantframe's own cache download.
+fn needs_mod_cache<T: std::fmt::Debug>(name: &str, result: DataResult<T>) {
+    if let Err(error) = result {
+        assert!(error.message.contains("Riven upgrade not found"), "{name} failed: {error}");
     }
 }
 
@@ -217,7 +216,7 @@ fn every_data_source_method_works_in_fixture_mode() {
             source.get_stock_riven_financial_report().await,
         );
         let riven = rivens.results[0].clone();
-        needs_weapon_cache(
+        needs_mod_cache(
             "stock_riven_get_by_id",
             source.stock_riven_get_by_id(riven.id).await,
         );
@@ -257,7 +256,7 @@ fn every_data_source_method_works_in_fixture_mode() {
         );
         assert!(std::fs::metadata(&path).expect("riven export").len() > 2);
         let last = rivens.results.last().expect("riven").clone();
-        needs_weapon_cache(
+        needs_mod_cache(
             "stock_riven_sell",
             source.stock_riven_sell(&last, 300).await,
         );
@@ -295,7 +294,7 @@ fn every_data_source_method_works_in_fixture_mode() {
                 bought: 100,
             })
             .await;
-        needs_weapon_cache("stock_riven_create", created);
+        needs_mod_cache("stock_riven_create", created);
 
         let wishes = non_empty(
             "get_wish_list_pagination",
@@ -584,7 +583,7 @@ fn every_data_source_method_works_in_fixture_mode() {
                 > 0
         );
         let auction = auctions.results[0].clone();
-        needs_weapon_cache(
+        needs_mod_cache(
             "get_wfm_auction_by_id",
             source.get_wfm_auction_by_id(auction.id.clone()).await,
         );

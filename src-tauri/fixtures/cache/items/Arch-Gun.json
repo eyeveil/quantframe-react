@@ -1,0 +1,167 @@
+[
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/NokkoArchGun/NokkoArchGun",
+  "name": "Arbucep",
+  "icon": "items/images/en/arbucep.f31d27a5f3be143aba9e645b1e4fc952.webp",
+  "wfmRivenUrl": "arbucep",
+  "wfmRivenId": "68efbff105fb2137056fb723",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 0.7,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/ThanoTechArchGun/ThanoTechArchGun",
+  "name": "Cortege",
+  "icon": "items/images/en/cortege.9ea6df8e184b821217af6bdf94abb310.png",
+  "wfmRivenUrl": "cortege",
+  "wfmRivenId": "5f498a389426ed005af5ecb2",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/LaunchGrenade/ArchCannon",
+  "name": "Corvas",
+  "icon": "items/images/en/corvas.2eb50d3296c78f3875e5e95f45fac275.png",
+  "wfmRivenUrl": "corvas",
+  "wfmRivenId": "5cfe91788be64500e4430cdf",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.2,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/ArchBurstGun/ArchBurstGun",
+  "name": "Cyngas",
+  "icon": "items/images/en/cyngas.06e5a46f3d3b985ce51c8154c0325088.png",
+  "wfmRivenUrl": "cyngas",
+  "wfmRivenId": "5cfe91738be64500e4430cdc",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.3,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/ArchwingHeavyPistols/ArchHeavyPistols",
+  "name": "Dual Decurion",
+  "icon": "riven_item/images/dual_decurion.c38ff4f5a6e811f42c54fd0d15144942.png",
+  "wfmRivenUrl": "dual_decurion",
+  "wfmRivenId": "5cfe917d8be64500e4430ce4",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.3,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/RocketArtillery/ArchRocketCrossbow",
+  "name": "Fluctus",
+  "icon": "items/images/en/fluctus.1260f4c62a54ae230993e30f66453712.png",
+  "wfmRivenUrl": "fluctus",
+  "wfmRivenId": "5cfe917a8be64500e4430ce3",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.1,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/RepurposedGrineerAntiAircraftGun/ArchGRNAAGun",
+  "name": "Grattler",
+  "icon": "items/images/en/grattler.1332aad0c83155f87a1caeac7bb93fc4.png",
+  "wfmRivenUrl": "grattler",
+  "wfmRivenId": "5cfe917a8be64500e4430ce2",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.1,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/FoldingMachineGun/ArchMachineGun",
+  "name": "Imperator",
+  "icon": "items/images/en/imperator.ca5c50909c6e4d40fc93fa5e9a525897.png",
+  "wfmRivenUrl": "imperator",
+  "wfmRivenId": "5cfe91768be64500e4430cde",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.1,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Grineer/HeavyWeapons/GrnHeavyGrenadeLauncher",
+  "name": "Kuva Ayanga",
+  "icon": "riven_item/images/kuva_ayanga.4312560b94c47f98b046d81344504e0d.png",
+  "wfmRivenUrl": "kuva_ayanga",
+  "wfmRivenId": "5dbe9b057ea27b0ffe3ca266",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 0.95,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/TnShieldframeArchGun/TnShieldFrameArchGun",
+  "name": "Larkspur",
+  "icon": "items/images/en/larkspur.dd276ff94db2ebbc9cc778ee03db8d71.png",
+  "wfmRivenUrl": "larkspur",
+  "wfmRivenId": "5cfe91748be64500e4430cdd",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.05,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/TnConcreteArchgun/TnConcreteArchgunWeapon",
+  "name": "Mandonel",
+  "icon": "riven_item/images/mandonel.242783b92f4aeadf1270b7012dfa9079.png",
+  "wfmRivenUrl": "mandonel",
+  "wfmRivenId": "657b07d2107314e45d820f3e",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.1,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/ThanoTechArchLongGun/ThanoTechLongGun",
+  "name": "Mausolon",
+  "icon": "items/images/en/mausolon.e36603d05a4cf5721df96af425333d94.png",
+  "wfmRivenUrl": "mausolon",
+  "wfmRivenId": "5f498a389426ed005af5ecb1",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 0.5,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/ThanoTechGrenadeLaunch/ThanoTechGrenadeLauncher",
+  "name": "Morgha",
+  "icon": "items/images/en/morgha.afc1c19230048e45ab0813aa68a996d1.png",
+  "wfmRivenUrl": "morgha",
+  "wfmRivenId": "5fb847a0c34da30068f912bd",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/ArchLongRifle/ArchLongRifle",
+  "name": "Phaedra",
+  "icon": "items/images/en/phaedra.990089ecdb2751f628e24bfe0493059e.png",
+  "wfmRivenUrl": "phaedra",
+  "wfmRivenId": "5cfe91798be64500e4430ce1",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.25,
+  "subType": null
+ },
+ {
+  "uniqueName": "/Lotus/Weapons/Tenno/Archwing/Primary/Railgun/ArchRailgun",
+  "name": "Velocitus",
+  "icon": "items/images/en/velocitus.cbd04bd264e30012bc32de60f2976d6e.png",
+  "wfmRivenUrl": "velocitus",
+  "wfmRivenId": "5cfe91798be64500e4430ce0",
+  "rivenType": "rifle",
+  "category": "archgun",
+  "disposition": 1.1,
+  "subType": null
+ }
+]
