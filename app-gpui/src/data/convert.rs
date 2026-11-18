@@ -772,9 +772,12 @@ pub fn wfm_debug_state(value: &Value) -> WfmDebugState {
     }
 }
 
+/// Reads `wf_inventory_get_rivens`. `WFInvItemRiven` flattens its
+/// `ItemRivenBase` into the riven object, and `ItemRivenBase` flattens its
+/// `Properties`, which keep the `is_in_stock` flag under `properties`.
 pub fn inventory_rivens(value: &Value) -> Paginated<InventoryRiven> {
     paginated_value(value, |riven| {
-        let base = &riven["base"];
+        let base = riven;
         let text = |key: &str| base[key].as_str().unwrap_or_default().to_owned();
         InventoryRiven {
             uuid: text("uuid"),
@@ -786,7 +789,7 @@ pub fn inventory_rivens(value: &Value) -> Paginated<InventoryRiven> {
             rank: base["sub_type"]["rank"].as_i64().unwrap_or(0),
             polarity: text("polarity"),
             riven_type: riven["riven_type"].as_str().unwrap_or_default().to_owned(),
-            is_in_stock: base["is_in_stock"].as_bool().unwrap_or(false),
+            is_in_stock: base["properties"]["is_in_stock"].as_bool().unwrap_or(false),
         }
     })
 }
@@ -810,5 +813,53 @@ fn paginated_value<T>(value: &Value, map: impl Fn(&Value) -> T) -> Paginated<T> 
             .as_array()
             .map(|results| results.iter().map(map).collect())
             .unwrap_or_default(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use qf_app_lib::{
+        types::ItemRivenBase,
+        wf_inventory::types::{RivenState, WFInvItemRiven},
+    };
+
+    use super::*;
+
+    #[test]
+    fn inventory_rivens_reads_the_flattened_base() {
+        let mut base = ItemRivenBase {
+            name: "Rubico".into(),
+            wfm_url: "rubico".into(),
+            mod_name: "Crita-visican".into(),
+            mastery_rank: 14,
+            re_rolls: 9,
+            polarity: "madurai".into(),
+            uuid: "riven-1".into(),
+            sub_type: Some(BackendSubType {
+                rank: Some(8),
+                ..BackendSubType::default()
+            }),
+            ..ItemRivenBase::default()
+        };
+        base.properties.set_property_value("is_in_stock", true);
+        let riven = WFInvItemRiven {
+            base,
+            riven_type: RivenState::Unveiled,
+        };
+        let value = json!({
+            "total": 1, "limit": 25, "page": 1, "total_pages": 1,
+            "results": [serde_json::to_value(&riven).expect("serialize")],
+        });
+        assert!(value["results"][0].get("base").is_none());
+        let page = inventory_rivens(&value);
+        let row = &page.results[0];
+        assert_eq!(row.name, "Rubico");
+        assert_eq!(row.wfm_url, "rubico");
+        assert_eq!(row.mod_name, "Crita-visican");
+        assert_eq!((row.mastery_rank, row.re_rolls, row.rank), (14, 9, 8));
+        assert_eq!(row.polarity, "madurai");
+        assert_eq!(row.uuid, "riven-1");
+        assert_eq!(row.riven_type, "unveiled");
+        assert!(row.is_in_stock);
     }
 }

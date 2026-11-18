@@ -3,10 +3,11 @@ use std::{
     sync::Mutex,
 };
 
+use chrono::{DateTime, Utc};
 use entity::{stock_item, stock_riven, syndicate_item, trade_entry, transaction, wish_list};
 use serde::Deserialize;
 use service::{
-    sea_orm::{EntityTrait, PaginatorTrait},
+    sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set},
     StockItemMutation, StockRivenMutation, SyndicateItemMutation, TradeEntryMutation,
     TransactionMutation, WishListMutation,
 };
@@ -82,9 +83,26 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
     seed_market(fixtures).await
 }
 
+/// How far to move a list of fixture dates so the latest lands on `now`.
+fn shift_to(now: DateTime<Utc>, dates: impl Iterator<Item = DateTime<Utc>>) -> chrono::Duration {
+    dates
+        .max()
+        .map_or(chrono::Duration::zero(), |latest| now - latest)
+}
+
 async fn seed_database(fixtures: &Path) -> Result<(), Error> {
     let conn = DATABASE.get().expect("Database not initialized");
-    let db: Database = read_json_file(&fixtures.join("database.json"))?;
+    let mut db: Database = read_json_file(&fixtures.join("database.json"))?;
+    // The fixture dates are fixed, so the transactions and trade entries move
+    // to end at the seed time, and the dashboard's "today" and "last 7 days"
+    // charts have data on any day.
+    let now = Utc::now();
+    let shift = shift_to(now, db.transactions.iter().map(|model| model.created_at));
+    for model in &mut db.transactions {
+        model.created_at += shift;
+        model.updated_at += shift;
+    }
+    let trade_shift = shift_to(now, db.trade_entries.iter().map(|model| model.created_at));
     let counts = format!(
         "stock items {}, stock rivens {}, wish list {}, transactions {}, trade entries {}, syndicate items {}",
         db.stock_items.len(),
@@ -113,7 +131,23 @@ async fn seed_database(fixtures: &Path) -> Result<(), Error> {
         TransactionMutation::create(conn, model, false).await?;
     }
     for model in &db.trade_entries {
-        TradeEntryMutation::create(conn, model).await?;
+        let created = TradeEntryMutation::create(conn, model).await?;
+        // `create` stamps the entry with the current time.
+        trade_entry::ActiveModel {
+            id: Set(created.id),
+            created_at: Set(model.created_at + trade_shift),
+            updated_at: Set(model.updated_at + trade_shift),
+            ..Default::default()
+        }
+        .update(conn)
+        .await
+        .map_err(|e| {
+            Error::new(
+                "Fixtures:Seed",
+                format!("Failed to date a trade entry: {e}"),
+                get_location!(),
+            )
+        })?;
     }
     for model in db.syndicate_items {
         SyndicateItemMutation::create(conn, model).await?;

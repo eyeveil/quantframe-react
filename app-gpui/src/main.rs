@@ -1,7 +1,17 @@
+mod about;
+mod analytics;
 mod assets;
+mod auth;
+mod chart;
+mod chat;
+mod debug;
+mod home;
+mod inventory;
+mod kit;
 mod listings;
 mod orders;
 mod prefs;
+mod settings;
 mod shell;
 mod theme;
 mod trade_messages;
@@ -60,16 +70,20 @@ impl Render for AppRoot {
         }
         let theme = Theme::global(cx);
         let colors = theme.colors;
-        let (title, detail, color) = match &self.backend.read(cx).status {
-            BackendStatus::Starting(step) => (
-                "Starting Quantframe",
-                step.clone().unwrap_or_default(),
-                colors.text_muted,
-            ),
+        let step = match &self.backend.read(cx).status {
             BackendStatus::Failed(error) => {
-                ("Quantframe could not start", error.clone(), colors.negative)
+                return auth::error_page(
+                    "Quantframe could not start",
+                    error,
+                    "Quit Quantframe",
+                    |_, _, cx| cx.quit(),
+                    cx,
+                )
+                .font_family(theme.type_scale.family.clone())
+                .into_any_element();
             }
-            BackendStatus::Ready => ("Starting Quantframe", String::new(), colors.text_muted),
+            BackendStatus::Starting(step) => step.clone().unwrap_or_default(),
+            BackendStatus::Ready => String::new(),
         };
         div()
             .size_full()
@@ -85,13 +99,13 @@ impl Render for AppRoot {
                     .text_size(theme.type_scale.title)
                     .font_weight(theme.type_scale.title_weight)
                     .text_color(colors.text)
-                    .child(title),
+                    .child("Starting Quantframe"),
             )
             .child(
                 div()
                     .text_size(theme.type_scale.body)
-                    .text_color(color)
-                    .child(detail),
+                    .text_color(colors.text_muted)
+                    .child(step),
             )
             .into_any_element()
     }

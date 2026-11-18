@@ -2,7 +2,17 @@
 
 The Rust and GPUI front end that replaces the Tauri and React app in `src/`. This crate is its own cargo workspace with its own `Cargo.lock`.
 
-Built so far: the app shell, the Listings screen (Items, Rivens, Wish list and Syndicates tabs), the Orders screen (Orders and Auctions tabs) and the Trade messages screen (Items, Custom and Rivens tabs). The Rust backend in `src-tauri` (`qf_app_lib`) feeds them. The other screens show a "not built yet" line, and `DataSource` already serves their data.
+The Rust backend in `src-tauri` (`qf_app_lib`) feeds every screen:
+
+- Listings (Items, Rivens, Wish list and Syndicates tabs), Orders (Orders and Auctions tabs) and Trade messages (Items, Custom and Rivens tabs).
+- Home, the dashboard of profit totals, profit charts, the latest transactions and totals per category.
+- Chat, the warframe.market conversations.
+- Analytics (Transactions with a list and a chart, Items, Rivens, Syndicates and Users tabs). The Items, Rivens, Syndicates and Users tabs read Quantframe's server, so in fixture mode they show the backend's refusal.
+- Inventory (Rivens and Syndicates tabs), read from the game through the source picked in Settings. Fixture mode has no inventory.
+- Settings, Debug (State and Warframe log tabs) and About.
+- Sign-in, and the states of a suspended account and of an error the app can't work past.
+
+Not built: the Warframe GDPR parser tab of Analytics, the popup that confirms a trade the game log shows (`src/pages/clean`), the update check, the theme editor and custom notification sounds.
 
 ## Build and run
 
@@ -50,12 +60,13 @@ These variables open the app in a given state, so screenshots can be scripted.
 
 | Variable | Values |
 | --- | --- |
-| `QF_SCREEN` | `listings`, `orders`, `trade-messages` |
-| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`. Trade messages: `item`, `custom`, `riven` |
+| `QF_SCREEN` | `listings`, `orders`, `trade-messages`, `home`, `chat`, `analytics`, `inventory`, `settings`, `debug`, `about`. `login`, `banned` and `error` show those states with sample text, whatever the account's state is |
+| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`. Trade messages: `item`, `custom`, `riven`. Analytics: `transactions`, `items`, `rivens`, `syndicates`, `users`. Inventory: `rivens`, `syndicates`. Debug: `state`, `game-log`. Settings: a section, such as `trading`, `buying`, `account` or `logs` (the `key` of each entry in `src/settings/schema.rs`) |
+| `QF_VIEW` | `chart` opens the Transactions tab of Analytics on its chart |
 | `QF_THEME` | `system`, `light`, `dark`. It takes precedence over the saved setting and doesn't change it |
 | `QF_PANEL` | `open`, `closed`. It takes precedence over the saved setting |
-| `QF_ROW` | The index of a row to select once the rows have loaded |
-| `QF_DIALOG` | The label of the toolbar button or row menu entry whose prompt to open, such as `Sell` or `Add riven` |
+| `QF_ROW` | The index of a row to select once the rows have loaded. On Chat, the conversation to open |
+| `QF_DIALOG` | The label of the toolbar button or row menu entry whose prompt to open, such as `Sell` or `Add riven`. On Chat, `send` writes a sample message and sends it |
 | `QF_STATE` | `loading`, `error`, `empty`. It shows that table state instead of the loaded rows |
 | `QF_WINDOW_CONTROLS` | Any value makes the app draw its own window buttons on Linux when no window manager draws them |
 
@@ -67,6 +78,18 @@ bash app-gpui/scripts/render-screens.sh
 
 The script runs the app on `src-tauri/fixtures` under Xvfb with Mesa lavapipe and writes one PNG per screen, tab and state to `docs/screenshots/`. Pass an output directory and shot names to render only some of them. `docs/screenshots/variants/` holds the three design variants of the first round.
 
+```sh
+bash app-gpui/scripts/check-settings-persist.sh
+```
+
+This script checks that a settings change survives a restart. It runs the app twice on one storage directory, switches one setting on with `xdotool`, clicks "Save changes", and fails unless the backend's `settings.json` holds the new value after both runs.
+
+## Settings
+
+The Settings screen edits a draft of the backend's settings and saves the whole draft with `app_update_settings` when you click "Save changes". "Revert" drops the draft. The appearance is the exception: the app saves it at once in `interface.conf`.
+
+`src/settings/schema.rs` is the list of sections and fields. A field names the place of its value in the settings JSON, its label, its hint and its kind, so a new backend setting needs one entry there and no view code.
+
 ## Layout
 
 - `src/theme.rs` holds the `Theme` struct with a dark and a light palette. Every colour and size a view uses comes from it, and `Theme::install` maps the same tokens onto the gpui-component theme.
@@ -75,7 +98,9 @@ The script runs the app on `src-tauri/fixtures` under Xvfb with Mesa lavapipe an
 - `src/data/` holds `DataSource`, whose methods are named after the Tauri commands, and `Backend`, the gpui entity that re-emits backend events. `src/lib.rs` exports `data` and `model` so `tests/` can use them.
 - `src/shell/` holds the sidebar, title bar, live scraper control and status bar.
 - `src/ui/` holds what every list screen shares. `grid.rs` has the `Catalog` trait and the table. `page.rs` loads a catalog through the backend and draws its toolbar, totals, filter chips, table and item panel. `screen.rs` puts pages behind tabs. `form.rs` builds the dialogs from a list of fields.
-- `src/listings/`, `src/orders/` and `src/trade_messages/` hold one `Catalog` per tab: its columns, row actions, dialogs and backend calls.
+- `src/listings/`, `src/orders/`, `src/trade_messages/`, `src/inventory/` and the price and transaction tabs of `src/analytics/` hold one `Catalog` per tab: its columns, row actions, dialogs and backend calls.
+- `src/home/`, `src/chat/`, `src/settings/`, `src/about/` and `src/auth/` hold the screens that are not tables. `src/debug/` holds a state view and the Warframe log table.
+- `src/kit.rs` holds what those screens share: cards, facts, link rows and the loading and error states. `src/chart.rs` draws grouped bars. The line charts are gpui-component's `LineChart`.
 
 ## Dependencies
 
@@ -83,7 +108,7 @@ The script runs the app on `src-tauri/fixtures` under Xvfb with Mesa lavapipe an
 | --- | --- | --- |
 | `gpui-pre` (imported as `gpui`) | `=0.3.12` | A crates.io snapshot of Zed's `gpui` that the gpui-component maintainer publishes. gpui-component pins this exact version. |
 | `gpui-pre-platform` (imported as `gpui_platform`) | `=0.3.12` | Provides `application()` for X11, Wayland, macOS and Windows. |
-| `gpui-component` | `=0.10.0` | Table, input, select, switch, button, checkbox, menu, dialog, notification, tooltip, title bar. |
+| `gpui-component` | `=0.10.0` | Table, input, select, switch, button, checkbox, menu, dialog, notification, tooltip, title bar, line chart. |
 | `gpui-kit-assets` | `=0.10.0` | Lucide icons. `src/assets.rs` embeds only the icons it lists. |
 
 Upgrade the four together, because gpui-component pins `gpui-pre` to one exact version.

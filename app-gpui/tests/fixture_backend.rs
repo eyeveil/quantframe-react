@@ -395,6 +395,27 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
             .await,
     )
     .results;
+    let mut days: Vec<&str> = entries
+        .iter()
+        .map(|entry| &entry.created_at[..10])
+        .collect();
+    days.sort_unstable();
+    days.dedup();
+    assert!(
+        days.len() > 10,
+        "trade entries keep their spread of days: {days:?}"
+    );
+    let summary = ok("dashboard_summary", source.dashboard_summary().await);
+    assert!(summary.today.summary.total_transactions >= 1);
+    assert!(summary.recent_days.summary.total_transactions >= 5);
+    assert!(
+        summary
+            .recent_days
+            .chart
+            .values
+            .iter()
+            .any(|value| *value != 0)
+    );
     let count = |group: &str| entries.iter().filter(|entry| entry.group == group).count();
     assert_eq!((count("item"), count("custom"), count("riven")), (12, 5, 6));
     let riven = entries
@@ -1272,6 +1293,18 @@ fn every_data_source_method_works_in_fixture_mode() {
             source.wf_inventory_get_syndicates(&list).await,
         );
         ok("wf_inventory_update", source.wf_inventory_update().await);
+        assert!(
+            ok(
+                "wf_inventory_list_rivens",
+                source.wf_inventory_list_rivens().await
+            )
+            .is_empty()
+        );
+        let missing = source
+            .wf_inventory_stock_riven("no-such-riven".to_owned(), 0)
+            .await
+            .expect_err("wf_inventory_stock_riven added a riven the inventory lacks");
+        assert_eq!(missing.message, "The riven is no longer in the inventory");
         let log = ok("log_export", source.log_export().await);
         assert!(log.exists());
         let _ = std::fs::remove_file(log);
