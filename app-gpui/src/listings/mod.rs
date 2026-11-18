@@ -3,7 +3,7 @@
 mod inspector;
 mod table;
 
-use std::{collections::BTreeMap, rc::Rc};
+use std::collections::BTreeMap;
 
 use gpui::{
     App, Context, Div, Entity, IntoElement, ParentElement, Pixels, Render, Stateful, Styled,
@@ -13,12 +13,12 @@ use gpui_component::{
     Sizable, Size,
     button::ButtonVariants,
     input::{Input, InputEvent, InputState},
-    table::{DataTable, TableState},
+    table::{DataTable, TableDelegate, TableState},
 };
 use gpui_kit_assets::IconName;
 
 use crate::{
-    data::DataSource,
+    data::{Backend, BackendEvent, DataKind, DataSource},
     model::{FinancialReport, StockItemListParams, StockStatus},
     theme::{Navigation, Theme, Variant},
     ui::{IconButton, chip, divider, dot, icon, label_text, number, percent, text_button},
@@ -47,7 +47,7 @@ impl ListingTab {
 }
 
 pub struct ListingsView {
-    source: Rc<dyn DataSource>,
+    source: DataSource,
     tab: ListingTab,
     status_filter: Option<StockStatus>,
     search: Entity<InputState>,
@@ -60,21 +60,14 @@ pub struct ListingsView {
 }
 
 impl ListingsView {
-    pub fn new(source: Rc<dyn DataSource>, window: &mut Window, cx: &mut Context<Self>) -> Self {
+    pub fn new(backend: Entity<Backend>, window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let source = backend.read(cx).source.clone();
         let search = cx.new(|cx| InputState::new(window, cx).placeholder("Search items"));
-        let page = source.get_stock_item_pagination(&StockItemListParams::default());
-        let total_items = page.total as usize;
-        let total_units = page.results.iter().map(|item| item.owned).sum();
         let width = table_width(window, cx);
-        let has_inspector = Theme::global(cx).layout.inspector_width.is_some();
         let table = cx.new(|cx| {
-            let mut state = TableState::new(StockTable::new(page.results, width, cx), window, cx)
+            TableState::new(StockTable::new(Vec::new(), width, cx), window, cx)
                 .col_movable(false)
-                .col_selectable(false);
-            if has_inspector {
-                state.set_selected_row(0, cx);
-            }
-            state
+                .col_selectable(false)
         });
         let subscriptions = vec![
             cx.subscribe(&search, |view, _, event: &InputEvent, cx| {
@@ -83,19 +76,56 @@ impl ListingsView {
                 }
             }),
             cx.observe(&table, |_, _, cx| cx.notify()),
+            cx.subscribe(&backend, |view, _, event: &BackendEvent, cx| {
+                if matches!(event, BackendEvent::Changed(DataKind::StockItems)) {
+                    view.load_totals(cx);
+                    view.reload(cx);
+                }
+            }),
         ];
-        Self {
-            status_counts: source.get_stock_item_status_counts(),
-            report: source.get_stock_item_financial_report(),
+        let mut view = Self {
+            status_counts: BTreeMap::new(),
+            report: FinancialReport::default(),
             source,
             tab: ListingTab::Items,
             status_filter: None,
             search,
             table,
-            total_items,
-            total_units,
+            total_items: 0,
+            total_units: 0,
             _subscriptions: subscriptions,
-        }
+        };
+        view.load_totals(cx);
+        view.reload(cx);
+        view
+    }
+
+    fn load_totals(&mut self, cx: &mut Context<Self>) {
+        let source = self.source.clone();
+        cx.spawn(async move |view, cx| {
+            let page = source
+                .get_stock_item_pagination(&StockItemListParams {
+                    limit: -1,
+                    ..StockItemListParams::default()
+                })
+                .await;
+            let counts = source.get_stock_item_status_counts().await;
+            let report = source.get_stock_item_financial_report().await;
+            view.update(cx, |view, cx| {
+                if let Ok(page) = page {
+                    view.total_items = page.total as usize;
+                    view.total_units = page.results.iter().map(|item| item.owned).sum();
+                }
+                if let Ok(counts) = counts {
+                    view.status_counts = counts;
+                }
+                if let Ok(report) = report {
+                    view.report = report;
+                }
+                cx.notify();
+            })
+        })
+        .detach();
     }
 
     fn reload(&mut self, cx: &mut Context<Self>) {
@@ -105,12 +135,25 @@ impl ListingsView {
             status: self.status_filter,
             ..StockItemListParams::default()
         };
-        let rows = self.source.get_stock_item_pagination(&params).results;
-        self.table.update(cx, |table, cx| {
-            table.delegate_mut().set_rows(rows);
-            cx.notify();
-        });
-        cx.notify();
+        let rows = self.source.get_stock_item_pagination(&params);
+        let has_inspector = Theme::global(cx).layout.inspector_width.is_some();
+        cx.spawn(async move |view, cx| {
+            let Ok(page) = rows.await else {
+                return Ok(());
+            };
+            view.update(cx, |view, cx| {
+                view.table.update(cx, |table, cx| {
+                    let first_load = table.delegate().rows_count(cx) == 0;
+                    table.delegate_mut().set_rows(page.results);
+                    if has_inspector && first_load && table.delegate().rows_count(cx) > 0 {
+                        table.set_selected_row(0, cx);
+                    }
+                    cx.notify();
+                });
+                cx.notify();
+            })
+        })
+        .detach();
     }
 
     fn set_status_filter(&mut self, status: Option<StockStatus>, cx: &mut Context<Self>) {

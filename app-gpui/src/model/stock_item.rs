@@ -54,3 +54,22 @@ impl StockItem {
         self.list_price.map(|price| price - self.bought)
     }
 }
+
+/// Input of `stock_item_create` and `wish_list_create`. `raw` is a
+/// warframe.market slug, id or unique name.
+#[derive(Clone, Debug, PartialEq)]
+pub struct NewStockItem {
+    pub raw: String,
+    pub sub_type: Option<SubType>,
+    pub quantity: i64,
+    pub bought: i64,
+}
+
+/// Input of `stock_item_update`. `None` leaves a field unchanged.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct StockItemUpdate {
+    pub owned: Option<i64>,
+    pub bought: Option<i64>,
+    pub list_price: Option<i64>,
+    pub is_hidden: Option<bool>,
+}

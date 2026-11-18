@@ -2,7 +2,7 @@
 
 The Rust and GPUI front end that replaces the Tauri and React app in `src/`. This crate is its own cargo workspace with its own `Cargo.lock`.
 
-Built so far: the app shell and the listings screen (live scraper Item tab), fed by fixture data. The other screens show a "not built yet" line.
+Built so far: the app shell and the listings screen (live scraper Item tab), fed by the Rust backend in `src-tauri` (`qf_app_lib`). The other screens show a "not built yet" line, and `DataSource` already serves their data.
 
 ## Build and run
 
@@ -11,7 +11,19 @@ Run these inside `nix develop` at the repo root.
 ```sh
 cd app-gpui
 CARGO_BUILD_JOBS=5 cargo build --release --locked
-QF_VARIANT=a target/release/quantframe
+QF_VARIANT=a target/release/quantframe --fixtures ../src-tauri/fixtures
+```
+
+The app starts the backend and shows a loading screen until the backend sends `app:ready`.
+
+- Fixture mode reads `src-tauri/fixtures` into a fresh temp directory and makes no network request. Pick it with `--fixtures <dir>` or `QF_FIXTURES=<dir>`. Debug builds use `src-tauri/fixtures` when neither is set.
+- Live mode uses the real app data directory, warframe.market and the Quantframe API. Release builds run in live mode when no fixture directory is named, and debug builds run in live mode with `--live`.
+- `QF_STORAGE_DIR=<dir>` replaces the data directory in either mode.
+
+Run the data layer test without network:
+
+```sh
+CARGO_BUILD_JOBS=5 unshare -rn cargo test --locked --offline
 ```
 
 `QF_VARIANT` selects the design variant: `a`, `b`, or `c`. Any other value selects `a`.
@@ -28,7 +40,7 @@ The script runs each variant under Xvfb with Mesa lavapipe and writes `docs/scre
 
 - `src/theme.rs` holds the `Theme` struct. Every colour, size and layout choice a view uses comes from it, and `Theme::install` maps the same tokens onto the gpui-component theme.
 - `src/model/` holds view models whose fields mirror the backend types in `src-tauri/entity` and `src/types/tauri.type.ts`.
-- `src/data/` holds the `DataSource` trait, named after the Tauri commands, and `FixtureSource`.
+- `src/data/` holds `DataSource`, whose methods are named after the Tauri commands, and `Backend`, the gpui entity that re-emits backend events. `src/lib.rs` exports `data` and `model` so `tests/` can use them.
 - `src/shell/` holds the navigation, title bar, live scraper control and status bar.
 - `src/listings/` holds the listings screen, its table delegate and the item panel of variant B.
 

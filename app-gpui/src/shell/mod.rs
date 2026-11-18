@@ -3,8 +3,6 @@
 
 mod nav;
 
-use std::rc::Rc;
-
 use gpui::{
     AnyElement, App, Context, Decorations, Div, Entity, IntoElement, ParentElement, Pixels, Render,
     Stateful, Styled, Window, div, img, prelude::*, px,
@@ -14,7 +12,7 @@ use gpui_kit_assets::IconName;
 
 use crate::{
     assets::APP_ICON,
-    data::DataSource,
+    data::{Backend, BackendEvent, DataKind, DataSource},
     listings::ListingsView,
     model::{LiveScraperState, StockStatus, User, UserStatus},
     theme::{Navigation, Theme, Variant},
@@ -25,39 +23,93 @@ use nav::{Screen, ScreenGroup};
 pub struct AppShell {
     screen: Screen,
     listings: Entity<ListingsView>,
+    source: DataSource,
     scraper: LiveScraperState,
     /// The message to show again when the scraper restarts.
     last_message: Option<crate::model::LiveScraperMessage>,
     user: User,
     live_orders: usize,
+    _subscription: gpui::Subscription,
 }
 
 impl AppShell {
-    pub fn new(source: Rc<dyn DataSource>, window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let scraper = source.live_scraper_get_state();
-        let live_orders = source
-            .get_stock_item_status_counts()
-            .get(&StockStatus::Live)
-            .copied()
-            .unwrap_or(0);
-        Self {
+    pub fn new(backend: Entity<Backend>, window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let source = backend.read(cx).source.clone();
+        let subscription = cx.subscribe(&backend, |shell, _, event: &BackendEvent, cx| {
+            match event {
+                BackendEvent::LiveScraperRunning(running) => {
+                    shell.scraper.is_running = *running;
+                    if !running {
+                        shell.scraper.message = None;
+                    }
+                }
+                BackendEvent::LiveScraperMessage(message) => {
+                    shell.last_message = Some(message.clone());
+                    shell.scraper.message = Some(message.clone());
+                }
+                BackendEvent::Changed(DataKind::User | DataKind::StockItems) => shell.refresh(cx),
+                _ => return,
+            }
+            cx.notify();
+        });
+        let mut shell = Self {
             screen: Screen::Listings,
-            user: source.user(),
-            last_message: scraper.message.clone(),
-            scraper,
-            live_orders,
-            listings: cx.new(|cx| ListingsView::new(source, window, cx)),
-        }
+            user: User::default(),
+            last_message: None,
+            scraper: LiveScraperState::default(),
+            live_orders: 0,
+            listings: cx.new(|cx| ListingsView::new(backend, window, cx)),
+            source,
+            _subscription: subscription,
+        };
+        shell.refresh(cx);
+        shell
+    }
+
+    fn refresh(&mut self, cx: &mut Context<Self>) {
+        let source = self.source.clone();
+        cx.spawn(async move |shell, cx| {
+            let user = source.user().await;
+            let scraper = source.live_scraper_get_state().await;
+            let counts = source.get_stock_item_status_counts().await;
+            shell.update(cx, |shell, cx| {
+                if let Ok(user) = user {
+                    shell.user = user;
+                }
+                if let Ok(scraper) = scraper {
+                    shell.scraper.is_running = scraper.is_running;
+                }
+                if let Ok(counts) = counts {
+                    shell.live_orders = counts.get(&StockStatus::Live).copied().unwrap_or(0);
+                }
+                cx.notify();
+            })
+        })
+        .detach();
     }
 
     fn toggle_scraper(&mut self, cx: &mut Context<Self>) {
-        self.scraper.is_running = !self.scraper.is_running;
-        self.scraper.message = self
-            .scraper
-            .is_running
-            .then(|| self.last_message.clone())
-            .flatten();
-        cx.notify();
+        let source = self.source.clone();
+        let start = !self.scraper.is_running;
+        cx.spawn(async move |shell, cx| {
+            let state = if start {
+                source.live_scraper_start().await
+            } else {
+                source.live_scraper_stop().await
+            };
+            shell.update(cx, |shell, cx| {
+                if let Ok(state) = state {
+                    shell.scraper.is_running = state.is_running;
+                    shell.scraper.message = shell
+                        .scraper
+                        .is_running
+                        .then(|| shell.last_message.clone())
+                        .flatten();
+                }
+                cx.notify();
+            })
+        })
+        .detach();
     }
 
     fn nav_item(&self, screen: Screen, cx: &mut Context<Self>) -> Stateful<Div> {
