@@ -11,7 +11,7 @@ use crate::{
     model::{ListParams, NewStockItem, OrderListParams, OrderTotals, OrderType, SubType, WfmOrder},
     theme::Theme,
     ui::{
-        IconButton, cells, day_and_time,
+        IconButton, cells, counted, day_and_time,
         form::{Field, FormSpec},
         grid::{
             Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, Load, MenuEntry, Outcome,
@@ -210,13 +210,13 @@ impl Catalog for Orders {
             Stat {
                 label: "Selling",
                 value: number(sell.platinum),
-                note: format!("{} sell orders", sell.count),
+                note: counted(sell.count as i64, "sell order", "sell orders"),
                 tone: Tone::Plain,
             },
             Stat {
                 label: "Buying",
                 value: number(buy.platinum),
-                note: format!("{} buy orders", buy.count),
+                note: counted(buy.count as i64, "buy order", "buy orders"),
                 tone: Tone::Plain,
             },
             Stat {

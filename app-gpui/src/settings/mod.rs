@@ -29,7 +29,7 @@ use crate::{
         icon, placeholder, segmented, text_button,
     },
 };
-use schema::{Choices, Extra, Field, Kind, ListSpec, SECTIONS, Section};
+use schema::{Choices, Extra, Field, Kind, ListSpec, SECTIONS, Section, TRADE_MODES};
 
 const NAV_WIDTH: f32 = 232.;
 const CONTENT_WIDTH: f32 = 760.;
@@ -143,6 +143,10 @@ fn parse(kind: Kind, text: &str) -> Result<Value, String> {
         )),
         _ => Ok(json!(text)),
     }
+}
+
+pub fn trade_mode_label(mode: &str) -> String {
+    choice_label(TRADE_MODES, mode)
 }
 
 fn choice_label(choices: Choices, value: &str) -> String {
@@ -953,7 +957,7 @@ impl SettingsView {
                     .px(px(14.))
                     .py(px(12.))
                     .text_color(colors.text_faint)
-                    .child(format!("No {} yet.", spec.noun)),
+                    .child(format!("No {} yet.", spec.plural)),
             )
         } else {
             card.child(header).children(rows)

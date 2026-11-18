@@ -19,7 +19,7 @@ use crate::{
     },
     theme::{Theme, tabular_figures},
     ui::{
-        IconButton, cells, choices, day_and_time,
+        IconButton, cells, choices, counted, day_and_time,
         form::{Field, FormSpec, FormValues},
         grid::{
             Catalog, ChipGroup, ColumnSpec, Emit, Load, MenuEntry, Outcome, PrimaryAction, Query,
@@ -548,7 +548,7 @@ impl Catalog for Rivens {
             Stat {
                 label: "Bought",
                 value: number(report.expenses),
-                note: format!("{} rivens in stock", rows.len()),
+                note: format!("{} in stock", counted(rows.len() as i64, "riven", "rivens")),
                 tone: Tone::Plain,
             },
             Stat {

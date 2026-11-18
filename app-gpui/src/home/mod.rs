@@ -5,7 +5,7 @@ use gpui::{
 use gpui_kit_assets::IconName;
 
 use crate::{
-    chart::{self, Series},
+    chart::{self, Series, Ticks},
     data::{Backend, BackendEvent, DataKind, DataSource},
     kit::{self, Loaded},
     model::{
@@ -13,14 +13,11 @@ use crate::{
         TransactionType,
     },
     theme::{Theme, tabular_figures},
-    ui::{day_and_time, dot, grid::Tone, number, placeholder},
+    ui::{MONTHS, counted, day_and_time, dot, grid::Tone, number, placeholder, short_date},
 };
 
 const CHART_HEIGHT: f32 = 150.;
 const PLOT_HEIGHT: f32 = CHART_HEIGHT + 34.;
-const MONTHS: [&str; 12] = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
 
 pub struct HomeView {
     source: DataSource,
@@ -63,9 +60,9 @@ impl HomeView {
 
 fn trades_line(report: &FinancialReport) -> String {
     format!(
-        "{} sales, {} purchases, {}% margin",
-        number(report.sale_count),
-        number(report.purchases_count),
+        "{}, {}, {}% margin",
+        counted(report.sale_count, "sale", "sales"),
+        counted(report.purchases_count, "purchase", "purchases"),
         kit::decimal(report.profit_margin),
     )
 }
@@ -174,13 +171,21 @@ fn chart_card(
         .child(report_strip(report, cx))
 }
 
-fn period_plot(id: &'static str, period: &PeriodSummary, color: gpui::Hsla, cx: &App) -> Div {
+fn period_plot(
+    id: &'static str,
+    period: &PeriodSummary,
+    labels: &[String],
+    ticks: Ticks,
+    color: gpui::Hsla,
+    cx: &App,
+) -> Div {
     if period.chart.values.iter().all(|value| *value == 0) {
         return chart::empty("No trades in this period.", PLOT_HEIGHT, cx);
     }
     chart::bars(
         id,
-        &period.chart.labels,
+        labels,
+        ticks,
         &[Series::new("Profit", color, period.chart.values.clone())],
         CHART_HEIGHT,
         cx,
@@ -193,6 +198,7 @@ fn charts(summary: &DashboardSummary, cx: &App) -> Div {
     let year = chart::bars(
         "chart-year",
         &months,
+        Ticks::FromFirst,
         &[
             Series::new(
                 "This year",
@@ -208,7 +214,17 @@ fn charts(summary: &DashboardSummary, cx: &App) -> Div {
         CHART_HEIGHT - 26.,
         cx,
     );
-    let days = summary.recent_days.chart.labels.len().saturating_sub(1).max(1);
+    let day_labels: Vec<String> = summary
+        .recent_days
+        .chart
+        .labels
+        .iter()
+        .map(|day| short_date(day))
+        .collect();
+    let recent_title = match day_labels.len().saturating_sub(1) {
+        0 | 1 => "Profit over the last day".to_owned(),
+        days => format!("Profit over the last {days} days"),
+    };
     div()
         .flex()
         .flex_shrink_0()
@@ -224,14 +240,28 @@ fn charts(summary: &DashboardSummary, cx: &App) -> Div {
             "Profit today by hour".to_owned(),
             summary.today.summary.total_profit,
             &summary.today.summary,
-            period_plot("chart-today", &summary.today, colors.positive, cx),
+            period_plot(
+                "chart-today",
+                &summary.today,
+                &summary.today.chart.labels,
+                Ticks::FromFirst,
+                colors.positive,
+                cx,
+            ),
             cx,
         ))
         .child(chart_card(
-            format!("Profit over the last {days} days"),
+            recent_title,
             summary.recent_days.summary.total_profit,
             &summary.recent_days.summary,
-            period_plot("chart-recent", &summary.recent_days, colors.info, cx),
+            period_plot(
+                "chart-recent",
+                &summary.recent_days,
+                &day_labels,
+                Ticks::FromLast,
+                colors.info,
+                cx,
+            ),
             cx,
         ))
 }
@@ -341,11 +371,11 @@ fn recent_transactions(summary: &DashboardSummary, cx: &App) -> Div {
                         .gap(px(14.))
                         .child(key(
                             colors.positive,
-                            format!("{} sales", number(summary.total.sale_count)),
+                            counted(summary.total.sale_count, "sale", "sales"),
                         ))
                         .child(key(
                             colors.info,
-                            format!("{} purchases", number(summary.total.purchases_count)),
+                            counted(summary.total.purchases_count, "purchase", "purchases"),
                         )),
                 ),
         )

@@ -5,7 +5,7 @@ use gpui_component::{Disableable, Icon, button::ButtonVariants};
 use gpui_kit_assets::IconName;
 
 use super::{
-    IconButton, dot_label, focus_ring,
+    IconButton, counted, dot_label, focus_ring,
     grid::{Emit, Tone},
     icon, number, text_button,
 };
@@ -258,7 +258,10 @@ pub fn render<A: Clone + 'static>(
                     .gap(px(8.))
                     .child(heading(
                         theme,
-                        format!("Price history, {} checks", model.history.len()),
+                        format!(
+                            "Price history, {}",
+                            counted(model.history.len() as i64, "check", "checks")
+                        ),
                     ))
                     .child(price_bars(&model.history, theme)),
             )

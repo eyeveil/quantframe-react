@@ -174,7 +174,7 @@ impl StateView {
                             scraper
                                 .trade_modes
                                 .iter()
-                                .map(|mode| mode.to_string())
+                                .map(|mode| crate::settings::trade_mode_label(&mode.to_string()))
                                 .collect::<Vec<_>>()
                                 .join(", "),
                         ),

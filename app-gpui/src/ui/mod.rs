@@ -41,18 +41,31 @@ pub fn number(value: i64) -> String {
     grouped
 }
 
-pub fn day_and_time(timestamp: &str) -> String {
-    const MONTHS: [&str; 12] = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ];
-    let month = timestamp
+pub fn counted(count: i64, singular: &str, plural: &str) -> String {
+    let noun = if count == 1 { singular } else { plural };
+    format!("{} {noun}", number(count))
+}
+
+pub const MONTHS: [&str; 12] = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+fn day_and_month(date: &str) -> Option<String> {
+    let month = date
         .get(5..7)
         .and_then(|month| month.parse::<usize>().ok())
-        .and_then(|month| MONTHS.get(month.wrapping_sub(1)));
-    match (month, timestamp.get(8..10), timestamp.get(11..16)) {
-        (Some(month), Some(day), Some(time)) => {
-            format!("{} {month}, {time}", day.trim_start_matches('0'))
-        }
+        .and_then(|month| MONTHS.get(month.wrapping_sub(1)))?;
+    let day = date.get(8..10)?;
+    Some(format!("{} {month}", day.trim_start_matches('0')))
+}
+
+pub fn short_date(date: &str) -> String {
+    day_and_month(date).unwrap_or_else(|| date.to_owned())
+}
+
+pub fn day_and_time(timestamp: &str) -> String {
+    match (day_and_month(timestamp), timestamp.get(11..16)) {
+        (Some(day), Some(time)) => format!("{day}, {time}"),
         _ => timestamp.to_owned(),
     }
 }
@@ -440,4 +453,25 @@ pub fn placeholder(name: IconName, title: &str, detail: &str, cx: &App) -> Div {
                 .text_color(colors.text_muted)
                 .child(detail.to_owned()),
         )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn counted_picks_the_singular_for_one() {
+        assert_eq!(counted(1, "sale", "sales"), "1 sale");
+        assert_eq!(counted(0, "purchase", "purchases"), "0 purchases");
+        assert_eq!(counted(1200, "unit", "units"), "1,200 units");
+    }
+
+    #[test]
+    fn dates_shorten_to_day_and_month() {
+        assert_eq!(short_date("2026-11-12"), "12 Nov");
+        assert_eq!(short_date("2026-01-05T08:30:00Z"), "5 Jan");
+        assert_eq!(short_date("04:00"), "04:00");
+        assert_eq!(day_and_time("2026-11-18T03:39:10Z"), "18 Nov, 03:39");
+        assert_eq!(day_and_time("2026-13-18T03:39:10Z"), "2026-13-18T03:39:10Z");
+    }
 }

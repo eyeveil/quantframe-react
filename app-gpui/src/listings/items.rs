@@ -14,7 +14,7 @@ use crate::{
     },
     theme::Theme,
     ui::{
-        IconButton, cells, choices, day_and_time,
+        IconButton, cells, choices, counted, day_and_time,
         form::{Field, FormSpec, FormValues},
         grid::{
             Catalog, ChipGroup, ColumnSpec, Emit, Load, MenuEntry, Outcome, PrimaryAction, Query,
@@ -276,7 +276,7 @@ impl Catalog for Items {
             Stat {
                 label: "Bought",
                 value: number(report.expenses),
-                note: format!("{} units in stock", number(units)),
+                note: format!("{} in stock", counted(units, "unit", "units")),
                 tone: Tone::Plain,
             },
             Stat {
@@ -333,7 +333,7 @@ impl Catalog for Items {
                     .field(
                         Field::platinum("bought", "Total paid", Some(0))
                             .half()
-                            .hint("For all units. 0 records no purchase."),
+                            .hint("0 records no purchase."),
                     ),
                 |values| {
                     Some(ItemAction::Create(NewStockItem {

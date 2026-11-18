@@ -20,7 +20,7 @@ use crate::{
     },
     theme::Theme,
     ui::{
-        IconButton, cells, choices, day_and_time,
+        IconButton, cells, choices, counted, day_and_time,
         form::{Field, FormSpec},
         grid::{
             Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, Load, MenuEntry, Outcome,
@@ -32,6 +32,7 @@ use crate::{
         prompts::{self, MessageItem},
         row_button,
         screen::TabbedScreen,
+        short_date,
     },
 };
 
@@ -443,7 +444,7 @@ impl Catalog for TradeEntries {
             Stat {
                 label: "Entries",
                 value: number(self.rows.len() as i64),
-                note: format!("{} tags", self.tag_counts().len()),
+                note: counted(self.tag_counts().len() as i64, "tag", "tags"),
                 tone: Tone::Plain,
             },
             Stat {
@@ -786,7 +787,7 @@ impl Catalog for TradeEntries {
                 },
             ]);
             if let Some(day) = &row.properties.last_updated {
-                facts.push(Fact::new("Market low from", day.clone()));
+                facts.push(Fact::new("Market low from", short_date(day)));
             }
         }
         facts.extend([

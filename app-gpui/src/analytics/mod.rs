@@ -11,13 +11,13 @@ use gpui::{
 use gpui_component::chart::LineChart;
 
 use crate::{
-    chart::{self, Series},
+    chart::{self, Series, Ticks},
     data::{Backend, BackendEvent, DataKind, DataSource},
     kit::{self, Loaded},
     model::{Transaction, TransactionType},
     theme::Theme,
     ui::{
-        Segment,
+        MONTHS, Segment,
         grid::Tone,
         number,
         page::{ListPage, PageHandle},
@@ -56,9 +56,6 @@ const RANGES: [(&str, Option<i64>); 4] = [
     ("All", None),
 ];
 const DAILY_LIMIT: i64 = 120;
-const MONTHS: [&str; 12] = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
 
 pub struct Ledger {
     list: Entity<ListPage<Transactions>>,
@@ -178,6 +175,7 @@ impl Ledger {
         let profit = total_revenue - total_expenses;
         let unit = if monthly { "month" } else { "day" };
         let period = match days {
+            Some(365) => "in the last year".to_owned(),
             Some(_) => format!("in the last {label}"),
             None => "since the first transaction".to_owned(),
         };
@@ -218,6 +216,7 @@ impl Ledger {
                 .child(chart::bars(
                     "ledger-bars",
                     &labels,
+                    Ticks::FromLast,
                     &[
                         Series::new("Revenue", colors.positive, revenue),
                         Series::new("Expenses", colors.negative, expenses),

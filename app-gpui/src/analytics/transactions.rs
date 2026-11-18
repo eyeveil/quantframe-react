@@ -12,7 +12,7 @@ use crate::{
     },
     theme::Theme,
     ui::{
-        IconButton, cells, day_and_time,
+        IconButton, cells, counted, day_and_time,
         form::{Field, FormSpec},
         grid::{
             Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, Load, MenuEntry, Outcome,
@@ -213,13 +213,13 @@ impl Catalog for Transactions {
             Stat {
                 label: "Revenue",
                 value: number(report.revenue),
-                note: format!("{} sales", number(report.sale_count)),
+                note: counted(report.sale_count, "sale", "sales"),
                 tone: Tone::Plain,
             },
             Stat {
                 label: "Expenses",
                 value: number(report.expenses),
-                note: format!("{} purchases", number(report.purchases_count)),
+                note: counted(report.purchases_count, "purchase", "purchases"),
                 tone: Tone::Plain,
             },
             Stat {
@@ -329,7 +329,10 @@ impl Catalog for Transactions {
                 Outcome::run(
                     source
                         .transaction_delete_bulk(keys.into_iter().map(|key| key as i64).collect()),
-                    format!("Deleted {count} transactions."),
+                    format!(
+                        "Deleted {}.",
+                        counted(count as i64, "transaction", "transactions")
+                    ),
                 )
             }
             TransactionAction::Export => {

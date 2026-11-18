@@ -367,7 +367,8 @@ impl Form {
     fn focus_first(&self, window: &mut Window, cx: &mut App) {
         let first = self.controls.iter().find_map(|control| match control {
             Control::Input(input) => Some(input.focus_handle(cx)),
-            Control::Select(_) | Control::Toggle(_) => None,
+            Control::Select(select) => Some(select.focus_handle(cx)),
+            Control::Toggle(_) => None,
         });
         if let Some(handle) = first {
             handle.focus(window, cx);

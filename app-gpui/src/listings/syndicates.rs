@@ -12,7 +12,7 @@ use crate::{
     model::{BulkEdit, StockStatus, SyndicateItem, SyndicateItemListParams, SyndicateItemUpdate},
     theme::Theme,
     ui::{
-        IconButton, cells, day_and_time,
+        IconButton, cells, counted, day_and_time,
         form::{Field, FormSpec},
         grid::{
             Catalog, ChipGroup, ChipSpec, ColumnSpec, Emit, Load, MenuEntry, Outcome,
@@ -264,7 +264,10 @@ impl Catalog for Syndicates {
                 let import = source.syndicate_item_import_items();
                 Outcome::Run(Box::pin(async move {
                     let count = import.await?;
-                    Ok(format!("Imported {} syndicate items.", number(count)))
+                    Ok(format!(
+                        "Imported {}.",
+                        counted(count, "syndicate item", "syndicate items")
+                    ))
                 }))
             }
             SyndicateAction::Sell(id) => match self.item(id) {

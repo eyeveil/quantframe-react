@@ -1,7 +1,10 @@
 //! A grouped bar chart drawn with plain elements. gpui-component's
 //! `BarChart` draws one series, and the dashboard compares two.
 
-use gpui::{App, Div, Hsla, ParentElement, SharedString, Styled, div, prelude::*, px};
+use gpui::{
+    App, Bounds, Div, Hsla, ParentElement, Pixels, SharedString, Styled, TextAlign, TextRun,
+    Window, canvas, div, point, prelude::*, px,
+};
 use gpui_component::tooltip::Tooltip;
 
 use crate::{
@@ -25,16 +28,79 @@ impl Series {
     }
 }
 
-const AXIS_WIDTH: f32 = 46.;
-const MAX_LABELS: usize = 12;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Ticks {
+    FromFirst,
+    FromLast,
+}
 
-fn label_step(count: usize) -> usize {
-    count.div_ceil(MAX_LABELS).max(1)
+impl Ticks {
+    fn first_index(self, groups: usize, step: usize) -> usize {
+        match self {
+            Self::FromFirst => 0,
+            Self::FromLast => groups.saturating_sub(1) % step,
+        }
+    }
+}
+
+const AXIS_WIDTH: f32 = 46.;
+const TICK_HEIGHT: f32 = 14.;
+const TICK_GAP: f32 = 6.;
+
+fn label_step(groups: usize, group_width: f32, label_width: f32) -> usize {
+    if groups == 0 || group_width <= 0. {
+        return 1;
+    }
+    let needed = ((label_width + TICK_GAP) / group_width).ceil().max(1.) as usize;
+    (needed..=groups / 2)
+        .find(|step| groups.is_multiple_of(*step))
+        .unwrap_or(needed)
+}
+
+fn paint_ticks(
+    labels: &[SharedString],
+    ticks: Ticks,
+    bounds: Bounds<Pixels>,
+    window: &mut Window,
+    cx: &mut App,
+) {
+    let style = window.text_style();
+    let font_size = style.font_size.to_pixels(window.rem_size());
+    let lines: Vec<_> = labels
+        .iter()
+        .map(|label| {
+            let run = TextRun {
+                len: label.len(),
+                font: style.font(),
+                color: style.color,
+                background_color: None,
+                underline: None,
+                strikethrough: None,
+            };
+            window
+                .text_system()
+                .shape_line(label.clone(), font_size, &[run], None)
+        })
+        .collect();
+    let widest = lines
+        .iter()
+        .map(|line| f32::from(line.width))
+        .fold(0., f32::max);
+    let group_width = f32::from(bounds.size.width) / lines.len().max(1) as f32;
+    let step = label_step(lines.len(), group_width, widest);
+    let first = ticks.first_index(lines.len(), step);
+    for (index, line) in lines.iter().enumerate().skip(first).step_by(step) {
+        let centre = px(group_width * (index as f32 + 0.5));
+        let origin = point(bounds.origin.x + centre - line.width / 2., bounds.origin.y);
+        line.paint(origin, px(TICK_HEIGHT), TextAlign::Left, None, window, cx)
+            .ok();
+    }
 }
 
 pub fn bars(
     id: &'static str,
     labels: &[String],
+    ticks: Ticks,
     series: &[Series],
     height: f32,
     cx: &App,
@@ -48,7 +114,6 @@ pub fn bars(
     let above = height * high as f32 / span;
     let below = height - above;
     let groups = labels.len();
-    let step = label_step(groups);
 
     let axis_label = |value: i64| {
         div()
@@ -174,28 +239,26 @@ pub fn bars(
         )
         .child(div().size_full().flex().children((0..groups).map(group)));
 
-    let ticks = div()
-        .flex()
+    let tick_labels: Vec<SharedString> = labels.iter().cloned().map(SharedString::from).collect();
+    let tick_row = div()
         .pl(px(AXIS_WIDTH))
-        .children(labels.iter().enumerate().map(|(index, label)| {
-            div()
-                .flex_1()
-                .min_w_0()
-                .flex()
-                .justify_center()
-                .text_size(theme.type_scale.caption)
-                .text_color(colors.text_faint)
-                .when(index % step == 0, |tick| {
-                    tick.child(div().whitespace_nowrap().child(label.clone()))
-                })
-        }));
+        .text_size(theme.type_scale.caption)
+        .text_color(colors.text_faint)
+        .child(
+            canvas(
+                |_, _, _| {},
+                move |bounds, (), window, cx| paint_ticks(&tick_labels, ticks, bounds, window, cx),
+            )
+            .w_full()
+            .h(px(TICK_HEIGHT)),
+        );
 
     div()
         .flex()
         .flex_col()
         .gap(px(8.))
         .child(div().flex().pt(px(6.)).child(axis).child(plot))
-        .child(ticks)
+        .child(tick_row)
         .when(series.len() > 1, |chart| {
             chart.child(legend(
                 series.iter().map(|series| (series.name, series.color)),
@@ -233,4 +296,31 @@ pub fn empty(text: &'static str, height: f32, cx: &App) -> Div {
         .text_size(theme.type_scale.caption + px(1.))
         .text_color(theme.colors.text_faint)
         .child(text)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn label_step_keeps_every_label_that_fits() {
+        assert_eq!(label_step(8, 45., 34.), 1);
+        assert_eq!(label_step(12, 26., 19.), 1);
+    }
+
+    #[test]
+    fn label_step_prefers_a_step_that_divides_the_groups() {
+        assert_eq!(label_step(24, 13., 30.), 3);
+        assert_eq!(label_step(24, 8., 30.), 6);
+        assert_eq!(label_step(23, 13., 30.), 3);
+        assert_eq!(label_step(0, 13., 30.), 1);
+    }
+
+    #[test]
+    fn ticks_from_last_always_label_the_last_group() {
+        assert_eq!(Ticks::FromLast.first_index(8, 2), 1);
+        assert_eq!(Ticks::FromLast.first_index(8, 1), 0);
+        assert_eq!(Ticks::FromLast.first_index(23, 3), 1);
+        assert_eq!(Ticks::FromFirst.first_index(24, 3), 0);
+    }
 }

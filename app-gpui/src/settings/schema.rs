@@ -42,6 +42,7 @@ pub struct ListSpec {
     pub title: &'static str,
     pub hint: &'static str,
     pub noun: &'static str,
+    pub plural: &'static str,
     pub columns: &'static [Field],
 }
 
@@ -100,7 +101,7 @@ const LANGUAGES: Choices = &[
     ("zh", "简体中文"),
 ];
 
-const TRADE_MODES: Choices = &[
+pub const TRADE_MODES: Choices = &[
     ("buy", "Buy"),
     ("sell", "Sell"),
     ("wishlist", "Wish list"),
@@ -278,6 +279,7 @@ pub const SECTIONS: &[Section] = &[
             title: "Dashboard categories",
             hint: "Each category totals the transactions whose item has one of its tags or types.",
             noun: "category",
+            plural: "categories",
             columns: &[
                 field("name", "Name", "", Kind::Text { placeholder: "Prime" }),
                 field(
@@ -368,6 +370,7 @@ pub const SECTIONS: &[Section] = &[
                 title: "Blacklist",
                 hint: "Items the live scraper leaves alone in the chosen trade modes. The Orders screen adds items here by name.",
                 noun: "blacklisted item",
+                plural: "blacklisted items",
                 columns: &[
                     field(
                         "wfmId",
@@ -390,6 +393,7 @@ pub const SECTIONS: &[Section] = &[
                 title: "Buy list",
                 hint: "Items the live scraper buys up to a price you set.",
                 noun: "buy list item",
+                plural: "buy list items",
                 columns: &[
                     field(
                         "wfmId",
@@ -637,6 +641,7 @@ pub const SECTIONS: &[Section] = &[
             title: "Syndicates to sell from",
             hint: "The live scraper lists an item only while you have the standing to buy it.",
             noun: "syndicate",
+            plural: "syndicates",
             columns: &[
                 field(
                     "name",

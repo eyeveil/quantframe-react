@@ -204,7 +204,10 @@ impl Catalog for Auctions {
             ),
             AuctionAction::DeleteAll => Outcome::ask(
                 FormSpec::confirm_danger(
-                    format!("Delete all {} auctions?", self.data.rows.len()),
+                    match self.data.rows.len() {
+                        1 => "Delete the auction?".to_owned(),
+                        count => format!("Delete all {count} auctions?"),
+                    },
                     "This removes the auctions from Warframe Market. Your stock rivens stay as they are.",
                     "Delete",
                 ),
