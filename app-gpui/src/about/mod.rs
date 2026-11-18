@@ -13,7 +13,7 @@ use crate::{
     ui::grid::Tone,
 };
 
-const LINKS: [(IconName, &str, &str, &str); 5] = [
+const LINKS: [(IconName, &str, &str, &str); 4] = [
     (
         IconName::BookOpen,
         "Guide",
@@ -34,15 +34,9 @@ const LINKS: [(IconName, &str, &str, &str); 5] = [
     ),
     (
         IconName::Github,
-        "Kenya-DK's Quantframe",
-        "The project this build comes from: github.com/Kenya-DK/quantframe-react",
+        "Original project",
+        "github.com/Kenya-DK/quantframe-react",
         "https://github.com/Kenya-DK/quantframe-react",
-    ),
-    (
-        IconName::Coffee,
-        "Buy Kenya-DK a coffee",
-        "Support the author of Quantframe.",
-        "https://www.buymeacoffee.com/kenyadk",
     ),
 ];
 
@@ -143,7 +137,12 @@ impl AboutView {
                 Tone::Plain,
                 cx,
             ))
-            .child(kit::fact("Author", info.authors.clone(), Tone::Plain, cx))
+            .child(kit::fact(
+                "Authors",
+                info.authors.replace(':', ", "),
+                Tone::Plain,
+                cx,
+            ))
     }
 }
 
@@ -209,7 +208,7 @@ impl Render for AboutView {
             .gap(px(8.))
             .p(px(14.))
             .child(paragraph(
-                "Kenya-DK wrote Quantframe and maintains it with its contributors. This build keeps the backend and replaces the interface with one written in GPUI.",
+                "Kenya-DK created Quantframe. eyeveil and the Quantframe contributors maintain this fork and built the GPUI app.",
                 cx,
             ))
             .child(paragraph(
@@ -217,7 +216,7 @@ impl Render for AboutView {
                 cx,
             ))
             .child(kit::note(
-                format!("Copyright 2023 to {year} Kenya-DK and the Quantframe contributors."),
+                format!("Copyright 2023 to {year} Kenya-DK, eyeveil, and the Quantframe contributors."),
                 cx,
             ));
         kit::scroll_page("about", cx).child(

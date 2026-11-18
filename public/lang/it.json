@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "Caffè"
-        },
         "discord": {
           "title": "Discordia"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Versione: <blue>{{version}}</blue> Fatto con ❤️ in 🇩🇰. © 2023-{{year}} Kenya-DK. Tutti i diritti riservati",
+        "version": "Versione: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe è un'app di terze parti e non è affiliata a Digital Extremes."
       },
       "button_check_for_updates": "Controlla gli aggiornamenti"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Debug",
-          "fake_orders_tooltip": "Attiva/disattiva Gli ordini falsi per il trading dal vivo (solo a scopo di test) verranno archiviati in dev.kenya.quantframe\\fake_orders",
+          "fake_orders_tooltip": "Attiva/disattiva Gli ordini falsi per il trading dal vivo (solo a scopo di test) verranno archiviati in dev.quantframe\\fake_orders",
           "fake_orders_label": "Utilizza ordini falsi Ordini in tempo reale",
           "datatable": {
             "columns": {

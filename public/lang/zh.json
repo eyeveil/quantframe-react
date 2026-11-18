@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "咖啡"
-        },
         "discord": {
           "title": "不和谐"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "版本：<blue>{{version}}</blue> 在 🇩🇰 中使用 ❤️ 制作。 © 2023-{{year}} Kenya-DK。版权所有",
+        "version": "版本：<blue>{{version}}</blue>",
         "disclaimer": "Quantframe 是第三方应用程序，不隶属于 Digital Extremes。"
       },
       "button_check_for_updates": "检查更新"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "调试",
-          "fake_orders_tooltip": "Toggle 实时交易的假订单（仅用于测试目的）将存储在 dev.kenya.quantframe\\fake_orders 中",
+          "fake_orders_tooltip": "Toggle 实时交易的假订单（仅用于测试目的）将存储在 dev.quantframe\\fake_orders 中",
           "fake_orders_label": "使用假订单 真实订单",
           "datatable": {
             "columns": {

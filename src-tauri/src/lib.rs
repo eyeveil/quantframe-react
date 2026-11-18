@@ -266,7 +266,7 @@ pub fn run() {
             if let Some(window) = app.get_webview_window("main") {
                 let version = app.package_info().version.to_string();
                 let name = app.package_info().name.as_str();
-                let _ = window.set_title(&format!("{name} v{version} - By Kenya-DK"));
+                let _ = window.set_title(&format!("{name} v{version}"));
             }
             // Clone the handle for async task
             let app_handle = app.handle().clone();

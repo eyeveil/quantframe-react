@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "Кофе"
-        },
         "discord": {
           "title": "Раздор"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Версия: <blue>{{version}}</blue> Сделано с ❤️ в 🇩🇰. © 2023-{{year}} Кения-ДК. Все права защищены",
+        "version": "Версия: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe — стороннее приложение, не связанное с Digital Extremes."
       },
       "button_check_for_updates": "Проверьте наличие обновлений"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Отладка",
-          "fake_orders_tooltip": "Toggle Поддельные ордера для реальной торговли (только для целей тестирования) будут храниться в dev.kenya.quantframe\\fake_orders",
+          "fake_orders_tooltip": "Toggle Поддельные ордера для реальной торговли (только для целей тестирования) будут храниться в dev.quantframe\\fake_orders",
           "fake_orders_label": "Используйте поддельные ордера Реальные ордера",
           "datatable": {
             "columns": {

@@ -24,7 +24,6 @@ gpui_kit_assets::icon_assets!(
         ChartColumn,
         CircleUser,
         Clock,
-        Coffee,
         Copy,
         Download,
         Ellipsis,

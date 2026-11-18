@@ -24,7 +24,7 @@ use crate::{
     DATABASE,
 };
 
-pub static APP_PATH: &str = "dev.kenya.quantframe";
+pub static APP_PATH: &str = "dev.quantframe";
 pub(crate) static STORAGE_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 pub fn get_device_id() -> String {

@@ -2,9 +2,9 @@
 name = "Quantframe"
 version = "1.6.31"
 description = "Quantframe"
-authors = ["Kenya-DK"]
+authors = ["Kenya-DK", "eyeveil", "Quantframe contributors"]
 license = ""
-repository = "https://github.com/Kenya-DK/quantframe-react"
+repository = "https://github.com/eyeveil/quantframe-react"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

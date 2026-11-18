@@ -133,7 +133,7 @@ fn main() {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
                 window_min_size: Some(size(px(1100.), px(640.))),
                 window_decorations: Some(WindowDecorations::Client),
-                app_id: Some("quantframe".to_owned()),
+                app_id: Some(qf_app_lib::helper::APP_PATH.to_owned()),
                 ..TitleBar::window_options()
             };
             let opened = cx.open_window(options, |window, cx| {

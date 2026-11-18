@@ -1,5 +1,17 @@
 # QuantFrame
 
+QuantFrame is a Warframe trading app. This fork adds a GPUI desktop interface. Kenya-DK created the original app. eyeveil and the QuantFrame contributors maintain this fork.
+
+## GPUI screenshots
+
+![QuantFrame dashboard](docs/screenshots/home-dark.png)
+
+![Item listings](docs/screenshots/listings-items-dark.png)
+
+![Sign in to QuantFrame](docs/screenshots/login.png)
+
+[Browse all GPUI screenshots](docs/screenshots).
+
 ## Run the GPUI app on x86-64 Linux
 
 From the repository root, build the app in the Nix development shell.
@@ -14,7 +26,17 @@ Open the app with sample listings, orders, and trade messages. Fixture mode uses
 nix develop -c env QF_FIXTURES="$PWD/src-tauri/fixtures" app-gpui/target/release/quantframe
 ```
 
-To use your own account, start the binary without `QF_FIXTURES`. Browse the [GPUI screenshots](docs/screenshots) for the screens available in this build.
+To use your own account, start the binary without `QF_FIXTURES`.
+
+## Copy an existing profile
+
+The fork stores its database, settings, and logs in `dev.quantframe` under your local data directory.
+
+- Linux: `${XDG_DATA_HOME:-$HOME/.local/share}/dev.quantframe`
+- macOS: `~/Library/Application Support/dev.quantframe`
+- Windows: `%LOCALAPPDATA%\dev.quantframe`
+
+To keep your existing profile, close both apps. Copy `dev.kenya.quantframe` to `dev.quantframe` in the same parent directory. If `dev.quantframe` already exists, back it up before replacing it.
 
 ## Tauri app
 
@@ -26,25 +48,15 @@ Inspired by [Akmayer's Warframe-Algo-Trader](https://github.com/akmayer/Warframe
   - Install size: 35MB
   - Idle resource consumption: 60MB, extremely small cpu footprint (on my rig, 0-0.1%)
   - Update distribution
-- Save data in sqllite db located at `C:\Users\*\AppData\Local\dev.kenya.quantframe\quantframe.sqlite`
-- Logs and setings wil be save at `C:\Users\*\AppData\Local\dev.kenya.quantframe`
-  - easily inspectible with db tools like https://beekeeperstudio.io
+- Store trading data in SQLite.
 - Api client to communicate with wf.market
 - Easy debugging / developer experience via edge dev tools
-
-## Screenshots
-
-![Login Screen](./docs/assets/login.png)
-
-![Main Screen](./docs/assets/main-screen.png)
-https://github.com/Kenya-DK/quantframe-react
-![Listing an item](./docs/assets/listing.png)
 
 ## Installation
 
 ### Download installer
 
-You can download the latest release from [here](https://github.com/Kenya-DK/quantframe-react/releases)
+The [upstream releases](https://github.com/Kenya-DK/quantframe-react/releases) ship the original Tauri app. Build this fork from source.
 
 ### OR Build it from source
 
@@ -102,7 +114,3 @@ This project uses:
 - [React](https://react.dev/): For the frontend.
 - [Mantine](https://mantine.dev/): use for the UI.
 - [Sqlite](https://www.sqlite.org/index.html): For the database.
-
-## 💰 Support My work
-
-<p><a href="https://www.buymeacoffee.com/kenyadk"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="45" width="210" alt="kenyadk" /></a></p>

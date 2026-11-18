@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "Café"
-        },
         "discord": {
           "title": "Discorde"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Version : <blue>{{version}}</blue> Réalisé avec ❤️ en 🇩🇰. © 2023-{{year}} Kenya-DK. Tous droits réservés",
+        "version": "Version : <blue>{{version}}</blue>",
         "disclaimer": "Quantframe est une application tierce et n'est pas affiliée à Digital Extremes."
       },
       "button_check_for_updates": "Vérifier les mises à jour"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Débogage",
-          "fake_orders_tooltip": "Toggle Les fausses commandes pour le trading en direct (à des fins de test uniquement) seront stockées dans dev.kenya.quantframe\\fake_orders",
+          "fake_orders_tooltip": "Toggle Les fausses commandes pour le trading en direct (à des fins de test uniquement) seront stockées dans dev.quantframe\\fake_orders",
           "fake_orders_label": "Utiliser de fausses commandes",
           "datatable": {
             "columns": {

@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "Kahve"
-        },
         "discord": {
           "title": "Anlaşmazlık"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Versiyon: <blue>{{version}}</blue> ❤️ ile 🇩🇰 yılında yapılmıştır. © 2023-{{year}} Kenya-DK. Her hakkı saklıdır",
+        "version": "Versiyon: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe bir üçüncü taraf uygulamasıdır ve Digital Extremes'e bağlı değildir."
       },
       "button_check_for_updates": "Güncellemeleri Kontrol Et"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Hata ayıklama",
-          "fake_orders_tooltip": "Canlı Ticaret için Sahte Emirleri Kapat (Yalnızca Test Amaçlı) dev.kenya.quantframe\\fake_orders dizininde saklanacaktır.",
+          "fake_orders_tooltip": "Canlı Ticaret için Sahte Emirleri Kapat (Yalnızca Test Amaçlı) dev.quantframe\\fake_orders dizininde saklanacaktır.",
           "fake_orders_label": "Sahte Siparişleri Kullan Canlı siparişler",
           "datatable": {
             "columns": {

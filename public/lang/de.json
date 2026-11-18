@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "Kaffee"
-        },
         "discord": {
           "title": "Zwietracht"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Version: <blue>{{version}}</blue> Hergestellt mit ❤️ in 🇩🇰. © 2023-{{year}} Kenia-DK. Alle Rechte vorbehalten",
+        "version": "Version: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe ist eine Drittanbieter-App und steht in keiner Verbindung zu Digital Extremes."
       },
       "button_check_for_updates": "Suchen Sie nach Updates"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Debuggen",
-          "fake_orders_tooltip": "Toggle Fake Orders für den Live-Handel (nur zu Testzwecken) werden in dev.kenya.quantframe\\fake_orders gespeichert",
+          "fake_orders_tooltip": "Toggle Fake Orders für den Live-Handel (nur zu Testzwecken) werden in dev.quantframe\\fake_orders gespeichert",
           "fake_orders_label": "Verwenden Sie Fake Orders. Live-Bestellungen",
           "datatable": {
             "columns": {

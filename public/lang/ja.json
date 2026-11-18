@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "コーヒー"
-        },
         "discord": {
           "title": "不和"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "バージョン: <blue>{{version}}</blue> 🇩🇰の❤️で作成されました。 © 2023-{{year}} ケニア-DK。無断転載を禁じます",
+        "version": "バージョン: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe はサードパーティのアプリであり、Digital Extremes とは提携していません。"
       },
       "button_check_for_updates": "アップデートをチェックする"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "デバッグ",
-          "fake_orders_tooltip": "Toggle ライブ取引の偽注文 (テスト目的のみ) は dev.kenya.quantframe\\fake_orders に保存されます",
+          "fake_orders_tooltip": "Toggle ライブ取引の偽注文 (テスト目的のみ) は dev.quantframe\\fake_orders に保存されます",
           "fake_orders_label": "偽の注文を使用する ライブ注文",
           "datatable": {
             "columns": {

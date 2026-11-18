@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "кава"
-        },
         "discord": {
           "title": "Розбрат"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Версія: <blue>{{version}}</blue> Зроблено за допомогою ❤️ у 🇩🇰. © 2023-{{year}} Kenya-DK. Всі права захищені",
+        "version": "Версія: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe є сторонньою програмою, яка не пов’язана з Digital Extremes."
       },
       "button_check_for_updates": "Перевірте наявність оновлень"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Налагодження",
-          "fake_orders_tooltip": "Увімкнути підроблені замовлення для реальної торгівлі (тільки для тестування) зберігатимуться в dev.kenya.quantframe\\fake_orders",
+          "fake_orders_tooltip": "Увімкнути підроблені замовлення для реальної торгівлі (тільки для тестування) зберігатимуться в dev.quantframe\\fake_orders",
           "fake_orders_label": "Використовуйте Fake Orders Live Orders",
           "datatable": {
             "columns": {

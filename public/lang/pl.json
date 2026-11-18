@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "Kawa"
-        },
         "discord": {
           "title": "Niezgoda"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Wersja: <blue>{{version}}</blue> Wykonane z ❤️ w 🇩🇰. © 2023-{{year}} Kenia-DK. Wszelkie prawa zastrzeżone",
+        "version": "Wersja: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe to aplikacja strony trzeciej, która nie jest powiązana z Digital Extremes."
       },
       "button_check_for_updates": "Sprawdź aktualizacje"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Debugowanie",
-          "fake_orders_tooltip": "Przełącz fałszywe zlecenia dla handlu na żywo (wyłącznie do celów testowych) będą przechowywane w dev.kenya.quantframe\\fake_orders",
+          "fake_orders_tooltip": "Przełącz fałszywe zlecenia dla handlu na żywo (wyłącznie do celów testowych) będą przechowywane w dev.quantframe\\fake_orders",
           "fake_orders_label": "Użyj fałszywych zamówień Zamówienia na żywo",
           "datatable": {
             "columns": {

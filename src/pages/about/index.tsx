@@ -2,8 +2,8 @@ import { Box, Text, Center, Group, Stack, CardProps, Card, Button } from "@manti
 import { useTranslatePages } from "@hooks/useTranslate.hook";
 import { useAppContext } from "@contexts/app.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookOpen, faCoffee } from "@fortawesome/free-solid-svg-icons";
-import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
+import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons";
 import classes from "./About.module.css";
 import { TextTranslate } from "@components/Shared/TextTranslate";
 import { useState } from "react";
@@ -52,9 +52,9 @@ export default function AboutPage() {
           <Group grow gap={"5vw"}>
             <InfoCard link="https://quantframe.app" icon={<FontAwesomeIcon size="5x" icon={faBookOpen} />} title={useTranslateCards("guide.title")} />
             <InfoCard
-              link="https://www.buymeacoffee.com/kenyadk"
-              icon={<FontAwesomeIcon size="5x" icon={faCoffee} style={{ color: "#ffa000" }} />}
-              title={useTranslateCards("coffee.title")}
+              link="https://github.com/eyeveil/quantframe-react"
+              icon={<FontAwesomeIcon size="5x" icon={faGithub} />}
+              title="GitHub"
             />
             <InfoCard
               link="https://discord.gg/dPSFPG5Qt6"
@@ -68,8 +68,9 @@ export default function AboutPage() {
         <TextTranslate
           size="lg"
           i18nKey={useTranslateText("version", undefined, true)}
-          values={{ version: app_info?.version || "0.0.0", year: new Date().getFullYear() }}
+          values={{ version: app_info?.version || "0.0.0" }}
         />
+        <Text size="lg">© 2023–{new Date().getFullYear()} Kenya-DK, eyeveil, and the Quantframe contributors.</Text>
         <Group justify="space-between">
           <TextTranslate size="lg" i18nKey={useTranslateText("disclaimer", undefined, true)} values={{}} />
           <Button

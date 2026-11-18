@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "Café"
-        },
         "discord": {
           "title": "Discordia"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "Versión: <blue>{{version}}</blue> Hecho con ❤️ en 🇩🇰. © 2023-{{year}} Kenia-DK. Reservados todos los derechos",
+        "version": "Versión: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe es una aplicación de terceros y no está afiliada a Digital Extremes."
       },
       "button_check_for_updates": "Buscar actualizaciones"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "Depuración",
-          "fake_orders_tooltip": "Alternar órdenes falsas para operaciones en vivo (solo para fines de prueba) se almacenará en dev.kenya.quantframe\\fake_orders",
+          "fake_orders_tooltip": "Alternar órdenes falsas para operaciones en vivo (solo para fines de prueba) se almacenará en dev.quantframe\\fake_orders",
           "fake_orders_label": "Utilice pedidos falsos Órdenes en vivo",
           "datatable": {
             "columns": {

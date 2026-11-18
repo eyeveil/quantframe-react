@@ -550,6 +550,8 @@ impl AppShell {
             .items_center()
             .gap(px(8.))
             .min_w_0()
+            .max_w(px(400.))
+            .text_size(theme.type_scale.caption + px(1.))
             .child(dot(
                 if running {
                     colors.positive
@@ -592,41 +594,21 @@ impl AppShell {
             )
     }
 
-    fn account_state(&self, cx: &App) -> Div {
+    fn order_count(&self, cx: &App) -> Div {
         let theme = Theme::global(cx);
-        let colors = theme.colors;
         div()
             .flex()
-            .flex_shrink_0()
             .items_center()
-            .gap(px(14.))
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(6.))
-                    .child(icon(
-                        IconName::Globe,
-                        theme.metrics.icon - px(2.),
-                        colors.text_faint,
-                    ))
-                    .child(format!(
-                        "{} of {} orders on Warframe Market",
-                        self.live_orders, self.user.order_limit
-                    )),
-            )
-            .child(match self.account_name() {
-                Some(name) => div()
-                    .flex()
-                    .items_center()
-                    .gap(px(6.))
-                    .child(dot(self.user_status_color(theme), px(6.)))
-                    .child(format!(
-                        "{name}, {}",
-                        self.user.wfm_status.label().to_lowercase()
-                    )),
-                None => div().child("Not signed in"),
-            })
+            .gap(px(6.))
+            .child(icon(
+                IconName::Globe,
+                theme.metrics.icon - px(2.),
+                theme.colors.text_faint,
+            ))
+            .child(format!(
+                "{} of {} orders on Warframe Market",
+                self.live_orders, self.user.order_limit
+            ))
     }
 
     fn status_bar(&self, cx: &App) -> Div {
@@ -636,8 +618,7 @@ impl AppShell {
             .flex()
             .flex_shrink_0()
             .items_center()
-            .justify_between()
-            .gap(px(16.))
+            .justify_end()
             .h(theme.metrics.status_bar_height)
             .px(theme.metrics.gutter)
             .border_t_1()
@@ -645,8 +626,7 @@ impl AppShell {
             .bg(colors.chrome)
             .text_size(theme.type_scale.caption + px(1.))
             .text_color(colors.text_muted)
-            .child(self.scraper_state(cx))
-            .child(self.account_state(cx))
+            .child(self.order_count(cx))
     }
 
     fn title_bar(
@@ -687,7 +667,11 @@ impl AppShell {
                             .items_center()
                             .gap(px(8.))
                             .child(self.appearance_button(cx))
-                            .when(!gated, |buttons| buttons.child(self.scraper_button(cx))),
+                            .when(!gated, |buttons| {
+                                buttons
+                                    .child(self.scraper_state(cx))
+                                    .child(self.scraper_button(cx))
+                            }),
                     ),
             )
             .when(draws_own_window_controls(window), |bar| {

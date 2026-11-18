@@ -2757,9 +2757,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -2767,7 +2764,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -2830,7 +2827,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -6674,9 +6671,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -6684,7 +6678,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -6747,7 +6741,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -10591,9 +10585,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -10601,7 +10592,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -10664,7 +10655,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -14508,9 +14499,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -14518,7 +14506,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -14581,7 +14569,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -18425,9 +18413,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -18435,7 +18420,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -18498,7 +18483,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -22342,9 +22327,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -22352,7 +22334,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -22415,7 +22397,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -26259,9 +26241,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -26269,7 +26248,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -26332,7 +26311,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -30176,9 +30155,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -30186,7 +30162,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -30249,7 +30225,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -33967,9 +33943,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -33977,7 +33950,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -34040,7 +34013,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -37884,9 +37857,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -37894,7 +37864,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -37957,7 +37927,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -41801,9 +41771,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -41811,7 +41778,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -41874,7 +41841,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -45718,9 +45685,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -45728,7 +45692,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -45791,7 +45755,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -49635,9 +49599,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -49645,7 +49606,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -49708,7 +49669,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"
@@ -53552,9 +53513,6 @@
     "pages.home.cards.last_transaction.info_box.sale": {
       "hash": "6577f016a5f9c1523238c6241feb6eac2ddd05c305a26a44db885c38bbfa4fc1"
     },
-    "pages.about.cards.coffee.title": {
-      "hash": "b0e1f06cf1e7d466ee3048ebef45d85b2d1d31d6164a9b92a6fd0887ba8ffe89"
-    },
     "pages.about.cards.discord.title": {
       "hash": "053bc65874ad6098e58c41c57b378a2f36b0220e5e0b46722245e6c2f796818c"
     },
@@ -53562,7 +53520,7 @@
       "hash": "1f0067917d7695e2d354967eeff01cdb787630b25f6a195e03fe890971bd54fe"
     },
     "pages.about.text.version": {
-      "hash": "85ba9e232afe90c892705c924308e832f8971c0c64ed7a73f48e8b1c3c2d63f6"
+      "hash": "be1d057a500d556afc4a9cb813a509b385ec7b873770fb2e2c100738fe236e6e"
     },
     "pages.about.text.disclaimer": {
       "hash": "19acd1812ff2928f78abe4259783eddf647f6e867cdd6469ca8f4479b0f95ec0"
@@ -53625,7 +53583,7 @@
       "hash": "47fc5bfb5680bd7a9d55085c13c03c5c75ab3a5e2beb3eebd08067146a17a0f1"
     },
     "pages.debug.tabs.debugging.fake_orders_tooltip": {
-      "hash": "50ed942c0f4d11057c973273fe2dd4e4b8b2926fdcf0a7d4ca77415c7f128721"
+      "hash": "451c084fe53f65089bb6a3eb5af75570de8971a3e414479f503ea468f39fcf1b"
     },
     "pages.debug.tabs.debugging.fake_orders_label": {
       "hash": "8e77f7374cc4158bc5651f74f232952755a560a76eb0a1518f3de45d0e216808"

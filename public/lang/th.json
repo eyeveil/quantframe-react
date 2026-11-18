@@ -1928,9 +1928,6 @@
     },
     "about": {
       "cards": {
-        "coffee": {
-          "title": "กาแฟ"
-        },
         "discord": {
           "title": "ความไม่ลงรอยกัน"
         },
@@ -1939,7 +1936,7 @@
         }
       },
       "text": {
-        "version": "เวอร์ชัน: <blue>{{version}}</blue> ทำด้วย ❤️ ใน 🇩🇰 © 2023-{{year}} เคนยา-DK สงวนลิขสิทธิ์",
+        "version": "เวอร์ชัน: <blue>{{version}}</blue>",
         "disclaimer": "Quantframe เป็นแอปของบุคคลที่สามและไม่มีส่วนเกี่ยวข้องกับ Digital Extremes"
       },
       "button_check_for_updates": "ตรวจสอบการอัปเดต"
@@ -1989,7 +1986,7 @@
         },
         "debugging": {
           "title": "การดีบัก",
-          "fake_orders_tooltip": "สลับคำสั่งซื้อปลอมสำหรับการซื้อขายสด (เพื่อการทดสอบเท่านั้น) จะถูกจัดเก็บไว้ใน dev.kenya.quantframe\\fake_orders",
+          "fake_orders_tooltip": "สลับคำสั่งซื้อปลอมสำหรับการซื้อขายสด (เพื่อการทดสอบเท่านั้น) จะถูกจัดเก็บไว้ใน dev.quantframe\\fake_orders",
           "fake_orders_label": "ใช้คำสั่งซื้อปลอม คำสั่งซื้อสด",
           "datatable": {
             "columns": {
