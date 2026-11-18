@@ -20,6 +20,9 @@ impl WebHookNotify {
         }
     }
     pub fn send(&self, value: Value) {
+        if crate::host::is_offline() {
+            return;
+        }
         if self.url.is_empty() {
             return;
         }

@@ -3,11 +3,11 @@ use std::{
     sync::Mutex,
 };
 
-use entity::{stock_item, stock_riven, trade_entry, transaction, wish_list};
+use entity::{stock_item, stock_riven, syndicate_item, trade_entry, transaction, wish_list};
 use serde::Deserialize;
 use service::{
-    StockItemMutation, StockRivenMutation, TradeEntryMutation, TransactionMutation,
-    WishListMutation,
+    StockItemMutation, StockRivenMutation, SyndicateItemMutation, TradeEntryMutation,
+    TransactionMutation, WishListMutation,
 };
 use utils::{get_location, info, read_json_file, Error, LoggerOptions};
 use wf_market::types::{Auction, AuctionList, ChatList, Order, OrderList};
@@ -21,6 +21,7 @@ struct Database {
     wish_list: Vec<wish_list::Model>,
     transactions: Vec<transaction::Model>,
     trade_entries: Vec<trade_entry::Model>,
+    syndicate_items: Vec<syndicate_item::Model>,
 }
 
 fn io_error(path: &Path, message: &str, e: std::io::Error) -> Error {
@@ -67,12 +68,13 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
     let conn = DATABASE.get().expect("Database not initialized");
     let db: Database = read_json_file(&fixtures.join("database.json"))?;
     let counts = format!(
-        "stock items {}, stock rivens {}, wish list {}, transactions {}, trade entries {}",
+        "stock items {}, stock rivens {}, wish list {}, transactions {}, trade entries {}, syndicate items {}",
         db.stock_items.len(),
         db.stock_rivens.len(),
         db.wish_list.len(),
         db.transactions.len(),
-        db.trade_entries.len()
+        db.trade_entries.len(),
+        db.syndicate_items.len()
     );
     for model in db.stock_items {
         StockItemMutation::create(conn, model).await?;
@@ -88,6 +90,9 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
     }
     for model in &db.trade_entries {
         TradeEntryMutation::create(conn, model).await?;
+    }
+    for model in db.syndicate_items {
+        SyndicateItemMutation::create(conn, model).await?;
     }
 
     let mut orders: OrderList<Order> = read_json_file(&fixtures.join("wfm_orders.json"))?;

@@ -57,6 +57,14 @@ impl LiveScraperState {
         }
         self.just_started.store(true, Ordering::SeqCst);
         *self.started_at.lock().unwrap() = Some(Instant::now());
+        if crate::host::is_offline() {
+            info(
+                "LiveScraper:Start",
+                "Fixture mode: the live scraper is marked running and makes no requests",
+                &LoggerOptions::default(),
+            );
+            return;
+        }
         info(
             "LiveScraper:Start",
             format!("Live Scraper started. Elapsed: {}", self.elapsed()),

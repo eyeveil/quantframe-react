@@ -42,6 +42,7 @@ pub mod types;
 pub use ::entity;
 pub use ::qf_api;
 pub use ::service;
+pub use ::utils as qf_utils;
 pub use ::wf_market;
 pub use host::{Host, State};
 
@@ -193,6 +194,7 @@ impl HeadlessOptions {
 /// Starts the backend without Tauri. Call once, inside a tokio runtime, before any command.
 pub async fn init_headless(opts: HeadlessOptions, host: Arc<dyn Host>) -> Result<(), Error> {
     host::install(host, tokio::runtime::Handle::current());
+    host::set_offline(opts.fixtures.is_some());
     let storage_dir = match (&opts.storage_dir, &opts.fixtures) {
         (Some(dir), _) => Some(dir.clone()),
         (None, Some(_)) => Some(fixtures::temp_storage_dir()?),

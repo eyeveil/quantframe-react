@@ -30,6 +30,9 @@ impl DiscordNotify {
         }
     }
     pub fn send(&self, variables: &HashMap<String, String>) {
+        if crate::host::is_offline() {
+            return;
+        }
         let variables = &mut variables.clone();
         if self.webhook.is_empty() {
             return;

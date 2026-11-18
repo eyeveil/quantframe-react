@@ -8,6 +8,7 @@ use crate::app::AppState;
 
 #[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn user_set_status(status: String, app: State<'_, Mutex<AppState>>) -> Result<(), Error> {
+    crate::host::ensure_online("Command::UserSetStatus")?;
     let app_state = app.lock().unwrap().clone();
     if app_state.wfm_socket.is_none() {
         return Err(Error::new(

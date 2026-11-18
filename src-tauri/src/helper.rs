@@ -56,14 +56,9 @@ pub fn get_sounds_path() -> PathBuf {
     sounds_path
 }
 
+/// The desktop, or the app storage directory on systems without one.
 pub fn get_desktop_path() -> PathBuf {
-    let desktop_path = match dirs::desktop_dir() {
-        Some(val) => val,
-        None => {
-            panic!("Could not find desktop path");
-        }
-    };
-    desktop_path
+    dirs::desktop_dir().unwrap_or_else(get_app_storage_path)
 }
 pub fn generate_transaction_summary(
     transactions: &Vec<entity::transaction::Model>,
@@ -208,7 +203,10 @@ pub async fn populate_item_market_properties(
     }
 
     // ---------------- Market Info ----------------
-    if operations.has("MarketInfo") && !operations.has("MarketPopulated") {
+    if operations.has("MarketInfo")
+        && !operations.has("MarketPopulated")
+        && !crate::host::is_offline()
+    {
         let mut orders = wfm
             .order()
             .get_orders_by_item(&item_info.wfm_url)
@@ -423,7 +421,10 @@ pub async fn populate_riven_market_properties(
     }
 
     // ---------------- Market Info ----------------
-    if operations.has("MarketInfo") && !operations.has("MarketPopulated") {
+    if operations.has("MarketInfo")
+        && !operations.has("MarketPopulated")
+        && !crate::host::is_offline()
+    {
         let mut filter = wf_market::types::AuctionFilter::new(
             wf_market::enums::AuctionType::Riven,
             &weapon_info.wfm_riven_url,

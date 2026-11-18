@@ -281,12 +281,79 @@ for n in range(12):
         entry["sub_type"] = sub
     trade_entries.append(entry)
 
+SYNDICATE_ITEMS = [
+    ("scattered_justice", "Steel Meridian", "SteelMeridianSyndicate", "live", 18),
+    ("justice_blades", "Steel Meridian", "SteelMeridianSyndicate", "pending", None),
+    ("neutralizing_justice", "Steel Meridian", "SteelMeridianSyndicate", "to_low_profit", None),
+    ("gilded_truth", "Arbiters of Hexis", "ArbitersSyndicate", "live", 30),
+    ("blade_of_truth", "Arbiters of Hexis", "ArbitersSyndicate", "no_buyers", None),
+    ("winds_of_purity", "New Loka", "NewLokaSyndicate", "live", 25),
+    ("bright_purity", "New Loka", "NewLokaSyndicate", "pending", None),
+    ("sequence_burn", "Cephalon Suda", "CephalonSudaSyndicate", "live", 16),
+]
+syndicate_items = []
+for n, (slug, syndicate, syndicate_unique, status, price) in enumerate(SYNDICATE_ITEMS):
+    item = by_slug[slug]
+    syndicate_items.append({
+        "wfm_id": item["id"],
+        "wfm_url": slug,
+        "item_name": item["i18n"]["en"]["name"],
+        "item_unique_name": item["gameRef"],
+        "sub_type": {"rank": 0},
+        "list_price": price,
+        "syndicate_name": syndicate,
+        "syndicate_unique_name": syndicate_unique,
+        "standing_cost": 25000,
+        "status": status,
+        "price_history": [],
+        "created_at": f"2026-11-{10 + n:02d}T18:00:00.000Z",
+        "updated_at": f"2026-11-{10 + n:02d}T18:00:00.000Z",
+        "changes": [],
+    })
+
+SYNDICATE_COLOURS = {
+    "SteelMeridianSyndicate": ("#e3683a", "#3a1e14"),
+    "ArbitersSyndicate": ("#d6d6d6", "#2b2b2b"),
+    "NewLokaSyndicate": ("#7fb069", "#1f2b1a"),
+    "CephalonSudaSyndicate": ("#4fa3d9", "#13263a"),
+}
+SYNDICATE_TITLES = [
+    {"level": level, "name": name, "minStanding": low, "maxStanding": high}
+    for level, name, low, high in [
+        (0, "Neutral", -5000, 5000),
+        (1, "Rank 1", 0, 22000),
+        (2, "Rank 2", 22000, 44000),
+        (3, "Rank 3", 44000, 70000),
+        (4, "Rank 4", 70000, 99000),
+        (5, "Rank 5", 99000, 132000),
+    ]
+]
+syndicates = {}
+for entry in syndicate_items:
+    unique = entry["syndicate_unique_name"]
+    icon, background = SYNDICATE_COLOURS[unique]
+    syndicate = syndicates.setdefault(unique, {
+        "uniqueName": unique,
+        "name": entry["syndicate_name"],
+        "canSelect": True,
+        "iconColour": icon,
+        "backgroundColour": background,
+        "titles": SYNDICATE_TITLES,
+        "favours": [],
+    })
+    syndicate["favours"].append({"standingCost": 25000, "creditsCost": 0, "uniqueName": entry["item_unique_name"]})
+syndicates["CephalonSudaSyndicate"]["favours"].append(
+    {"standingCost": 25000, "creditsCost": 0, "uniqueName": by_slug["toxic_sequence"]["gameRef"]}
+)
+write("cache/items/Syndicate.json", list(syndicates.values()))
+
 write("database.json", {
     "stock_items": stock_items,
     "stock_rivens": stock_rivens,
     "wish_list": wish_list,
     "transactions": transactions,
     "trade_entries": trade_entries,
+    "syndicate_items": syndicate_items,
 })
 
 order_pool = [i for i in items if any(t in i["tags"] for t in ("set", "mod", "arcane_enhancement"))]

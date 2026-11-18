@@ -20,6 +20,7 @@ impl WFInvProfileSource {
     }
 
     async fn fetch(&self) -> Result<WarframeRootObject, Error> {
+        crate::host::ensure_online(&format!("{COMPONENT}:Fetch"))?;
         let resp = reqwest::get(&self.get_url(&self.id)).await.map_err(|e| {
             Error::new(
                 format!("{COMPONENT}:Fetch:Request"),

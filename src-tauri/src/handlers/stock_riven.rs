@@ -128,6 +128,9 @@ async fn delete_existing_auction(
     component: &str,
 ) -> Result<(), Error> {
     let app = states::app_state()?;
+    if crate::host::is_offline() {
+        return Ok(());
+    }
 
     if let Some(auction) = app
         .wfm_client

@@ -179,6 +179,7 @@ fn handle_new_message(wfm_client: &WFClient<WFAuthenticated>, msg: &WsMessage) {
 pub async fn setup_socket(
     wfm_client: WFClient<WFAuthenticated>,
 ) -> Result<(WsClient, WsClient), Error> {
+    crate::host::ensure_online("AppState:SetupSocket")?;
     if wfm_client.get_user().is_err() {
         return Err(Error::new(
             "AppState:SetupSocket",

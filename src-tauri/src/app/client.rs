@@ -48,7 +48,8 @@ impl AppState {
             "N/A",
             is_pre_release,
         )
-        .with_user_agent(&user_agent);
+        .with_user_agent(&user_agent)
+        .with_offline(offline);
         let analytics = Analytics::new(qf_client.clone());
         let wfm_client = Self::new_base_wfm_client()
             .with_user_agent(&user_agent)

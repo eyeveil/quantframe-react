@@ -163,6 +163,7 @@ pub async fn stock_riven_delete(
         .auction()
         .cache_auctions()
         .get_by_uuid(&item.uuid)
+        .filter(|_| !crate::host::is_offline())
     {
         Some(auction) => {
             app.wfm_client
