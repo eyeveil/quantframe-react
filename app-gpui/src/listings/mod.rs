@@ -26,7 +26,11 @@ use crate::{
 };
 pub use rivens::{attribute_lines, attributes_cell, attributes_text, words};
 
-pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> Entity<TabbedScreen> {
+pub fn screen(
+    backend: &Entity<Backend>,
+    window: &mut Window,
+    cx: &mut App,
+) -> Entity<TabbedScreen> {
     cx.new(|cx| {
         let mut screen = TabbedScreen::new("listing-tab");
         let page = cx.new(|cx| ListPage::new(items::Items::default(), backend, window, cx));
@@ -102,7 +106,15 @@ fn limit_cell<A: Clone + 'static>(
     emit: &Emit<A>,
     cx: &App,
 ) -> AnyElement {
-    cells::stepped_price(id, value, LIMIT_STEP, step(-LIMIT_STEP), step(LIMIT_STEP), emit, cx)
+    cells::stepped_price(
+        id,
+        value,
+        LIMIT_STEP,
+        step(-LIMIT_STEP),
+        step(LIMIT_STEP),
+        emit,
+        cx,
+    )
 }
 
 /// A price limit read from an edit dialog. Emptying the field of one row

@@ -10,7 +10,11 @@ use crate::{
     ui::{page::ListPage, screen::TabbedScreen},
 };
 
-pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> Entity<TabbedScreen> {
+pub fn screen(
+    backend: &Entity<Backend>,
+    window: &mut Window,
+    cx: &mut App,
+) -> Entity<TabbedScreen> {
     cx.new(|cx| {
         let mut screen = TabbedScreen::new("orders-tab");
         let page = cx.new(|cx| ListPage::new(list::Orders::default(), backend, window, cx));

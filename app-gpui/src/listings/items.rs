@@ -6,8 +6,8 @@ use gpui::{AnyElement, App, IntoElement, ParentElement, Styled, div, px};
 use gpui_kit_assets::IconName;
 
 use super::{
-    StockData, bulk_toolbar, every_row, ids, limit_cell, limit_field, load_stock, market_url,
-    slug, status_chips, status_filter, stepped,
+    StockData, bulk_toolbar, every_row, ids, limit_cell, limit_field, load_stock, market_url, slug,
+    status_chips, status_filter, stepped,
 };
 use crate::{
     data::{DataKind, DataSource},
@@ -32,11 +32,21 @@ pub enum ItemAction {
     Add,
     Create(NewStockItem),
     Sell(u64),
-    Sold { id: u64, quantity: i64, total: i64 },
+    Sold {
+        id: u64,
+        quantity: i64,
+        total: i64,
+    },
     SellAtList(u64),
     Edit(Vec<u64>),
-    Save { ids: Vec<u64>, update: StockItemUpdate },
-    StepMinPrice { id: u64, step: i64 },
+    Save {
+        ids: Vec<u64>,
+        update: StockItemUpdate,
+    },
+    StepMinPrice {
+        id: u64,
+        step: i64,
+    },
     ToggleHidden(u64),
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
@@ -95,13 +105,9 @@ impl Items {
             _ => None,
         };
         let properties = single.as_ref().map(|item| item.properties.clone());
-        let bought = Field::platinum(
-            "bought",
-            "Bought",
-            single.as_ref().map(|item| item.bought),
-        )
-        .hint("Average paid per unit.")
-        .half();
+        let bought = Field::platinum("bought", "Bought", single.as_ref().map(|item| item.bought))
+            .hint("Average paid per unit.")
+            .half();
         let owned = Field::number("owned", "Owned", single.as_ref().map(|item| item.owned))
             .min(1)
             .half();
@@ -264,7 +270,12 @@ impl Catalog for Items {
         let rows = &self.data.rows;
         let report = &self.data.report;
         let units: i64 = rows.iter().map(|item| item.owned).sum();
-        let live = self.data.counts.get(&StockStatus::Live).copied().unwrap_or(0);
+        let live = self
+            .data
+            .counts
+            .get(&StockStatus::Live)
+            .copied()
+            .unwrap_or(0);
         vec![
             Stat {
                 label: "Bought",
@@ -564,11 +575,7 @@ impl Catalog for Items {
                             .in_row()
                             .on_click(emit.on_click(ItemAction::Edit(vec![id]))),
                     )
-                    .child(overflow_button(
-                        id,
-                        move || Self::row_menu(&menu_row),
-                        emit,
-                    ))
+                    .child(overflow_button(id, move || Self::row_menu(&menu_row), emit))
                     .into_any_element()
             }
         }
@@ -603,7 +610,11 @@ impl Catalog for Items {
         }
         menu.extend([
             MenuEntry::new("Edit", IconName::SquarePen, ItemAction::Edit(vec![id])),
-            MenuEntry::new("Show details", IconName::PanelRight, ItemAction::Details(id)),
+            MenuEntry::new(
+                "Show details",
+                IconName::PanelRight,
+                ItemAction::Details(id),
+            ),
             if row.is_hidden {
                 MenuEntry::new(
                     "Show on Warframe Market",

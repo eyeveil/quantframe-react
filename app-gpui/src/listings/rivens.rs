@@ -185,13 +185,25 @@ pub enum RivenAction {
     Add,
     Create(NewStockRiven),
     Sell(u64),
-    Sold { id: u64, price: i64 },
+    Sold {
+        id: u64,
+        price: i64,
+    },
     SellAtList(u64),
     Edit(Vec<u64>),
-    Save { ids: Vec<u64>, update: StockRivenUpdate },
-    StepMinPrice { id: u64, step: i64 },
+    Save {
+        ids: Vec<u64>,
+        update: StockRivenUpdate,
+    },
+    StepMinPrice {
+        id: u64,
+        step: i64,
+    },
     Filter(u64),
-    SaveFilter { id: u64, filter: RivenFilter },
+    SaveFilter {
+        id: u64,
+        filter: RivenFilter,
+    },
     ToggleHidden(u64),
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
@@ -362,7 +374,11 @@ impl Rivens {
                     .optional()
                     .half(),
             )
-            .field(Field::number("rolls_max", "Re-rolls to", rolls_max).optional().half())
+            .field(
+                Field::number("rolls_max", "Re-rolls to", rolls_max)
+                    .optional()
+                    .half(),
+            )
             .field(
                 Field::number("mastery_min", "Mastery rank from", mastery_min)
                     .min(MIN_MASTERY)
@@ -393,7 +409,12 @@ impl Rivens {
                 "Needs a negative attribute",
                 filter.required_negative,
             ));
-        for (index, attribute) in riven.attributes.iter().enumerate().take(ATTRIBUTE_KEYS.len()) {
+        for (index, attribute) in riven
+            .attributes
+            .iter()
+            .enumerate()
+            .take(ATTRIBUTE_KEYS.len())
+        {
             let required = filter
                 .attributes
                 .iter()
@@ -530,7 +551,12 @@ impl Catalog for Rivens {
     fn summary(&self) -> Vec<Stat> {
         let rows = &self.data.rows;
         let report = &self.data.report;
-        let live = self.data.counts.get(&StockStatus::Live).copied().unwrap_or(0);
+        let live = self
+            .data
+            .counts
+            .get(&StockStatus::Live)
+            .copied()
+            .unwrap_or(0);
         vec![
             Stat {
                 label: "Bought",
@@ -602,11 +628,12 @@ impl Catalog for Rivens {
                 ),
                 None => Outcome::Done,
             },
-            RivenAction::SellAtList(id) => match self.riven(id).and_then(|riven| riven.list_price)
-            {
-                Some(price) => self.perform(RivenAction::Sold { id, price }, source),
-                None => Outcome::Done,
-            },
+            RivenAction::SellAtList(id) => {
+                match self.riven(id).and_then(|riven| riven.list_price) {
+                    Some(price) => self.perform(RivenAction::Sold { id, price }, source),
+                    None => Outcome::Done,
+                }
+            }
             RivenAction::Sold { id, price } => match self.riven(id) {
                 Some(riven) => Outcome::run(
                     source.stock_riven_sell(&riven, price),
@@ -677,10 +704,11 @@ impl Catalog for Rivens {
                 None => Outcome::Done,
             },
             RivenAction::Delete(rows) if rows.is_empty() => Outcome::Done,
-            RivenAction::Delete(rows) => Outcome::ask(
-                prompts::delete(rows.len(), "riven", "rivens"),
-                move |_| Some(RivenAction::Deleted(rows.clone())),
-            ),
+            RivenAction::Delete(rows) => {
+                Outcome::ask(prompts::delete(rows.len(), "riven", "rivens"), move |_| {
+                    Some(RivenAction::Deleted(rows.clone()))
+                })
+            }
             RivenAction::Deleted(rows) => match rows.as_slice() {
                 [id] => Outcome::run_quietly(source.stock_riven_delete(*id as i64)),
                 _ => Outcome::run_quietly(source.stock_riven_delete_multiple(ids(&rows))),
@@ -785,7 +813,9 @@ impl Catalog for Rivens {
                             .in_row()
                             .on_click(emit.on_click(RivenAction::Filter(id)));
                         if row.filter.enabled {
-                            button.tone(theme.colors.accent).hover_tone(theme.colors.accent)
+                            button
+                                .tone(theme.colors.accent)
+                                .hover_tone(theme.colors.accent)
                         } else {
                             button
                         }
@@ -805,11 +835,7 @@ impl Catalog for Rivens {
                             .in_row()
                             .on_click(emit.on_click(RivenAction::Edit(vec![id]))),
                     )
-                    .child(overflow_button(
-                        id,
-                        move || Self::row_menu(&menu_row),
-                        emit,
-                    ))
+                    .child(overflow_button(id, move || Self::row_menu(&menu_row), emit))
                     .into_any_element()
             }
         }
@@ -929,10 +955,7 @@ impl Catalog for Rivens {
                 Fact::amount("Minimum price", row.properties.min_price, "Not set"),
                 Fact::new("Auction filter", filter_summary(&row.filter)),
                 Fact::new("Mastery rank", number(row.mastery_rank)),
-                Fact::new(
-                    "Rank",
-                    format!("{} of {MAX_RANK}", row.rank.unwrap_or(0)),
-                ),
+                Fact::new("Rank", format!("{} of {MAX_RANK}", row.rank.unwrap_or(0))),
                 Fact::new("Re-rolls", number(row.re_rolls)),
                 Fact::new("Last checked", day_and_time(&row.updated_at)),
             ],

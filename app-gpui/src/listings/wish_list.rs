@@ -34,11 +34,21 @@ pub enum WishAction {
     Add,
     Create(NewStockItem),
     Buy(u64),
-    Bought { id: u64, quantity: i64, total: i64 },
+    Bought {
+        id: u64,
+        quantity: i64,
+        total: i64,
+    },
     BuyAtBid(u64),
     Edit(Vec<u64>),
-    Save { ids: Vec<u64>, update: WishListUpdate },
-    StepMaxPrice { id: u64, step: i64 },
+    Save {
+        ids: Vec<u64>,
+        update: WishListUpdate,
+    },
+    StepMaxPrice {
+        id: u64,
+        step: i64,
+    },
     ToggleHidden(u64),
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
@@ -192,7 +202,9 @@ impl Catalog for WishList {
         vec![
             ColumnSpec::new("item", "Item", 200.).flex().sortable(),
             ColumnSpec::new("rank", "Rank", 120.),
-            ColumnSpec::new("quantity", "Quantity", 96.).end().sortable(),
+            ColumnSpec::new("quantity", "Quantity", 96.)
+                .end()
+                .sortable(),
             ColumnSpec::new("max_price", "Max price", 124.)
                 .sortable()
                 .droppable(2),
@@ -228,7 +240,12 @@ impl Catalog for WishList {
             .iter()
             .map(|wish| wish.list_price.unwrap_or(0) * wish.quantity)
             .sum();
-        let live = self.data.counts.get(&StockStatus::Live).copied().unwrap_or(0);
+        let live = self
+            .data
+            .counts
+            .get(&StockStatus::Live)
+            .copied()
+            .unwrap_or(0);
         vec![
             Stat {
                 label: "Bids",
@@ -387,10 +404,11 @@ impl Catalog for WishList {
                 None => Outcome::Done,
             },
             WishAction::Delete(rows) if rows.is_empty() => Outcome::Done,
-            WishAction::Delete(rows) => Outcome::ask(
-                prompts::delete(rows.len(), "wish", "wishes"),
-                move |_| Some(WishAction::Deleted(rows.clone())),
-            ),
+            WishAction::Delete(rows) => {
+                Outcome::ask(prompts::delete(rows.len(), "wish", "wishes"), move |_| {
+                    Some(WishAction::Deleted(rows.clone()))
+                })
+            }
             WishAction::Deleted(rows) => match rows.as_slice() {
                 [id] => Outcome::run_quietly(source.wish_list_delete(*id as i64)),
                 _ => Outcome::run_quietly(source.wish_list_delete_multiple(ids(&rows))),
@@ -473,11 +491,7 @@ impl Catalog for WishList {
                 cx,
             ),
             "list_price" => cells::amount(row.list_price, "No bid", cx),
-            "total" => cells::amount(
-                row.list_price.map(|price| price * row.quantity),
-                "",
-                cx,
-            ),
+            "total" => cells::amount(row.list_price.map(|price| price * row.quantity), "", cx),
             "status" => cells::status(theme.status_color(row.status), row.status.label(), cx),
             _ => {
                 let menu_row = row.clone();
@@ -503,11 +517,7 @@ impl Catalog for WishList {
                             .in_row()
                             .on_click(emit.on_click(WishAction::Edit(vec![id]))),
                     )
-                    .child(overflow_button(
-                        id,
-                        move || Self::row_menu(&menu_row),
-                        emit,
-                    ))
+                    .child(overflow_button(id, move || Self::row_menu(&menu_row), emit))
                     .into_any_element()
             }
         }
@@ -542,7 +552,11 @@ impl Catalog for WishList {
         }
         menu.extend([
             MenuEntry::new("Edit", IconName::SquarePen, WishAction::Edit(vec![id])),
-            MenuEntry::new("Show details", IconName::PanelRight, WishAction::Details(id)),
+            MenuEntry::new(
+                "Show details",
+                IconName::PanelRight,
+                WishAction::Details(id),
+            ),
             if row.is_hidden {
                 MenuEntry::new(
                     "Show on Warframe Market",

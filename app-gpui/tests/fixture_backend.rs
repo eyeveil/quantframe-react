@@ -41,7 +41,10 @@ fn offline(name: &str, result: DataResult<impl std::fmt::Debug>) {
 /// entries, which come from Quantframe's own cache download.
 fn needs_mod_cache<T: std::fmt::Debug>(name: &str, result: DataResult<T>) {
     if let Err(error) = result {
-        assert!(error.message.contains("Riven upgrade not found"), "{name} failed: {error}");
+        assert!(
+            error.message.contains("Riven upgrade not found"),
+            "{name} failed: {error}"
+        );
     }
 }
 
@@ -67,7 +70,10 @@ async fn cache_lists(source: &DataSource) {
         .expect("typing rhino finds Rhino Prime Set");
     assert_eq!(set.wfm_url, "rhino_prime_set");
     assert!(!set.bulk_tradable);
-    let flow = items.iter().find(|item| item.name == "Primed Flow").expect("Primed Flow");
+    let flow = items
+        .iter()
+        .find(|item| item.name == "Primed Flow")
+        .expect("Primed Flow");
     assert_eq!(flow.max_rank, Some(10));
     assert!(
         items
@@ -82,7 +88,10 @@ async fn cache_lists(source: &DataSource) {
         source.cache_get_riven_weapons().await,
     );
     assert!(weapons.len() > 300, "only {} riven weapons", weapons.len());
-    let rubico = weapons.iter().find(|weapon| weapon.name == "Rubico").expect("Rubico");
+    let rubico = weapons
+        .iter()
+        .find(|weapon| weapon.name == "Rubico")
+        .expect("Rubico");
     assert_eq!(rubico.wfm_url, "rubico");
     assert_eq!(rubico.riven_type, "rifle");
     assert!(!rubico.wfm_id.is_empty());
@@ -97,7 +106,10 @@ async fn cache_lists(source: &DataSource) {
         .find(|stat| stat.wfm_url == "critical_chance")
         .expect("critical_chance");
     assert_eq!(critical.label, "Critical Chance");
-    let punch = stats.iter().find(|stat| stat.wfm_url == "punch_through").expect("punch_through");
+    let punch = stats
+        .iter()
+        .find(|stat| stat.wfm_url == "punch_through")
+        .expect("punch_through");
     assert!(punch.fits("rifle") && !punch.fits("melee"));
 }
 
@@ -113,8 +125,12 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
         .find(|item| item.properties.min_price.is_some())
         .expect("a stock item with a minimum price");
     assert_eq!(limited.properties.min_price, Some(limited.bought + 5));
-    assert!(items.iter().any(|item| item.properties.min_sma == Some(15)
-        && item.properties.min_profit == Some(10)));
+    assert!(
+        items
+            .iter()
+            .any(|item| item.properties.min_sma == Some(15)
+                && item.properties.min_profit == Some(10))
+    );
     assert!(items.iter().any(|item| item.properties.is_bulk));
     let item = items
         .iter()
@@ -173,7 +189,13 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
         .iter()
         .find(|riven| riven.filter.enabled)
         .expect("a riven with a filter");
-    assert_eq!(filtered.filter.mastery_rank, Some(MinMax { min: 8, max: Some(16) }));
+    assert_eq!(
+        filtered.filter.mastery_rank,
+        Some(MinMax {
+            min: 8,
+            max: Some(16)
+        })
+    );
     assert_eq!(filtered.filter.similarity, Some(60.0));
     assert_eq!(filtered.filter.attributes.len(), filtered.attributes.len());
     assert!(
@@ -196,7 +218,10 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
         .clone();
     let mut filter = RivenFilter {
         enabled: true,
-        re_rolls: Some(MinMax { min: 2, max: Some(20) }),
+        re_rolls: Some(MinMax {
+            min: 2,
+            max: Some(20),
+        }),
         required_negative: true,
         attributes: riven
             .attributes
@@ -249,8 +274,16 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
         .iter()
         .find(|wish| wish.properties.max_price.is_some())
         .expect("a wish with a maximum price");
-    assert!(capped.properties.max_price.is_some_and(|price| price > 12));
-    assert!(wishes.iter().any(|wish| wish.properties.min_price.is_some()));
+    assert_eq!(
+        capped.properties.max_price,
+        capped.list_price.map(|price| price + 12)
+    );
+    assert!(wishes.iter().all(|wish| wish.list_price.is_some()));
+    assert!(
+        wishes
+            .iter()
+            .any(|wish| wish.properties.min_price.is_some())
+    );
     assert!(wishes.iter().any(|wish| wish.properties.is_bulk));
     let wish = wishes[1].clone();
     let saved = ok(
@@ -311,7 +344,11 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
     )
     .results;
     assert!(orders.iter().all(|order| order.potential_profit.is_some()));
-    assert!(orders.iter().all(|order| order.closed_avg.is_some_and(|avg| avg > 0.0)));
+    assert!(
+        orders
+            .iter()
+            .all(|order| order.closed_avg.is_some_and(|avg| avg > 0.0))
+    );
     let sell_profit: i64 = orders
         .iter()
         .filter(|order| order.order_type == OrderType::Sell)
@@ -322,14 +359,25 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
         source.get_wfm_orders_status_counts().await,
     );
     assert!(sell_profit > 0);
-    assert_eq!(totals[&OrderType::Sell].potential_profit, sell_profit as f64);
+    assert_eq!(
+        totals[&OrderType::Sell].potential_profit,
+        sell_profit as f64
+    );
 
     let auctions = ok(
         "get_wfm_auctions_pagination",
         source.get_wfm_auctions_pagination(list).await,
     )
     .results;
-    assert_eq!(auctions.iter().filter(|auction| auction.can_import).count(), 2);
+    assert_eq!(
+        auctions.iter().filter(|auction| auction.can_import).count(),
+        2
+    );
+    let overview = ok(
+        "get_wfm_auctions_overview",
+        source.get_wfm_auctions_overview().await,
+    );
+    assert_eq!(overview.potential_profit, 100 + 168 + 210 + 103 + 100);
     assert!(
         auctions
             .iter()

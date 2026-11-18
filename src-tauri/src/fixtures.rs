@@ -6,6 +6,7 @@ use std::{
 use entity::{stock_item, stock_riven, syndicate_item, trade_entry, transaction, wish_list};
 use serde::Deserialize;
 use service::{
+    sea_orm::{EntityTrait, PaginatorTrait},
     StockItemMutation, StockRivenMutation, SyndicateItemMutation, TradeEntryMutation,
     TransactionMutation, WishListMutation,
 };
@@ -64,7 +65,24 @@ pub fn prepare_storage(fixtures: &Path) -> Result<(), Error> {
 }
 
 /// Fills the database and the warframe.market caches. Runs after `setup_manages`.
+/// A database that already has stock items, from an earlier run on the same
+/// `QF_STORAGE_DIR`, keeps its rows, so edits survive a restart.
 pub async fn seed(fixtures: &Path) -> Result<(), Error> {
+    let conn = DATABASE.get().expect("Database not initialized");
+    let existing = stock_item::Entity::find().count(conn).await.unwrap_or(0);
+    if existing == 0 {
+        seed_database(fixtures).await?;
+    } else {
+        info(
+            "Fixtures:Seed",
+            format!("Kept the {existing} stock items already in the database"),
+            &LoggerOptions::default(),
+        );
+    }
+    seed_market(fixtures).await
+}
+
+async fn seed_database(fixtures: &Path) -> Result<(), Error> {
     let conn = DATABASE.get().expect("Database not initialized");
     let db: Database = read_json_file(&fixtures.join("database.json"))?;
     let counts = format!(
@@ -83,7 +101,13 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
         StockRivenMutation::create(conn, model).await?;
     }
     for model in &db.wish_list {
-        WishListMutation::create(conn, model).await?;
+        let created = WishListMutation::create(conn, model).await?;
+        // `create` starts every wish as pending with no bid.
+        let update = wish_list::UpdateWishList::new(created.id)
+            .with_list_price(model.list_price)
+            .with_status(model.status.clone())
+            .with_price_history(model.price_history.0.clone());
+        WishListMutation::update_by_id(conn, update).await?;
     }
     for model in &db.transactions {
         TransactionMutation::create(conn, model, false).await?;
@@ -94,7 +118,15 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
     for model in db.syndicate_items {
         SyndicateItemMutation::create(conn, model).await?;
     }
+    info(
+        "Fixtures:Seed",
+        format!("Seeded {counts} from {}", fixtures.display()),
+        &LoggerOptions::default(),
+    );
+    Ok(())
+}
 
+async fn seed_market(fixtures: &Path) -> Result<(), Error> {
     let mut orders: OrderList<Order> = read_json_file(&fixtures.join("wfm_orders.json"))?;
     let auctions: AuctionList<Auction> = read_json_file(&fixtures.join("wfm_auctions.json"))?;
     let chats: ChatList = read_json_file(&fixtures.join("wfm_chats.json"))?;
@@ -113,7 +145,7 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
 
     info(
         "Fixtures:Seed",
-        format!("Seeded {counts}, {wfm_counts} from {}", fixtures.display()),
+        format!("Seeded {wfm_counts} from {}", fixtures.display()),
         &LoggerOptions::default(),
     );
     Ok(())

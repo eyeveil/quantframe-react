@@ -18,7 +18,7 @@ The app starts the backend and shows a loading screen until the backend sends `a
 
 - Fixture mode reads `src-tauri/fixtures` into a fresh temp directory and makes no network request. Pick it with `--fixtures <dir>` or `QF_FIXTURES=<dir>`. Debug builds use `src-tauri/fixtures` when neither is set.
 - Live mode uses the real app data directory, warframe.market and the Quantframe API. Release builds run in live mode when no fixture directory is named, and debug builds run in live mode with `--live`.
-- `QF_STORAGE_DIR=<dir>` replaces the data directory in either mode.
+- `QF_STORAGE_DIR=<dir>` replaces the data directory in either mode. In fixture mode the fixtures fill its database only while it has no stock items, so edits made on one run are still there on the next.
 
 Run the data layer test without network:
 

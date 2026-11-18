@@ -9,15 +9,17 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use gpui::{AnyElement, App, AppContext, Entity, IntoElement, ParentElement, Styled, Window, div, px};
+use gpui::{
+    AnyElement, App, AppContext, Entity, IntoElement, ParentElement, Styled, Window, div, px,
+};
 use gpui_kit_assets::IconName;
 
 use crate::{
     data::{Backend, DataKind, DataResult, DataSource},
     model::{
         ListParams, NewTradeEntry, PriceLookupParams, RivenWeapon, SubType, TradableItem,
-        TradeEntry, TradeEntryGroup, TradeEntryListParams, TradeEntryProperties,
-        TradeEntryUpdate, tag_label,
+        TradeEntry, TradeEntryGroup, TradeEntryListParams, TradeEntryProperties, TradeEntryUpdate,
+        tag_label,
     },
     theme::Theme,
     ui::{
@@ -45,7 +47,11 @@ const GROUPS: [(TradeEntryGroup, &str); 3] = [
     (TradeEntryGroup::Riven, "Rivens"),
 ];
 
-pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> Entity<TabbedScreen> {
+pub fn screen(
+    backend: &Entity<Backend>,
+    window: &mut Window,
+    cx: &mut App,
+) -> Entity<TabbedScreen> {
     cx.new(|cx| {
         let mut screen = TabbedScreen::new("trade-tab");
         for (group, label) in GROUPS {
@@ -87,8 +93,14 @@ pub enum TradeAction {
     FindRivens,
     FoundRivens(RivenSearch),
     Edit(Vec<u64>),
-    Save { ids: Vec<u64>, update: TradeEntryUpdate },
-    StepPrice { id: u64, step: i64 },
+    Save {
+        ids: Vec<u64>,
+        update: TradeEntryUpdate,
+    },
+    StepPrice {
+        id: u64,
+        step: i64,
+    },
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
     Details(u64),
@@ -148,7 +160,10 @@ fn updated(entry: &TradeEntry) -> String {
 
 impl TradeEntries {
     fn entry(&self, id: u64) -> Option<TradeEntry> {
-        self.rows.iter().find(|entry| entry.id as u64 == id).cloned()
+        self.rows
+            .iter()
+            .find(|entry| entry.id as u64 == id)
+            .cloned()
     }
 
     fn params(&self) -> TradeEntryListParams {
@@ -167,6 +182,14 @@ impl TradeEntries {
         match self.group {
             TradeEntryGroup::Riven => "WTB",
             TradeEntryGroup::Item | TradeEntryGroup::Custom => "WTS",
+        }
+    }
+
+    /// Riven entries give two of the tag column's width to the market columns.
+    const fn tags_width(&self) -> f32 {
+        match self.group {
+            TradeEntryGroup::Riven => 200.,
+            TradeEntryGroup::Item | TradeEntryGroup::Custom => 280.,
         }
     }
 
@@ -214,9 +237,13 @@ impl TradeEntries {
                         .half()
                         .hint("For mods and arcanes."),
                 ),
-            (TradeEntryGroup::Riven, Lookup::Weapons(weapons)) if !weapons.is_empty() => {
-                spec.field(Field::search("item", "Weapon", choices::weapons(weapons), None))
-            }
+            (TradeEntryGroup::Riven, Lookup::Weapons(weapons)) if !weapons.is_empty() => spec
+                .field(Field::search(
+                    "item",
+                    "Weapon",
+                    choices::weapons(weapons),
+                    None,
+                )),
             (TradeEntryGroup::Item, _) => spec
                 .field(
                     Field::text("name", "Item", "", "Arcane Energize")
@@ -387,7 +414,7 @@ impl Catalog for TradeEntries {
             ]);
         }
         columns.extend([
-            ColumnSpec::new("tags", "Tags", 280.).droppable(1),
+            ColumnSpec::new("tags", "Tags", self.tags_width()).droppable(1),
             ColumnSpec::new("updated", "Updated", 148.)
                 .sortable()
                 .droppable(2),
@@ -721,11 +748,7 @@ impl Catalog for TradeEntries {
                             .hover_tone(theme.colors.negative)
                             .on_click(emit.on_click(TradeAction::Delete(vec![id]))),
                     )
-                    .child(overflow_button(
-                        id,
-                        move || Self::row_menu(&menu_row),
-                        emit,
-                    ))
+                    .child(overflow_button(id, move || Self::row_menu(&menu_row), emit))
                     .into_any_element()
             }
         }
@@ -753,7 +776,11 @@ impl Catalog for TradeEntries {
                 TradeAction::Message(vec![id]),
             ),
             MenuEntry::new("Edit", IconName::SquarePen, TradeAction::Edit(vec![id])),
-            MenuEntry::new("Show details", IconName::PanelRight, TradeAction::Details(id)),
+            MenuEntry::new(
+                "Show details",
+                IconName::PanelRight,
+                TradeAction::Details(id),
+            ),
             MenuEntry::new("Copy name", IconName::Copy, TradeAction::CopyName(id)),
             MenuEntry::new("Delete", IconName::Trash, TradeAction::Delete(vec![id])).separated(),
         ]

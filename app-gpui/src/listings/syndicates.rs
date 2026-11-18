@@ -31,11 +31,20 @@ use crate::{
 pub enum SyndicateAction {
     Import,
     Sell(u64),
-    Sold { id: u64, price: i64 },
+    Sold {
+        id: u64,
+        price: i64,
+    },
     SellAtList(u64),
     Edit(u64),
-    Save { id: u64, update: SyndicateItemUpdate },
-    StepMinPrice { id: u64, step: i64 },
+    Save {
+        id: u64,
+        update: SyndicateItemUpdate,
+    },
+    StepMinPrice {
+        id: u64,
+        step: i64,
+    },
     Delete(Vec<u64>),
     Deleted(Vec<u64>),
     Details(u64),
@@ -138,9 +147,7 @@ impl Catalog for Syndicates {
             ColumnSpec::new("list_price", "List price", 104.)
                 .end()
                 .sortable(),
-            ColumnSpec::new("min_price", "Min price", 124.)
-                .sortable()
-                .droppable(4),
+            ColumnSpec::new("min_price", "Min price", 124.).sortable(),
             ColumnSpec::new("rate", "Per 1,000 standing", 144.)
                 .end()
                 .sortable()
@@ -253,7 +260,11 @@ impl Catalog for Syndicates {
         })
     }
 
-    fn perform(&mut self, action: SyndicateAction, source: &DataSource) -> Outcome<SyndicateAction> {
+    fn perform(
+        &mut self,
+        action: SyndicateAction,
+        source: &DataSource,
+    ) -> Outcome<SyndicateAction> {
         match action {
             SyndicateAction::Import => {
                 let import = source.syndicate_item_import_items();
@@ -282,11 +293,7 @@ impl Catalog for Syndicates {
             }
             SyndicateAction::Sold { id, price } => match self.item(id) {
                 Some(item) => {
-                    let notice = format!(
-                        "Sold {} for {} platinum.",
-                        item.item_name,
-                        number(price)
-                    );
+                    let notice = format!("Sold {} for {} platinum.", item.item_name, number(price));
                     Outcome::run(
                         source.syndicate_item_sell(
                             item.wfm_url,
@@ -448,11 +455,7 @@ impl Catalog for Syndicates {
                             .in_row()
                             .on_click(emit.on_click(SyndicateAction::Edit(id))),
                     )
-                    .child(overflow_button(
-                        id,
-                        move || Self::row_menu(&menu_row),
-                        emit,
-                    ))
+                    .child(overflow_button(id, move || Self::row_menu(&menu_row), emit))
                     .into_any_element()
             }
         }

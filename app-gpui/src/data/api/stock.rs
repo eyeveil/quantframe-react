@@ -10,9 +10,7 @@ use qf_app_lib::{
 };
 use serde_json::{Value, json};
 
-use super::{
-    all, dto, status_counts, stock_list, syndicate_list, to_backend, with_properties,
-};
+use super::{all, dto, status_counts, stock_list, syndicate_list, to_backend, with_properties};
 use crate::{
     data::{DataResult, DataSource, convert},
     model::*,
@@ -592,7 +590,10 @@ fn stock_riven_changes(id: i64, update: &StockRivenUpdate) -> Value {
             ("re_rolls", update.re_rolls.map(|v| json!(v))),
             ("mastery_rank", update.mastery_rank.map(|v| json!(v))),
             ("is_hidden", update.is_hidden.map(|v| json!(v))),
-            ("filter", update.filter.as_ref().map(convert::backend_riven_filter)),
+            (
+                "filter",
+                update.filter.as_ref().map(convert::backend_riven_filter),
+            ),
         ],
         &[("min_price", update.min_price.map(|v| json!(v)))],
     )

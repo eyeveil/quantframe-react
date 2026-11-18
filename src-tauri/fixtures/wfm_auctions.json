@@ -41,7 +41,10 @@
    },
    "name": "Rubico Hexa-critatis",
    "mod_name": "Hexa-critatis",
-   "uuid": "5d773e58-3c14-5c3a-bff2-5a39ef1c8bbb"
+   "uuid": "5d773e58-3c14-5c3a-bff2-5a39ef1c8bbb",
+   "properties": {
+    "potential_profit": 100
+   }
   },
   {
    "id": "8ffb13a4bdcb73f7319f22a4",
@@ -84,7 +87,10 @@
    },
    "name": "Kuva Bramma Igni-toxidex",
    "mod_name": "Igni-toxidex",
-   "uuid": "7f9e4701-8dce-5684-a45a-fbd8ff4cf2c4"
+   "uuid": "7f9e4701-8dce-5684-a45a-fbd8ff4cf2c4",
+   "properties": {
+    "potential_profit": 168
+   }
   },
   {
    "id": "ed77f1314fe73a88ea299f3b",
@@ -132,7 +138,10 @@
    },
    "name": "Acceltra Igni-critadex",
    "mod_name": "Igni-critadex",
-   "uuid": "3062e9be-1324-5688-a818-550bd642cfdf"
+   "uuid": "3062e9be-1324-5688-a818-550bd642cfdf",
+   "properties": {
+    "potential_profit": 210
+   }
   },
   {
    "id": "616190d15e22732e02e89731",
@@ -180,7 +189,10 @@
    },
    "name": "Torid Toxi-satidex",
    "mod_name": "Toxi-satidex",
-   "uuid": "fixture-auction-03"
+   "uuid": "fixture-auction-03",
+   "properties": {
+    "potential_profit": 103
+   }
   },
   {
    "id": "263cbe8f66b74bd73c276aae",
@@ -223,7 +235,10 @@
    },
    "name": "Nikana Acri-satican",
    "mod_name": "Acri-satican",
-   "uuid": "fixture-auction-04"
+   "uuid": "fixture-auction-04",
+   "properties": {
+    "potential_profit": 100
+   }
   }
  ]
 }

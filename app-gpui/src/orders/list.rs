@@ -2,17 +2,15 @@
 
 use std::{cmp::Ordering, collections::BTreeMap};
 
-use gpui::{AnyElement, App, Hsla, IntoElement, ParentElement, Styled, div, px};
 use crate::ui::numeric;
+use gpui::{AnyElement, App, Hsla, IntoElement, ParentElement, Styled, div, px};
 use gpui_kit_assets::IconName;
 use serde_json::json;
 
 use super::row_key;
 use crate::{
     data::{DataKind, DataSource},
-    model::{
-        ListParams, NewStockItem, OrderListParams, OrderTotals, OrderType, SubType, WfmOrder,
-    },
+    model::{ListParams, NewStockItem, OrderListParams, OrderTotals, OrderType, SubType, WfmOrder},
     theme::Theme,
     ui::{
         IconButton, cells, day_and_time,
@@ -160,7 +158,9 @@ impl Catalog for Orders {
             ColumnSpec::new("item", "Item", 200.).flex().sortable(),
             ColumnSpec::new("type", "Type", 96.).sortable(),
             ColumnSpec::new("rank", "Rank", 120.),
-            ColumnSpec::new("quantity", "Quantity", 92.).end().sortable(),
+            ColumnSpec::new("quantity", "Quantity", 92.)
+                .end()
+                .sortable(),
             ColumnSpec::new("platinum", "Price", 92.).end().sortable(),
             ColumnSpec::new("total", "Total", 96.)
                 .end()
@@ -296,9 +296,11 @@ impl Catalog for Orders {
             OrderAction::Trade(key) => match self.order(key) {
                 Some(order) => {
                     let spec = match order.order_type {
-                        OrderType::Sell => {
-                            prompts::sold(&order.item_name, Some(order.quantity), Some(total(&order)))
-                        }
+                        OrderType::Sell => prompts::sold(
+                            &order.item_name,
+                            Some(order.quantity),
+                            Some(total(&order)),
+                        ),
                         OrderType::Buy => prompts::bought(
                             &order.item_name,
                             Some(order.quantity),
@@ -393,10 +395,11 @@ impl Catalog for Orders {
                 }
                 None => Outcome::Done,
             },
-            OrderAction::Delete(key) => Outcome::ask(
-                prompts::delete(1, "order", "orders"),
-                move |_| Some(OrderAction::Deleted(key)),
-            ),
+            OrderAction::Delete(key) => {
+                Outcome::ask(prompts::delete(1, "order", "orders"), move |_| {
+                    Some(OrderAction::Deleted(key))
+                })
+            }
             OrderAction::Deleted(key) => match self.order(key) {
                 Some(order) => Outcome::run_quietly(source.order_delete_by_id(order.id)),
                 None => Outcome::Done,
@@ -410,10 +413,9 @@ impl Catalog for Orders {
                 None => Outcome::Done,
             },
             OrderAction::OpenMarket(key) => match self.order(key) {
-                Some(order) => Outcome::OpenUrl(format!(
-                    "https://warframe.market/items/{}",
-                    order.item_url
-                )),
+                Some(order) => {
+                    Outcome::OpenUrl(format!("https://warframe.market/items/{}", order.item_url))
+                }
                 None => Outcome::Done,
             },
         }
@@ -449,7 +451,11 @@ impl Catalog for Orders {
                 }
                 cells::name(row.item_name.clone(), &flags, cx)
             }
-            "type" => cells::status(type_color(row.order_type, theme), row.order_type.label(), cx),
+            "type" => cells::status(
+                type_color(row.order_type, theme),
+                row.order_type.label(),
+                cx,
+            ),
             "rank" => cells::text(variant(row).unwrap_or_default()),
             "quantity" => cells::amount(Some(row.quantity), "", cx),
             "platinum" => cells::amount(Some(row.platinum), "", cx),
@@ -485,11 +491,7 @@ impl Catalog for Orders {
                             .hover_tone(theme.colors.negative)
                             .on_click(emit.on_click(OrderAction::Delete(id))),
                     )
-                    .child(overflow_button(
-                        id,
-                        move || Self::row_menu(&menu_row),
-                        emit,
-                    ))
+                    .child(overflow_button(id, move || Self::row_menu(&menu_row), emit))
                     .into_any_element()
             }
         }
@@ -522,7 +524,11 @@ impl Catalog for Orders {
                 IconName::ShoppingCart,
                 OrderAction::TradeAtPrice(id),
             ),
-            MenuEntry::new("Show details", IconName::PanelRight, OrderAction::Details(id)),
+            MenuEntry::new(
+                "Show details",
+                IconName::PanelRight,
+                OrderAction::Details(id),
+            ),
             MenuEntry::new("Copy name", IconName::Copy, OrderAction::CopyName(id)).separated(),
             MenuEntry::new(
                 "Open on Warframe Market",
@@ -564,8 +570,9 @@ impl Catalog for Orders {
                 match row.potential_profit {
                     Some(profit) => Fact::new("Estimated profit per unit", number(profit))
                         .tone(Tone::of_profit(profit)),
-                    None => Fact::new("Estimated profit per unit", "No price data")
-                        .tone(Tone::Muted),
+                    None => {
+                        Fact::new("Estimated profit per unit", "No price data").tone(Tone::Muted)
+                    }
                 },
                 match row.closed_avg {
                     Some(average) => Fact::new("Closing average", format!("{average:.1}")),

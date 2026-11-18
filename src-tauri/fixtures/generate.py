@@ -432,8 +432,9 @@ def add_trader_properties(db, orders, auctions):
         order["properties"] = {"closed_avg": closed_avg,
                                "potential_profit": round(closed_avg - order["platinum"])}
     for n, auction in enumerate(auctions):
-        auction["uuid"] = (stock_riven_uuid(db["stock_rivens"][n]) if n < 3
-                           else f"fixture-auction-{n:02d}")
+        riven = db["stock_rivens"][n]
+        auction["uuid"] = stock_riven_uuid(riven) if n < 3 else f"fixture-auction-{n:02d}"
+        auction["properties"] = {"potential_profit": auction["starting_price"] - riven["bought"]}
     entries = db["trade_entries"]
     for n, (name, price, tags) in enumerate(CUSTOM_ENTRIES):
         entries.append({

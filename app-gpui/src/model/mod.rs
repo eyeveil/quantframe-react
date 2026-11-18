@@ -22,8 +22,8 @@ mod wfm;
 mod wish_list;
 
 pub use analytics::{ItemPrice, PriceLookupParams, RivenPrice, SyndicateItemPrice, UserActivity};
-pub use cache::{RivenStat, RivenWeapon, TradableItem};
 pub use app::{AppInfo, EeLogLine, EeLogParams, GdprState, RouteLimiter, WfmDebugState};
+pub use cache::{RivenStat, RivenWeapon, TradableItem};
 pub use dashboard::{BestSeller, CategorySummary, Chart, DashboardSummary, PeriodSummary};
 pub use financial_report::FinancialReport;
 pub use inventory::{InventoryRiven, InventorySyndicate};

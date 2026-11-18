@@ -219,25 +219,27 @@ impl Catalog for Auctions {
                 source.auction_delete_all(),
                 "Deleted the auctions from Warframe Market.",
             ),
-            AuctionAction::Import(key) => match self.auction(key).filter(|auction| auction.can_import) {
-                Some(auction) => Outcome::ask(
-                    FormSpec::new(format!("Import {}", title(&auction)), "Import")
-                        .description(
-                            "This adds the riven to your stock, so the live scraper prices it.",
-                        )
-                        .field(
-                            Field::platinum("bought", "Bought", Some(0))
-                                .hint("What you paid for the riven."),
-                        ),
-                    move |values| {
-                        Some(AuctionAction::Imported {
-                            key,
-                            bought: values.number("bought")?,
-                        })
-                    },
-                ),
-                None => Outcome::Done,
-            },
+            AuctionAction::Import(key) => {
+                match self.auction(key).filter(|auction| auction.can_import) {
+                    Some(auction) => Outcome::ask(
+                        FormSpec::new(format!("Import {}", title(&auction)), "Import")
+                            .description(
+                                "This adds the riven to your stock, so the live scraper prices it.",
+                            )
+                            .field(
+                                Field::platinum("bought", "Bought", Some(0))
+                                    .hint("What you paid for the riven."),
+                            ),
+                        move |values| {
+                            Some(AuctionAction::Imported {
+                                key,
+                                bought: values.number("bought")?,
+                            })
+                        },
+                    ),
+                    None => Outcome::Done,
+                }
+            }
             AuctionAction::Imported { key, bought } => match self.auction(key) {
                 Some(auction) => Outcome::run(
                     source.auction_import_by_id(auction.id.clone(), bought),
@@ -245,10 +247,11 @@ impl Catalog for Auctions {
                 ),
                 None => Outcome::Done,
             },
-            AuctionAction::Delete(key) => Outcome::ask(
-                prompts::delete(1, "auction", "auctions"),
-                move |_| Some(AuctionAction::Deleted(key)),
-            ),
+            AuctionAction::Delete(key) => {
+                Outcome::ask(prompts::delete(1, "auction", "auctions"), move |_| {
+                    Some(AuctionAction::Deleted(key))
+                })
+            }
             AuctionAction::Deleted(key) => match self.auction(key) {
                 Some(auction) => Outcome::run_quietly(source.auction_delete_by_id(auction.id)),
                 None => Outcome::Done,
@@ -324,11 +327,7 @@ impl Catalog for Auctions {
                             .hover_tone(theme.colors.negative)
                             .on_click(emit.on_click(AuctionAction::Delete(id))),
                     )
-                    .child(overflow_button(
-                        id,
-                        move || Self::row_menu(&menu_row),
-                        emit,
-                    ))
+                    .child(overflow_button(id, move || Self::row_menu(&menu_row), emit))
                     .into_any_element()
             }
         }

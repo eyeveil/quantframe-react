@@ -118,7 +118,11 @@ fn cooldown(properties: &Properties) -> Option<CoolDownInfo> {
 
 fn int(properties: &Properties, key: &str) -> Option<i64> {
     let value: Option<Value> = properties.get_property_value(key, None);
-    value.and_then(|value| value.as_i64().or_else(|| value.as_f64().map(|v| v.round() as i64)))
+    value.and_then(|value| {
+        value
+            .as_i64()
+            .or_else(|| value.as_f64().map(|v| v.round() as i64))
+    })
 }
 
 fn flag(properties: &Properties, key: &str) -> bool {
@@ -222,9 +226,8 @@ fn riven_filter(filter: MatchRivenStruct) -> RivenFilter {
 
 /// The backend form of a riven filter, as `stock_riven_update` reads it.
 pub fn backend_riven_filter(filter: &RivenFilter) -> Value {
-    let min_max = |value: &Option<MinMax>| {
-        value.map(|value| json!({ "min": value.min, "max": value.max }))
-    };
+    let min_max =
+        |value: &Option<MinMax>| value.map(|value| json!({ "min": value.min, "max": value.max }));
     let mut map = serde_json::Map::new();
     map.insert("enabled".into(), json!(filter.enabled));
     if let Some(value) = min_max(&filter.mastery_rank) {
@@ -361,7 +364,11 @@ pub fn trade_entry(model: trade_entry::Model) -> TradeEntry {
     let number = |key: &str| {
         properties
             .and_then(|properties| properties.get(key))
-            .and_then(|value| value.as_i64().or_else(|| value.as_f64().map(|v| v.round() as i64)))
+            .and_then(|value| {
+                value
+                    .as_i64()
+                    .or_else(|| value.as_f64().map(|v| v.round() as i64))
+            })
     };
     let properties = TradeEntryProperties {
         min_price: number("min_price"),
@@ -480,7 +487,11 @@ pub fn order(order: wfm::Order) -> WfmOrder {
         potential_profit: order
             .properties
             .get_property_value::<Option<Value>>("potential_profit", None)
-            .and_then(|value| value.as_i64().or_else(|| value.as_f64().map(|v| v.round() as i64))),
+            .and_then(|value| {
+                value
+                    .as_i64()
+                    .or_else(|| value.as_f64().map(|v| v.round() as i64))
+            }),
         closed_avg: order
             .properties
             .get_property_value::<Option<f64>>("closed_avg", None),
