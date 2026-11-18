@@ -39,6 +39,8 @@ pub fn temp_storage_dir() -> Result<PathBuf, Error> {
     Ok(dir)
 }
 
+const FIXTURE_MARKER: &str = ".quantframe-fixtures";
+
 fn copy_dir(from: &Path, to: &Path) -> Result<(), Error> {
     std::fs::create_dir_all(to).map_err(|e| io_error(to, "Failed to create", e))?;
     for entry in std::fs::read_dir(from).map_err(|e| io_error(from, "Failed to read", e))? {
@@ -58,6 +60,22 @@ fn copy_dir(from: &Path, to: &Path) -> Result<(), Error> {
 /// Puts the fixture cache and user into the storage directory before startup reads them.
 pub fn prepare_storage(fixtures: &Path) -> Result<(), Error> {
     let storage = helper::get_app_storage_path();
+    let marker = storage.join(FIXTURE_MARKER);
+    let has_data = std::fs::read_dir(&storage)
+        .map(|entries| entries.flatten().any(|entry| entry.file_name() != "logs"))
+        .unwrap_or(false);
+    if has_data && !marker.exists() {
+        return Err(Error::new(
+            "Fixtures:PrepareStorage",
+            format!(
+                "{} holds data from a real run. Fixture mode needs an empty directory or one it created.",
+                storage.display()
+            ),
+            get_location!(),
+        ));
+    }
+    std::fs::create_dir_all(&storage).map_err(|e| io_error(&storage, "Failed to create", e))?;
+    std::fs::write(&marker, "").map_err(|e| io_error(&marker, "Failed to write", e))?;
     copy_dir(&fixtures.join("cache"), &storage.join("cache"))?;
     let user = fixtures.join("user.json");
     std::fs::copy(&user, storage.join("auth.json"))

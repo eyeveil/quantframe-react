@@ -124,7 +124,10 @@ fn plain_decimal(value: f64) -> String {
 /// The text an editor shows for a value.
 fn editor_text(kind: Kind, value: &Value) -> String {
     match kind {
-        Kind::Int { .. } => value.as_i64().map(|value| value.to_string()).unwrap_or_default(),
+        Kind::Int { .. } => value
+            .as_i64()
+            .map(|value| value.to_string())
+            .unwrap_or_default(),
         Kind::Decimal { .. } => value.as_f64().map(plain_decimal).unwrap_or_default(),
         Kind::Words { .. } => strings(value).join(", "),
         _ => value.as_str().unwrap_or_default().to_owned(),
@@ -163,7 +166,12 @@ fn choice_label(choices: Choices, value: &str) -> String {
 /// The text of a list cell.
 fn cell_text(kind: Kind, value: &Value) -> String {
     match kind {
-        Kind::Toggle => if value.as_bool().unwrap_or(false) { "Yes" } else { "No" }.to_owned(),
+        Kind::Toggle => if value.as_bool().unwrap_or(false) {
+            "Yes"
+        } else {
+            "No"
+        }
+        .to_owned(),
         Kind::Flags(choices) => {
             let on = strings(value);
             let labels: Vec<_> = choices
@@ -178,10 +186,7 @@ fn cell_text(kind: Kind, value: &Value) -> String {
             }
         }
         Kind::Choice(choices) => choice_label(choices, value.as_str().unwrap_or_default()),
-        Kind::Int { .. } => value
-            .as_i64()
-            .map(crate::ui::number)
-            .unwrap_or_default(),
+        Kind::Int { .. } => value.as_i64().map(crate::ui::number).unwrap_or_default(),
         _ => editor_text(kind, value),
     }
 }
@@ -192,7 +197,10 @@ fn source_parts(value: &Value) -> (&'static str, String) {
         .iter()
         .find_map(|(variant, _, _, key)| {
             let detail = value.get(*variant)?;
-            Some((*variant, detail[*key].as_str().unwrap_or_default().to_owned()))
+            Some((
+                *variant,
+                detail[*key].as_str().unwrap_or_default().to_owned(),
+            ))
         })
         .unwrap_or(("None", String::new()))
 }
@@ -204,18 +212,37 @@ fn source_value(variant: &str, detail: &str) -> Value {
     }
 }
 
+fn apply_user_edits_onto(saved: &Value, draft: &Value, current: &mut Value) {
+    match (saved, draft, current) {
+        (Value::Object(saved), Value::Object(draft), Value::Object(current)) => {
+            for (key, value) in draft {
+                match (saved.get(key), current.get_mut(key)) {
+                    (Some(before), Some(now)) => apply_user_edits_onto(before, value, now),
+                    (Some(before), None) if before == value => {}
+                    _ => {
+                        current.insert(key.clone(), value.clone());
+                    }
+                }
+            }
+        }
+        (saved, draft, current) if saved != draft => *current = draft.clone(),
+        _ => {}
+    }
+}
+
 impl SettingsView {
     pub fn new(backend: &Entity<Backend>, window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let subscription =
-            cx.subscribe_in(backend, window, |view, _, event: &BackendEvent, window, cx| {
-                match event {
-                    BackendEvent::Changed(DataKind::Settings) if !view.dirty() => {
-                        view.load(window, cx);
-                    }
-                    BackendEvent::Changed(DataKind::User) => view.load_user(cx),
-                    _ => {}
+        let subscription = cx.subscribe_in(
+            backend,
+            window,
+            |view, _, event: &BackendEvent, window, cx| match event {
+                BackendEvent::Changed(DataKind::Settings) if !view.dirty() => {
+                    view.load(window, cx);
                 }
-            });
+                BackendEvent::Changed(DataKind::User) => view.load_user(cx),
+                _ => {}
+            },
+        );
         let mut view = Self {
             source: backend.read(cx).source.clone(),
             saved: Loaded::Loading,
@@ -271,7 +298,12 @@ impl SettingsView {
     }
 
     /// Takes what the backend holds as both the saved state and the draft.
-    fn stored(&mut self, settings: Result<Settings, String>, window: &mut Window, cx: &mut Context<Self>) {
+    fn stored(
+        &mut self,
+        settings: Result<Settings, String>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         let value = settings
             .and_then(|settings| serde_json::to_value(settings).map_err(|error| error.to_string()));
         match value {
@@ -327,12 +359,14 @@ impl SettingsView {
                 area.set_value(text.to_owned(), window, cx);
                 area
             });
-            self._subscriptions
-                .push(cx.subscribe(&area, move |view, _, event: &InputEvent, cx| {
+            self._subscriptions.push(cx.subscribe(
+                &area,
+                move |view, _, event: &InputEvent, cx| {
                     if matches!(event, InputEvent::Change) {
                         view.edited(key, field, cx);
                     }
-                }));
+                },
+            ));
             Editor::Area(area)
         } else {
             let input = cx.new(|cx| {
@@ -340,12 +374,14 @@ impl SettingsView {
                 input.set_value(text.to_owned(), window, cx);
                 input
             });
-            self._subscriptions
-                .push(cx.subscribe(&input, move |view, _, event: &InputEvent, cx| {
+            self._subscriptions.push(cx.subscribe(
+                &input,
+                move |view, _, event: &InputEvent, cx| {
                     if matches!(event, InputEvent::Change) {
                         view.edited(key, field, cx);
                     }
-                }));
+                },
+            ));
             Editor::Line(input)
         };
         self.editors.insert(key, editor);
@@ -396,16 +432,36 @@ impl SettingsView {
     }
 
     fn save(&mut self, window: &mut Window, cx: &mut Context<Self>) {
-        let settings = match serde_json::from_value::<Settings>(self.draft.clone()) {
-            Ok(settings) => settings,
-            Err(error) => {
-                return window.push_notification(
-                    Notification::error(error.to_string()).title("Could not save the settings"),
-                    cx,
-                );
-            }
+        let Some(saved) = self.saved.ready().cloned() else {
+            return;
         };
-        self.store(settings, "Saved the settings.", window, cx);
+        let draft = self.draft.clone();
+        let current = self.source.app_get_settings();
+        self.saving = true;
+        cx.spawn_in(window, async move |view, cx| {
+            let merged = current
+                .await
+                .map_err(|error| kit::describe(&error))
+                .and_then(|current| serde_json::to_value(current).map_err(|e| e.to_string()))
+                .and_then(|mut current| {
+                    apply_user_edits_onto(&saved, &draft, &mut current);
+                    serde_json::from_value::<Settings>(current).map_err(|e| e.to_string())
+                });
+            view.update_in(cx, |view, window, cx| {
+                view.saving = false;
+                match merged {
+                    Ok(settings) => view.store(settings, "Saved the settings.", window, cx),
+                    Err(reason) => window.push_notification(
+                        Notification::error(reason).title("Could not save the settings"),
+                        cx,
+                    ),
+                }
+                cx.notify();
+            })
+            .ok();
+        })
+        .detach();
+        cx.notify();
     }
 
     fn store(
@@ -822,7 +878,11 @@ impl SettingsView {
             .text_size(theme.type_scale.caption)
             .font_weight(theme.type_scale.label_weight)
             .text_color(colors.text_muted)
-            .children(spec.columns.iter().map(|column| cell(column.label.to_owned())))
+            .children(
+                spec.columns
+                    .iter()
+                    .map(|column| cell(column.label.to_owned())),
+            )
             .child(div().w(px(56.)).flex_shrink_0());
         let rows = entries.iter().enumerate().map(|(index, entry)| {
             div()
@@ -855,9 +915,11 @@ impl SettingsView {
                                 IconName::SquarePen,
                                 format!("Edit this {}", spec.noun),
                             )
-                            .on_click(cx.listener(move |view, _, window, cx| {
-                                view.edit_entry(spec, Some(index), window, cx);
-                            })),
+                            .on_click(cx.listener(
+                                move |view, _, window, cx| {
+                                    view.edit_entry(spec, Some(index), window, cx);
+                                },
+                            )),
                         )
                         .child(
                             IconButton::new(
@@ -866,16 +928,18 @@ impl SettingsView {
                                 format!("Remove this {}", spec.noun),
                             )
                             .hover_tone(colors.negative)
-                            .on_click(cx.listener(move |view, _, _, cx| {
-                                let mut entries = get(&view.draft, spec.path)
-                                    .as_array()
-                                    .cloned()
-                                    .unwrap_or_default();
-                                if index < entries.len() {
-                                    entries.remove(index);
-                                }
-                                view.put(spec.path, Value::Array(entries), cx);
-                            })),
+                            .on_click(cx.listener(
+                                move |view, _, _, cx| {
+                                    let mut entries = get(&view.draft, spec.path)
+                                        .as_array()
+                                        .cloned()
+                                        .unwrap_or_default();
+                                    if index < entries.len() {
+                                        entries.remove(index);
+                                    }
+                                    view.put(spec.path, Value::Array(entries), cx);
+                                },
+                            )),
                         ),
                 )
         });
@@ -930,14 +994,24 @@ impl SettingsView {
         let facts = kit::card(cx)
             .px(px(14.))
             .py(px(8.))
-            .child(kit::fact("Name", user.wfm_username.clone(), Tone::Plain, cx))
+            .child(kit::fact(
+                "Name",
+                user.wfm_username.clone(),
+                Tone::Plain,
+                cx,
+            ))
             .child(kit::fact(
                 "Platform",
                 user.platform.to_uppercase(),
                 Tone::Plain,
                 cx,
             ))
-            .child(kit::fact("Language on warframe.market", user.locale.clone(), Tone::Plain, cx))
+            .child(kit::fact(
+                "Language on warframe.market",
+                user.locale.clone(),
+                Tone::Plain,
+                cx,
+            ))
             .child(kit::fact(
                 "Account verified",
                 if user.verification { "Yes" } else { "No" },
@@ -950,7 +1024,11 @@ impl SettingsView {
                 Tone::Plain,
                 cx,
             ));
-        let statuses = [UserStatus::Online, UserStatus::InGame, UserStatus::Invisible];
+        let statuses = [
+            UserStatus::Online,
+            UserStatus::InGame,
+            UserStatus::Invisible,
+        ];
         let status = self.popup(
             "account-status",
             statuses
@@ -1031,8 +1109,12 @@ impl SettingsView {
             "Read the inventory from",
             match variant {
                 "Profile" => "Your public profile on api.warframe.com.",
-                "Alecaframe" => "AlecaFrame's data file. Leave the file empty for its default place.",
-                "File" => "A JSON file in the lastData or InventoryJson format. Quantframe reads it again when it changes.",
+                "Alecaframe" => {
+                    "AlecaFrame's data file. Leave the file empty for its default place."
+                }
+                "File" => {
+                    "A JSON file in the lastData or InventoryJson format. Quantframe reads it again when it changes."
+                }
                 _ => "With no source, the Inventory screen stays empty.",
             },
             picker,
@@ -1244,8 +1326,10 @@ impl SettingsView {
                     )
                     .child(kit::note(section.blurb, cx)),
             );
-        if matches!(section.extra, Extra::Account | Extra::Appearance | Extra::InventorySource)
-            && let Some(extra) = self.extra(section.extra, window, cx)
+        if matches!(
+            section.extra,
+            Extra::Account | Extra::Appearance | Extra::InventorySource
+        ) && let Some(extra) = self.extra(section.extra, window, cx)
         {
             body = body.child(extra);
         }
@@ -1352,5 +1436,23 @@ impl Render for SettingsView {
                 )
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod apply_user_edits_onto_tests {
+    use super::apply_user_edits_onto;
+    use serde_json::json;
+
+    #[test]
+    fn keeps_backend_changes_to_fields_the_user_left_alone() {
+        let saved = json!({ "a": { "standing": 100, "volume": 1.0 }, "list": [1] });
+        let draft = json!({ "a": { "standing": 100, "volume": 0.5 }, "list": [1] });
+        let mut current = json!({ "a": { "standing": 40, "volume": 1.0 }, "list": [1, 2] });
+        apply_user_edits_onto(&saved, &draft, &mut current);
+        assert_eq!(
+            current,
+            json!({ "a": { "standing": 40, "volume": 0.5 }, "list": [1, 2] })
+        );
     }
 }
