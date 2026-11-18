@@ -364,7 +364,7 @@ impl Catalog for TradeEntries {
     const SEARCH_PLACEHOLDER: &'static str = "Search entries";
     const EMPTY_HINT: &'static str =
         "Add what you trade with a price, then write a trade chat message from the list.";
-    const WATCH: &'static [DataKind] = &[];
+    const WATCH: &'static [DataKind] = &[DataKind::TradeEntries];
 
     fn load(&self, source: &DataSource) -> Load<Self::Data> {
         let rows = source.get_trade_entry_pagination(&self.params());

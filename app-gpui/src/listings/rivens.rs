@@ -14,8 +14,8 @@ use super::{
 use crate::{
     data::{DataKind, DataSource},
     model::{
-        MinMax, NewStockRiven, RivenAttribute, RivenFilter, RivenFilterAttribute, RivenStat,
-        RivenWeapon, StockRiven, StockRivenUpdate, StockStatus,
+        BulkEdit, MinMax, NewStockRiven, RivenAttribute, RivenFilter, RivenFilterAttribute,
+        RivenStat, RivenWeapon, StockRiven, StockRivenUpdate, StockStatus,
     },
     theme::{Theme, tabular_figures},
     ui::{
@@ -651,7 +651,7 @@ impl Catalog for Rivens {
                     Some((id, min_price)) => Outcome::run_quietly(source.stock_riven_update(
                         id,
                         StockRivenUpdate {
-                            min_price: Some(min_price),
+                            min_price: BulkEdit::Set(min_price),
                             ..StockRivenUpdate::default()
                         },
                     )),
@@ -814,8 +814,10 @@ impl Catalog for Rivens {
                             "Sell at the list price",
                         )
                         .in_row()
-                        .disabled(row.list_price.is_none())
-                        .on_click(emit.on_click(RivenAction::SellAtList(id))),
+                        .on_click_or_disabled(
+                            row.list_price
+                                .map(|_| emit.on_click(RivenAction::SellAtList(id))),
+                        ),
                     )
                     .child(
                         IconButton::new(("edit", id), IconName::SquarePen, "Edit")

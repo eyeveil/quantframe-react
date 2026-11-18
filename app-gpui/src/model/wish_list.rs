@@ -1,4 +1,4 @@
-use super::{CoolDownInfo, PriceHistory, StockStatus, SubType};
+use super::{BulkEdit, CoolDownInfo, Limit, PriceHistory, StockStatus, SubType};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct WishListItem {
@@ -31,7 +31,7 @@ pub struct WishListUpdate {
     pub quantity: Option<i64>,
     pub list_price: Option<i64>,
     pub is_hidden: Option<bool>,
-    pub min_price: Option<i64>,
-    pub max_price: Option<i64>,
+    pub min_price: BulkEdit<Limit>,
+    pub max_price: BulkEdit<Limit>,
     pub is_bulk: Option<bool>,
 }

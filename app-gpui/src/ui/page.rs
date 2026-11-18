@@ -442,17 +442,13 @@ impl<C: Catalog> ListPage<C> {
         let colors = theme.colors;
         let checked = self.table.read(cx).delegate().checked();
         let items = self.catalog.toolbar(&checked).into_iter().map(|item| {
-            let button = IconButton::new(item.id, item.icon, item.tooltip)
-                .disabled(item.action.is_none());
+            let button = IconButton::new(item.id, item.icon, item.tooltip);
             let button = if item.danger {
                 button.hover_tone(colors.negative)
             } else {
                 button
             };
-            match item.action {
-                Some(action) => button.on_click(self.emit.on_click(action)),
-                None => button,
-            }
+            button.on_click_or_disabled(item.action.map(|action| self.emit.on_click(action)))
         });
         let open = panel_open(cx);
         let panel_toggle = IconButton::new(

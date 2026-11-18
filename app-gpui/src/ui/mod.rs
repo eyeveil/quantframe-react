@@ -8,7 +8,7 @@ pub mod prompts;
 pub mod screen;
 
 use gpui::{
-    App, BoxShadow, ClickEvent, Div, ElementId, Entity, Focusable, Hsla, InteractiveElement, Interactivity,
+    AnyElement, App, BoxShadow, ClickEvent, Div, ElementId, Entity, Focusable, Hsla, InteractiveElement, Interactivity,
     IntoElement, ParentElement, Pixels, RenderOnce, SharedString, Stateful,
     StatefulInteractiveElement, StyleRefinement, Styled, Window, div, point, prelude::*, px,
 };
@@ -99,9 +99,15 @@ pub struct IconButton {
     tooltip: SharedString,
     tone: Option<Hsla>,
     hover_tone: Option<Hsla>,
-    disabled: bool,
     selected: bool,
     tab_stop: bool,
+}
+
+#[derive(IntoElement)]
+pub struct DisabledIconButton {
+    id: ElementId,
+    name: IconName,
+    tooltip: SharedString,
 }
 
 impl IconButton {
@@ -118,7 +124,6 @@ impl IconButton {
             tooltip: tooltip.into(),
             tone: None,
             hover_tone: None,
-            disabled: false,
             selected: false,
             tab_stop: true,
         }
@@ -134,17 +139,30 @@ impl IconButton {
         self
     }
 
-    pub fn disabled(mut self, disabled: bool) -> Self {
-        self.disabled = disabled;
-        self
-    }
-
     pub fn on_click(
         mut self,
         handler: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
     ) -> Self {
         self.base = self.base.on_click(handler);
         self
+    }
+
+    pub fn on_click_or_disabled(
+        self,
+        handler: Option<impl Fn(&ClickEvent, &mut Window, &mut App) + 'static>,
+    ) -> AnyElement {
+        match handler {
+            Some(handler) => self.on_click(handler).into_any_element(),
+            None => self.disabled().into_any_element(),
+        }
+    }
+
+    pub fn disabled(self) -> DisabledIconButton {
+        DisabledIconButton {
+            id: self.id,
+            name: self.name,
+            tooltip: self.tooltip,
+        }
     }
 
     pub fn in_row(mut self) -> Self {
@@ -178,31 +196,37 @@ impl Selectable for IconButton {
     }
 }
 
+fn icon_frame(
+    base: Stateful<Div>,
+    name: IconName,
+    tooltip: SharedString,
+    theme: &Theme,
+) -> Stateful<Div> {
+    base.flex()
+        .flex_shrink_0()
+        .items_center()
+        .justify_center()
+        .size(theme.metrics.action_button)
+        .rounded(theme.metrics.radius)
+        .child(Icon::new(name).size(theme.metrics.icon))
+        .tooltip(move |window, cx| Tooltip::new(tooltip.clone()).build(window, cx))
+}
+
+impl RenderOnce for DisabledIconButton {
+    fn render(self, _: &mut Window, cx: &mut App) -> impl IntoElement {
+        let theme = Theme::global(cx);
+        icon_frame(div().id(self.id), self.name, self.tooltip, theme)
+            .text_color(theme.colors.text_faint.opacity(0.5))
+    }
+}
+
 impl RenderOnce for IconButton {
     fn render(self, _: &mut Window, cx: &mut App) -> impl IntoElement {
         let theme = Theme::global(cx);
         let colors = theme.colors;
         let ring = focus_ring(theme);
-        let tooltip = self.tooltip;
-        let base = if self.disabled {
-            div().id(self.id)
-        } else {
-            self.base
-        };
-        let button = base
-            .flex()
-            .flex_shrink_0()
-            .items_center()
-            .justify_center()
-            .size(theme.metrics.action_button)
-            .rounded(theme.metrics.radius)
-            .child(Icon::new(self.name).size(theme.metrics.icon))
-            .tooltip(move |window, cx| Tooltip::new(tooltip.clone()).build(window, cx));
-        if self.disabled {
-            return button.text_color(colors.text_faint.opacity(0.5));
-        }
         let hover_tone = self.hover_tone.unwrap_or(colors.text);
-        button
+        icon_frame(self.base, self.name, self.tooltip, theme)
             .cursor_pointer()
             .text_color(self.tone.unwrap_or(colors.text_muted))
             .when(self.selected, |button| {

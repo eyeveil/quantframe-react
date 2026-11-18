@@ -1,4 +1,4 @@
-use super::{CoolDownInfo, PriceHistory, StockStatus, SubType};
+use super::{BulkEdit, CoolDownInfo, Limit, PriceHistory, StockStatus, SubType};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct SyndicateItem {
@@ -36,5 +36,5 @@ pub struct NewSyndicateItem {
 pub struct SyndicateItemUpdate {
     pub list_price: Option<i64>,
     pub standing_cost: Option<i64>,
-    pub min_price: Option<i64>,
+    pub min_price: BulkEdit<Limit>,
 }

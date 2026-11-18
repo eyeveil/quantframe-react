@@ -18,8 +18,10 @@ use qf_app_lib::{
     qf_api::types as qf,
     qf_utils::{Properties, SubType as BackendSubType},
     utils::SubTypeExt,
+    wf_inventory::types::{RivenState, WFInvItemRiven},
     wf_market::{enums as wfm_enums, types as wfm},
 };
+use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::model::*;
@@ -653,27 +655,8 @@ fn chart(value: &Value) -> Chart {
     }
 }
 
-fn report_value(value: &Value) -> FinancialReport {
-    let int = |key: &str| value[key].as_f64().unwrap_or(0.0).round() as i64;
-    let float = |key: &str| value[key].as_f64().unwrap_or(0.0);
-    FinancialReport {
-        total_transactions: int("total_transactions"),
-        average_transaction: float("average_transaction"),
-        total_profit: int("total_profit"),
-        average_profit: float("average_profit"),
-        profit_margin: float("profit_margin"),
-        roi: float("roi"),
-        sale_count: int("sale_count"),
-        highest_revenue: int("highest_revenue"),
-        lowest_revenue: int("lowest_revenue"),
-        average_revenue: float("average_revenue"),
-        revenue: int("revenue"),
-        purchases_count: int("purchases_count"),
-        highest_expense: int("highest_expense"),
-        lowest_expense: int("lowest_expense"),
-        average_expense: float("average_expense"),
-        expenses: int("expenses"),
-    }
+fn report_value(value: &Value) -> Result<FinancialReport, serde_json::Error> {
+    Ok(report(BackendReport::deserialize(value)?))
 }
 
 fn text(value: &Value, key: &str) -> String {
@@ -684,41 +667,39 @@ fn text(value: &Value, key: &str) -> String {
         .to_owned()
 }
 
-fn period(value: &Value) -> PeriodSummary {
-    PeriodSummary {
-        summary: report_value(&value["summary"]),
+fn period(value: &Value) -> Result<PeriodSummary, serde_json::Error> {
+    Ok(PeriodSummary {
+        summary: report_value(&value["summary"])?,
         chart: chart(&value["chart"]),
-    }
+    })
 }
 
 pub fn dashboard(value: Value) -> Result<DashboardSummary, serde_json::Error> {
     let recent: Vec<transaction::Model> =
         serde_json::from_value(value["resent_transactions"].clone())?;
+    let categories: Vec<Value> = from_value(&value["categories"]);
     let best = &value["best_seller"];
     Ok(DashboardSummary {
-        total: report_value(&value["total"]),
-        present_year: period(&value["total"]["present_year"]),
-        last_year: period(&value["total"]["last_year"]),
-        today: period(&value["today"]),
-        recent_days: period(&value["recent_days"]),
+        total: report_value(&value["total"])?,
+        present_year: period(&value["total"]["present_year"])?,
+        last_year: period(&value["total"]["last_year"])?,
+        today: period(&value["today"])?,
+        recent_days: period(&value["recent_days"])?,
         best_seller: BestSeller {
             wfm_id: text(best, "wfm_id"),
             item_name: text(best, "item_name"),
-            report: report_value(best),
+            report: report_value(best)?,
         },
-        categories: value["categories"]
-            .as_array()
-            .map(|categories| {
-                categories
-                    .iter()
-                    .map(|category| CategorySummary {
-                        name: text(category, "name"),
-                        icon: text(category, "icon"),
-                        report: report_value(category),
-                    })
-                    .collect()
+        categories: categories
+            .iter()
+            .map(|category| {
+                Ok(CategorySummary {
+                    name: text(category, "name"),
+                    icon: text(category, "icon"),
+                    report: report_value(category)?,
+                })
             })
-            .unwrap_or_default(),
+            .collect::<Result<_, serde_json::Error>>()?,
         recent_transactions: recent.into_iter().map(transaction).collect(),
     })
 }
@@ -762,23 +743,29 @@ pub fn wfm_debug_state(value: &Value) -> WfmDebugState {
     }
 }
 
-pub fn inventory_rivens(value: &Value) -> Paginated<InventoryRiven> {
-    paginated_value(value, |riven| {
-        let base = riven;
-        let text = |key: &str| base[key].as_str().unwrap_or_default().to_owned();
-        InventoryRiven {
-            uuid: text("uuid"),
-            name: text("name"),
-            wfm_url: text("wfm_url"),
-            mod_name: text("mod_name"),
-            mastery_rank: base["mastery_rank"].as_i64().unwrap_or(0),
-            re_rolls: base["re_rolls"].as_i64().unwrap_or(0),
-            rank: base["sub_type"]["rank"].as_i64().unwrap_or(0),
-            polarity: text("polarity"),
-            riven_type: riven["riven_type"].as_str().unwrap_or_default().to_owned(),
-            is_in_stock: base["properties"]["is_in_stock"].as_bool().unwrap_or(false),
+pub fn inventory_riven(riven: WFInvItemRiven) -> InventoryRiven {
+    let base = riven.base;
+    InventoryRiven {
+        is_in_stock: base.properties.get_property_value("is_in_stock", false),
+        rank: base
+            .sub_type
+            .and_then(|sub_type| sub_type.rank)
+            .unwrap_or(0),
+        uuid: base.uuid,
+        name: base.name,
+        wfm_url: base.wfm_url,
+        mod_name: base.mod_name,
+        mastery_rank: base.mastery_rank,
+        re_rolls: base.re_rolls,
+        polarity: base.polarity,
+        riven_type: match riven.riven_type {
+            RivenState::Unveiled => "unveiled",
+            RivenState::Veiled => "veiled",
+            RivenState::PreVeiled => "pre-veiled",
+            RivenState::Unknown => "unknown",
         }
-    })
+        .to_owned(),
+    }
 }
 
 pub fn inventory_syndicates(value: &Value) -> Paginated<InventorySyndicate> {
@@ -805,10 +792,7 @@ fn paginated_value<T>(value: &Value, map: impl Fn(&Value) -> T) -> Paginated<T> 
 
 #[cfg(test)]
 mod tests {
-    use qf_app_lib::{
-        types::ItemRivenBase,
-        wf_inventory::types::{RivenState, WFInvItemRiven},
-    };
+    use qf_app_lib::types::ItemRivenBase;
 
     use super::*;
 
@@ -833,13 +817,9 @@ mod tests {
             base,
             riven_type: RivenState::Unveiled,
         };
-        let value = json!({
-            "total": 1, "limit": 25, "page": 1, "total_pages": 1,
-            "results": [serde_json::to_value(&riven).expect("serialize")],
-        });
-        assert!(value["results"][0].get("base").is_none());
-        let page = inventory_rivens(&value);
-        let row = &page.results[0];
+        let value = serde_json::to_value(&riven).expect("serialize");
+        assert!(value.get("base").is_none());
+        let row = inventory_riven(serde_json::from_value(value).expect("deserialize"));
         assert_eq!(row.name, "Rubico");
         assert_eq!(row.wfm_url, "rubico");
         assert_eq!(row.mod_name, "Crita-visican");

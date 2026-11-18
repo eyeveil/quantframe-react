@@ -41,7 +41,6 @@
    },
    "name": "Rubico Hexa-critatis",
    "mod_name": "Hexa-critatis",
-   "uuid": "5d773e58-3c14-5c3a-bff2-5a39ef1c8bbb",
    "properties": {
     "potential_profit": 100
    }
@@ -87,7 +86,6 @@
    },
    "name": "Kuva Bramma Igni-toxidex",
    "mod_name": "Igni-toxidex",
-   "uuid": "7f9e4701-8dce-5684-a45a-fbd8ff4cf2c4",
    "properties": {
     "potential_profit": 168
    }
@@ -138,7 +136,6 @@
    },
    "name": "Acceltra Igni-critadex",
    "mod_name": "Igni-critadex",
-   "uuid": "3062e9be-1324-5688-a818-550bd642cfdf",
    "properties": {
     "potential_profit": 210
    }

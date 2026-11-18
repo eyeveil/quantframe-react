@@ -135,9 +135,9 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
             .stock_item_update(
                 item.id,
                 StockItemUpdate {
-                    min_price: Some(65),
-                    min_profit: Some(12),
-                    min_sma: Some(-1),
+                    min_price: BulkEdit::Set(Limit::Value(65)),
+                    min_profit: BulkEdit::Set(Limit::Value(12)),
+                    min_sma: BulkEdit::Set(Limit::Value(-1)),
                     is_bulk: Some(true),
                     ..StockItemUpdate::default()
                 },
@@ -155,7 +155,7 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
             .stock_item_update(
                 item.id,
                 StockItemUpdate {
-                    min_price: Some(0),
+                    min_price: BulkEdit::Set(Limit::Unset),
                     is_bulk: Some(false),
                     ..StockItemUpdate::default()
                 },
@@ -232,7 +232,7 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
             .stock_riven_update(
                 riven.id,
                 StockRivenUpdate {
-                    min_price: Some(150),
+                    min_price: BulkEdit::Set(Limit::Value(150)),
                     filter: Some(filter.clone()),
                     ..StockRivenUpdate::default()
                 },
@@ -284,8 +284,8 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
             .wish_list_update(
                 wish.id,
                 WishListUpdate {
-                    max_price: Some(140),
-                    min_price: Some(30),
+                    max_price: BulkEdit::Set(Limit::Value(140)),
+                    min_price: BulkEdit::Set(Limit::Value(30)),
                     ..WishListUpdate::default()
                 },
             )
@@ -316,7 +316,7 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
             .syndicate_item_update(
                 synd.id,
                 SyndicateItemUpdate {
-                    min_price: Some(22),
+                    min_price: BulkEdit::Set(Limit::Value(22)),
                     ..SyndicateItemUpdate::default()
                 },
             )
@@ -1311,6 +1311,10 @@ fn every_data_source_method_works_in_fixture_mode() {
     assert!(
         seen.contains(&BackendEvent::LiveScraperRunning(true)),
         "no running event in {seen:?}"
+    );
+    assert!(
+        seen.contains(&BackendEvent::Changed(DataKind::TradeEntries)),
+        "no trade entry event in {seen:?}"
     );
     assert!(
         seen.contains(&BackendEvent::Changed(DataKind::StockItems))

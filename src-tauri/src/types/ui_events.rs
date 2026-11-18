@@ -18,6 +18,7 @@ pub enum UIEvent {
     OnDeleteWfmOrders,
     OnDeleteWfmAuctions,
     RefreshTransactions,
+    RefreshTradeEntries,
     RefreshWfmAuctions,
     OnNotify,
     OnWfmChatMessage,
@@ -37,6 +38,7 @@ impl UIEvent {
             UIEvent::RefreshCache => "Cache:Refresh",
             UIEvent::RefreshWishListItems => "LiveScraper:RefreshWishListItems",
             UIEvent::RefreshTransactions => "Transaction:RefreshTransactions",
+            UIEvent::RefreshTradeEntries => "TradeEntry:RefreshTradeEntries",
             UIEvent::RefreshWfmOrders => "LiveScraper:RefreshWfmOrders",
             UIEvent::OnDeleteWfmOrders => "Wfm:OnDeleteOrders",
             UIEvent::OnDeleteWfmAuctions => "Wfm:OnDeleteAuctions",
@@ -56,11 +58,13 @@ impl Display for UIEvent {
 #[derive(PartialEq, Debug, Clone)]
 pub enum UIOperationEvent {
     CreateOrUpdate,
+    Delete,
 }
 impl UIOperationEvent {
     pub fn as_str(&self) -> &str {
         match *self {
             UIOperationEvent::CreateOrUpdate => "CREATE_OR_UPDATE",
+            UIOperationEvent::Delete => "DELETE",
         }
     }
 }

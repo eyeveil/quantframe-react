@@ -2,6 +2,7 @@ mod analytics;
 mod app;
 mod cache;
 mod dashboard;
+mod edit;
 mod financial_report;
 mod inventory;
 mod live_scraper;
@@ -21,6 +22,7 @@ pub use analytics::{ItemPrice, PriceLookupParams, RivenPrice, SyndicateItemPrice
 pub use app::{AppInfo, EeLogLine, EeLogParams, GdprState, RouteLimiter, WfmDebugState};
 pub use cache::{RivenStat, RivenWeapon, TradableItem};
 pub use dashboard::{BestSeller, CategorySummary, Chart, DashboardSummary, PeriodSummary};
+pub use edit::{BulkEdit, Limit};
 pub use financial_report::FinancialReport;
 pub use inventory::{InventoryRiven, InventorySyndicate};
 pub use live_scraper::{LiveScraperMessage, LiveScraperState};

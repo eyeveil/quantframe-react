@@ -5,8 +5,12 @@ use service::{TradeEntryMutation, TradeEntryQuery};
 use utils::{get_location, info, Error, LoggerOptions};
 
 use crate::{
-    track_event, utils::CreateTradeEntryExt, DATABASE,
+    send_event_update, track_event, types::UIOperationEvent, utils::CreateTradeEntryExt, DATABASE,
 };
+
+fn trade_entries_changed(operation: UIOperationEvent, ids: Vec<i64>) {
+    send_event_update!(UIEvent::RefreshTradeEntries, operation, serde_json::json!(ids));
+}
 
 #[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn get_trade_entry_pagination(
@@ -43,6 +47,7 @@ pub async fn trade_entry_create(mut input: CreateTradeEntry) -> Result<Model, Er
                 EventType::TradeEntryCreate,
                 [("success", "true".to_string())]
             );
+            trade_entries_changed(UIOperationEvent::CreateOrUpdate, vec![item.id]);
             Ok(item)
         }
         Err(e) => {
@@ -60,7 +65,7 @@ pub async fn trade_entry_create(mut input: CreateTradeEntry) -> Result<Model, Er
 #[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_create_multiple(mut inputs: Vec<CreateTradeEntry>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
-    let mut total = 0;
+    let mut ids = Vec::new();
     for input in inputs.iter_mut() {
         input.validate().map_err(|e| {
             let err = e.clone();
@@ -77,7 +82,7 @@ pub async fn trade_entry_create_multiple(mut inputs: Vec<CreateTradeEntry>) -> R
         })?;
         let model = input.to_model();
         match TradeEntryMutation::create_or_update(conn, input.override_existing, &model).await {
-            Ok(_) => total += 1,
+            Ok(item) => ids.push(item.id),
             Err(e) => {
                 track_event!(
                     EventType::TradeEntryCreate,
@@ -94,9 +99,11 @@ pub async fn trade_entry_create_multiple(mut inputs: Vec<CreateTradeEntry>) -> R
         EventType::TradeEntryCreate,
         [
             ("success", "true".to_string()),
-            ("count", total.to_string()),
+            ("count", ids.len().to_string()),
         ]
     );
+    let total = ids.len() as i64;
+    trade_entries_changed(UIOperationEvent::CreateOrUpdate, ids);
     Ok(total)
 }
 
@@ -151,16 +158,17 @@ pub async fn trade_entry_delete(id: i64) -> Result<Model, Error> {
         EventType::TradeEntryDelete,
         [("success", "true".to_string())]
     );
+    trade_entries_changed(UIOperationEvent::Delete, vec![id]);
     Ok(item)
 }
 #[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn trade_entry_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
     let conn = DATABASE.get().unwrap();
-    let mut deleted_count = 0;
+    let mut deleted = Vec::new();
 
     for id in ids {
         match TradeEntryMutation::delete_by_id(conn, id).await {
-            Ok(_) => deleted_count += 1,
+            Ok(_) => deleted.push(id),
             Err(e) => {
                 track_event!(
                     EventType::TradeEntryDelete,
@@ -177,9 +185,11 @@ pub async fn trade_entry_delete_multiple(ids: Vec<i64>) -> Result<i64, Error> {
         EventType::TradeEntryDelete,
         [
             ("success", "true".to_string()),
-            ("count", deleted_count.to_string()),
+            ("count", deleted.len().to_string()),
         ]
     );
+    let deleted_count = deleted.len() as i64;
+    trade_entries_changed(UIOperationEvent::Delete, deleted);
     Ok(deleted_count)
 }
 #[cfg_attr(feature = "tauri", tauri::command)]
@@ -192,6 +202,7 @@ pub async fn trade_entry_update(input: UpdateTradeEntry) -> Result<Model, Error>
                 EventType::TradeEntryUpdate,
                 [("success", "true".to_string())]
             );
+            trade_entries_changed(UIOperationEvent::CreateOrUpdate, vec![item.id]);
             Ok(item)
         }
         Err(e) => {
@@ -256,6 +267,10 @@ pub async fn trade_entry_update_multiple(
             ("success", "true".to_string()),
             ("count", updated_items.len().to_string()),
         ]
+    );
+    trade_entries_changed(
+        UIOperationEvent::CreateOrUpdate,
+        updated_items.iter().map(|item| item.id).collect(),
     );
     Ok(updated_items)
 }

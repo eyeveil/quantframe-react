@@ -12,7 +12,9 @@ use gpui::AnyElement;
 
 use crate::{
     data::{Backend, DataResult},
-    model::{FinancialReport, Paginated, StockItemListParams, StockStatus, SubType},
+    model::{
+        BulkEdit, FinancialReport, Limit, Paginated, StockItemListParams, StockStatus, SubType,
+    },
     theme::Theme,
     ui::{
         cells,
@@ -83,9 +85,12 @@ fn load_stock<T: Send + 'static>(
 
 const LIMIT_STEP: i64 = 5;
 
-fn stepped(limit: Option<i64>, step: i64) -> Option<i64> {
-    let next = limit.unwrap_or(0) + step;
-    (next >= 0).then_some(next)
+fn stepped(limit: Option<i64>, step: i64) -> Option<Limit> {
+    match limit.unwrap_or(0) + step {
+        0 => Some(Limit::Unset),
+        next if next > 0 => Some(Limit::Value(next)),
+        _ => None,
+    }
 }
 
 fn limit_cell<A: Clone + 'static>(
@@ -106,11 +111,11 @@ fn limit_cell<A: Clone + 'static>(
     )
 }
 
-fn limit_field(values: &FormValues, key: &str, single: bool) -> Option<i64> {
+fn limit_field(values: &FormValues, key: &str, single: bool) -> BulkEdit<Limit> {
     match values.number(key) {
-        Some(value) => Some(value),
-        None if single => Some(0),
-        None => None,
+        Some(value) => BulkEdit::Set(Limit::Value(value)),
+        None if single => BulkEdit::Set(Limit::Unset),
+        None => BulkEdit::Keep,
     }
 }
 

@@ -1,9 +1,9 @@
 use crate::{enums::*, stock_item, stock_riven, syndicate_item, transaction::*, wish_list};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use utils::{group_by, Properties};
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FinancialReport {
     // General transaction metrics
     pub total_transactions: usize,
