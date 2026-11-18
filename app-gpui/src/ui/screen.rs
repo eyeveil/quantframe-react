@@ -53,6 +53,25 @@ impl TabbedScreen {
         });
     }
 
+    /// Adds a tab that is not a list page, such as a chart.
+    pub fn add_view<V: 'static>(
+        &mut self,
+        key: &'static str,
+        label: &'static str,
+        view: Entity<V>,
+        cx: &mut Context<Self>,
+    ) where
+        Entity<V>: PageHandle,
+    {
+        self._subscriptions
+            .push(cx.observe(&view, |_, _, cx| cx.notify()));
+        self.tabs.push(Tab {
+            key,
+            label,
+            page: Box::new(view),
+        });
+    }
+
     /// The active tab's page.
     pub fn page(&self) -> &dyn PageHandle {
         self.tabs[self.active].page.as_ref()

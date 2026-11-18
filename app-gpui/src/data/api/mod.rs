@@ -2,6 +2,7 @@
 //! the Tauri commands in `src-tauri/src/commands`.
 
 mod app;
+mod inventory;
 mod market;
 mod stock;
 mod trades;

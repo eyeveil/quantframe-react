@@ -11,6 +11,7 @@ pub enum Screen {
     Analytics,
     Inventory,
     Settings,
+    Debug,
     About,
 }
 
@@ -22,7 +23,7 @@ pub enum ScreenGroup {
 }
 
 impl Screen {
-    pub const ALL: [Self; 9] = [
+    pub const ALL: [Self; 10] = [
         Self::Listings,
         Self::Orders,
         Self::TradeMessages,
@@ -31,6 +32,7 @@ impl Screen {
         Self::Analytics,
         Self::Inventory,
         Self::Settings,
+        Self::Debug,
         Self::About,
     ];
 
@@ -51,6 +53,7 @@ impl Screen {
             Self::Analytics => "Analytics",
             Self::Inventory => "Inventory",
             Self::Settings => "Settings",
+            Self::Debug => "Debug",
             Self::About => "About",
         }
     }
@@ -65,6 +68,7 @@ impl Screen {
             Self::Analytics => IconName::ChartColumn,
             Self::Inventory => IconName::Package,
             Self::Settings => IconName::Settings,
+            Self::Debug => IconName::Bug,
             Self::About => IconName::Info,
         }
     }
@@ -73,7 +77,7 @@ impl Screen {
         match self {
             Self::Listings | Self::Orders | Self::TradeMessages => ScreenGroup::Trading,
             Self::Home | Self::Chat | Self::Analytics | Self::Inventory => ScreenGroup::Overview,
-            Self::Settings | Self::About => ScreenGroup::App,
+            Self::Settings | Self::Debug | Self::About => ScreenGroup::App,
         }
     }
 }

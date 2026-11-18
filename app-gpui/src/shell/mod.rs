@@ -16,27 +16,71 @@ use gpui_component::{
 use gpui_kit_assets::IconName;
 
 use crate::{
+    about::AboutView,
+    analytics,
     assets::APP_ICON,
+    auth::{self, LoginView, SignedIn},
+    chat::ChatView,
     data::{Backend, BackendEvent, DataKind, DataSource},
-    listings,
-    model::{LiveScraperMessage, LiveScraperState, StockStatus, User, UserStatus},
+    debug,
+    home::HomeView,
+    inventory, listings,
+    model::{Ban, BanService, LiveScraperMessage, LiveScraperState, StockStatus, User, UserStatus},
     orders,
+    settings::SettingsView,
     theme::{Appearance, AppearanceChoice, Theme, tabular_figures},
     trade_messages,
-    ui::{
-        IconButton, dot, focus_ring, icon, number, page, placeholder,
-        screen::TabbedScreen,
-        text_button,
-    },
+    ui::{IconButton, dot, focus_ring, icon, number, page, screen::TabbedScreen, text_button},
 };
 use nav::{Screen, ScreenGroup};
 
+/// A state that replaces the whole app until it ends.
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Gate {
+    SignIn,
+    Banned(Ban),
+    Failed(String),
+}
+
+impl Gate {
+    /// The gate a `QF_SCREEN` value names, so a script can render each one.
+    fn preview(key: &str) -> Option<Self> {
+        match key {
+            "login" => Some(Self::SignIn),
+            "banned" => Some(Self::Banned(Ban {
+                service: BanService::WarframeMarket,
+                until: Some("2026-12-02T08:00:00Z".to_owned()),
+                reason: Some("Repeated no-shows on accepted trades.".to_owned()),
+            })),
+            "error" => Some(Self::Failed(
+                "The warframe.market session could not be restored (401 Unauthorized)."
+                    .to_owned(),
+            )),
+            _ => None,
+        }
+    }
+}
+
 pub struct AppShell {
+    backend: Entity<Backend>,
     source: DataSource,
     screen: Screen,
     listings: Entity<TabbedScreen>,
     orders: Entity<TabbedScreen>,
     trade_messages: Entity<TabbedScreen>,
+    /// The other screens are built the first time they open.
+    analytics: Option<Entity<TabbedScreen>>,
+    inventory: Option<Entity<TabbedScreen>>,
+    debug: Option<Entity<TabbedScreen>>,
+    home: Option<Entity<HomeView>>,
+    chat: Option<Entity<ChatView>>,
+    settings: Option<Entity<SettingsView>>,
+    about: Option<Entity<AboutView>>,
+    login: Entity<LoginView>,
+    /// A gate forced by `QF_SCREEN`, shown whatever the account's state is.
+    preview: Option<Gate>,
+    /// The backend's current `App:Error`, shown above the screen.
+    app_error: Option<String>,
     scraper: LiveScraperState,
     /// The message to show again when the scraper restarts.
     last_message: Option<LiveScraperMessage>,
@@ -50,6 +94,7 @@ pub struct AppShell {
 /// (the label of the button whose prompt to open).
 struct Startup {
     screen: Option<Screen>,
+    preview: Option<Gate>,
     tab: Option<String>,
     row: Option<usize>,
     dialog: Option<String>,
@@ -60,6 +105,7 @@ impl Startup {
         let var = |name: &str| std::env::var(name).ok().filter(|value| !value.is_empty());
         Self {
             screen: var("QF_SCREEN").and_then(|key| Screen::from_key(&key)),
+            preview: var("QF_SCREEN").and_then(|key| Gate::preview(&key)),
             tab: var("QF_TAB"),
             row: var("QF_ROW").and_then(|row| row.parse().ok()),
             dialog: var("QF_DIALOG"),
@@ -73,7 +119,17 @@ impl AppShell {
         Theme::follow_system(window.appearance(), cx);
         let source = backend.read(cx).source.clone();
         let startup = Startup::from_env();
+        let login = cx.new(|cx| LoginView::new(&backend, window, cx));
         let mut shell = Self {
+            analytics: None,
+            inventory: None,
+            debug: None,
+            home: None,
+            chat: None,
+            settings: None,
+            about: None,
+            preview: startup.preview.clone(),
+            app_error: None,
             screen: startup.screen.unwrap_or(Screen::Listings),
             listings: listings::screen(&backend, window, cx),
             orders: orders::screen(&backend, window, cx),
@@ -102,11 +158,15 @@ impl AppShell {
                         BackendEvent::Changed(DataKind::User | DataKind::StockItems) => {
                             shell.refresh(cx);
                         }
+                        BackendEvent::Error(error) => shell.app_error = error.clone(),
                         _ => return,
                     }
                     cx.notify();
                 }),
+                cx.subscribe(&login, |shell, _, _: &SignedIn, cx| shell.refresh(cx)),
             ],
+            login,
+            backend,
         };
         shell.refresh(cx);
         cx.defer_in(window, move |shell, window, cx| {
@@ -141,40 +201,123 @@ impl AppShell {
     }
 
     fn apply_startup(&mut self, startup: Startup, window: &mut Window, cx: &mut Context<Self>) {
-        let Some(screen) = self.built_screen().cloned() else {
-            return;
-        };
-        screen.update(cx, |screen, cx| {
-            if let Some(tab) = &startup.tab {
-                screen.open_tab(tab, window, cx);
-            }
-            let page = screen.page();
-            page.focus(window, cx);
-            page.on_load(startup.row, startup.dialog, cx);
-        });
+        self.ensure_built(window, cx);
+        if let Some(screen) = self.built_screen().cloned() {
+            screen.update(cx, |screen, cx| {
+                if let Some(tab) = &startup.tab {
+                    screen.open_tab(tab, window, cx);
+                }
+                let page = screen.page();
+                page.focus(window, cx);
+                page.on_load(startup.row, startup.dialog, cx);
+            });
+        } else if let (Screen::Settings, Some(settings), Some(tab)) =
+            (self.screen, &self.settings, &startup.tab)
+        {
+            settings.update(cx, |settings, cx| settings.open_section(tab, cx));
+        } else if let (Screen::Chat, Some(chat)) = (self.screen, &self.chat) {
+            chat.update(cx, |chat, _| chat.on_load(startup.row, startup.dialog));
+        }
+        if self.gate() == Some(Gate::SignIn) {
+            self.login
+                .clone()
+                .update(cx, |login, cx| login.focus(window, cx));
+        }
     }
 
-    /// The view of the current screen, when the screen is built.
+    /// Builds the current screen's view when this is its first opening.
+    fn ensure_built(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let backend = self.backend.clone();
+        match self.screen {
+            Screen::Listings | Screen::Orders | Screen::TradeMessages => {}
+            Screen::Analytics => {
+                self.analytics
+                    .get_or_insert_with(|| analytics::screen(&backend, window, cx));
+            }
+            Screen::Inventory => {
+                self.inventory
+                    .get_or_insert_with(|| inventory::screen(&backend, window, cx));
+            }
+            Screen::Debug => {
+                self.debug
+                    .get_or_insert_with(|| debug::screen(&backend, window, cx));
+            }
+            Screen::Home => {
+                self.home
+                    .get_or_insert_with(|| cx.new(|cx| HomeView::new(&backend, cx)));
+            }
+            Screen::Chat => {
+                self.chat
+                    .get_or_insert_with(|| cx.new(|cx| ChatView::new(&backend, window, cx)));
+            }
+            Screen::Settings => {
+                self.settings
+                    .get_or_insert_with(|| cx.new(|cx| SettingsView::new(&backend, window, cx)));
+            }
+            Screen::About => {
+                self.about
+                    .get_or_insert_with(|| cx.new(|cx| AboutView::new(&backend, cx)));
+            }
+        }
+    }
+
+    /// The view of the current screen, when the screen is made of tabs.
     fn built_screen(&self) -> Option<&Entity<TabbedScreen>> {
         match self.screen {
             Screen::Listings => Some(&self.listings),
             Screen::Orders => Some(&self.orders),
             Screen::TradeMessages => Some(&self.trade_messages),
-            Screen::Home
-            | Screen::Chat
-            | Screen::Analytics
-            | Screen::Inventory
-            | Screen::Settings
-            | Screen::About => None,
+            Screen::Analytics => self.analytics.as_ref(),
+            Screen::Inventory => self.inventory.as_ref(),
+            Screen::Debug => self.debug.as_ref(),
+            Screen::Home | Screen::Chat | Screen::Settings | Screen::About => None,
         }
     }
 
     fn open_screen(&mut self, screen: Screen, window: &mut Window, cx: &mut Context<Self>) {
+        if let (Screen::Chat, Some(chat)) = (self.screen, &self.chat) {
+            chat.clone().update(cx, |chat, cx| chat.leave(cx));
+        }
         self.screen = screen;
+        self.ensure_built(window, cx);
         if let Some(view) = self.built_screen().cloned() {
             view.update(cx, |view, cx| view.page().focus(window, cx));
+        } else if let (Screen::Chat, Some(chat)) = (screen, &self.chat) {
+            chat.clone().update(cx, |chat, cx| {
+                chat.enter(cx);
+                chat.focus(window, cx);
+            });
         }
         cx.notify();
+    }
+
+    /// The state that replaces the app, if the account is in one.
+    fn gate(&self) -> Option<Gate> {
+        if self.preview.is_some() {
+            return self.preview.clone();
+        }
+        if let Some(ban) = &self.user.banned {
+            return Some(Gate::Banned(ban.clone()));
+        }
+        self.user.anonymous.then_some(Gate::SignIn)
+    }
+
+    fn sign_out(&mut self, cx: &mut Context<Self>) {
+        self.preview = None;
+        let signed_out = self.source.auth_logout();
+        cx.spawn(async move |shell, cx| {
+            let user = signed_out.await;
+            shell
+                .update(cx, |shell, cx| {
+                    if let Ok(user) = user {
+                        shell.user = user;
+                    }
+                    shell.refresh(cx);
+                    cx.notify();
+                })
+                .ok();
+        })
+        .detach();
     }
 
     fn toggle_scraper(&mut self, cx: &mut Context<Self>) {
@@ -526,7 +669,14 @@ impl AppShell {
             .child(self.account_state(cx))
     }
 
-    fn title_bar(&self, window: &Window, cx: &mut Context<Self>) -> impl IntoElement + use<> {
+    /// The bar at the top. While a gate is up it carries only the app's
+    /// name, the appearance button and the window buttons.
+    fn title_bar(
+        &self,
+        gated: bool,
+        window: &Window,
+        cx: &mut Context<Self>,
+    ) -> impl IntoElement + use<> {
         let theme = Theme::global(cx).clone();
         let colors = theme.colors;
         TitleBar::new()
@@ -546,7 +696,12 @@ impl AppShell {
                             .text_size(theme.type_scale.title)
                             .font_weight(theme.type_scale.title_weight)
                             .text_color(colors.text)
-                            .child(self.screen.label()),
+                            .when(gated && cfg!(target_os = "macos"), |title| title.pl(px(66.)))
+                            .child(if gated {
+                                "Quantframe"
+                            } else {
+                                self.screen.label()
+                            }),
                     )
                     .child(
                         div()
@@ -554,7 +709,7 @@ impl AppShell {
                             .items_center()
                             .gap(px(8.))
                             .child(self.appearance_button(cx))
-                            .child(self.scraper_button(cx)),
+                            .when(!gated, |buttons| buttons.child(self.scraper_button(cx))),
                     ),
             )
             .when(draws_own_window_controls(window), |bar| {
@@ -563,18 +718,79 @@ impl AppShell {
     }
 
     fn content(&self, cx: &App) -> AnyElement {
-        match self.built_screen() {
-            Some(screen) => screen.clone().into_any_element(),
-            None => div()
+        let view = match self.screen {
+            Screen::Home => self.home.clone().map(IntoElement::into_any_element),
+            Screen::Chat => self.chat.clone().map(IntoElement::into_any_element),
+            Screen::Settings => self.settings.clone().map(IntoElement::into_any_element),
+            Screen::About => self.about.clone().map(IntoElement::into_any_element),
+            _ => self
+                .built_screen()
+                .cloned()
+                .map(IntoElement::into_any_element),
+        };
+        view.unwrap_or_else(|| {
+            div()
                 .size_full()
                 .bg(Theme::global(cx).colors.surface)
-                .child(placeholder(
-                    self.screen.icon(),
-                    &format!("{} is not built yet", self.screen.label()),
-                    "Use the Tauri app for this screen until the GPUI app has it.",
-                    cx,
-                ))
-                .into_any_element(),
+                .into_any_element()
+        })
+    }
+
+    /// The backend's current error, on one line above the screen.
+    fn error_banner(&self, error: &str, cx: &mut Context<Self>) -> Div {
+        let theme = Theme::global(cx).clone();
+        let colors = theme.colors;
+        div()
+            .flex()
+            .flex_shrink_0()
+            .items_center()
+            .gap(px(9.))
+            .h(px(36.))
+            .pl(theme.metrics.gutter)
+            .pr(px(8.))
+            .border_b_1()
+            .border_color(colors.border)
+            .bg(colors.chrome)
+            .child(icon(
+                IconName::TriangleAlert,
+                theme.metrics.icon,
+                colors.negative,
+            ))
+            .child(
+                div()
+                    .flex_1()
+                    .min_w_0()
+                    .truncate()
+                    .text_color(colors.text)
+                    .child(error.to_owned()),
+            )
+            .child(
+                IconButton::new("error-dismiss", IconName::X, "Hide this error").on_click(
+                    cx.listener(|shell, _, _, cx| {
+                        shell.app_error = None;
+                        cx.notify();
+                    }),
+                ),
+            )
+    }
+
+    fn gate_view(&self, gate: &Gate, cx: &mut Context<Self>) -> AnyElement {
+        match gate {
+            Gate::SignIn => self.login.clone().into_any_element(),
+            Gate::Banned(ban) => auth::banned(
+                ban,
+                cx.listener(|shell, _, _, cx| shell.sign_out(cx)),
+                cx,
+            )
+            .into_any_element(),
+            Gate::Failed(reason) => auth::error_page(
+                "Quantframe ran into a problem",
+                reason,
+                "Quit Quantframe",
+                |_, _, cx| cx.quit(),
+                cx,
+            )
+            .into_any_element(),
         }
     }
 }
@@ -627,24 +843,31 @@ fn window_controls(cx: &App) -> Div {
 impl Render for AppShell {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = Theme::global(cx).clone();
-        div()
+        let frame = div()
             .size_full()
             .flex()
             .bg(theme.colors.window)
             .font_family(theme.type_scale.family.clone())
             .text_size(theme.type_scale.body)
-            .text_color(theme.colors.text)
-            .child(self.sidebar(cx))
-            .child(
-                div()
-                    .flex_1()
-                    .min_w_0()
-                    .h_full()
-                    .flex()
-                    .flex_col()
-                    .child(self.title_bar(window, cx))
-                    .child(div().flex_1().min_h_0().child(self.content(cx)))
-                    .child(self.status_bar(cx)),
-            )
+            .text_color(theme.colors.text);
+        if let Some(gate) = self.gate() {
+            return frame
+                .flex_col()
+                .child(self.title_bar(true, window, cx))
+                .child(div().flex_1().min_h_0().child(self.gate_view(&gate, cx)));
+        }
+        let error = self.app_error.clone();
+        frame.child(self.sidebar(cx)).child(
+            div()
+                .flex_1()
+                .min_w_0()
+                .h_full()
+                .flex()
+                .flex_col()
+                .child(self.title_bar(false, window, cx))
+                .children(error.map(|error| self.error_banner(&error, cx)))
+                .child(div().flex_1().min_h_0().child(self.content(cx)))
+                .child(self.status_bar(cx)),
+        )
     }
 }

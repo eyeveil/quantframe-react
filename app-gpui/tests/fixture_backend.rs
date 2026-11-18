@@ -853,6 +853,18 @@ fn every_data_source_method_works_in_fixture_mode() {
             source.wf_inventory_get_syndicates(&list).await,
         );
         ok("wf_inventory_update", source.wf_inventory_update().await);
+        assert!(
+            ok(
+                "wf_inventory_list_rivens",
+                source.wf_inventory_list_rivens().await
+            )
+            .is_empty()
+        );
+        let missing = source
+            .wf_inventory_stock_riven("no-such-riven".to_owned(), 0)
+            .await
+            .expect_err("wf_inventory_stock_riven added a riven the inventory lacks");
+        assert_eq!(missing.message, "The riven is no longer in the inventory");
         let log = ok("log_export", source.log_export().await);
         assert!(log.exists());
         let _ = std::fs::remove_file(log);
