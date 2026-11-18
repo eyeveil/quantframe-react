@@ -9,6 +9,7 @@ binary="$root/app-gpui/target/release/quantframe"
 out="${1:-$root/docs/screenshots}"
 shift || true
 mkdir -p "$out"
+[[ -x "$binary" ]] || { echo "Build the GPUI release binary before rendering." >&2; exit 1; }
 
 shots=(
   "listings-items-dark|QF_SCREEN=listings QF_TAB=items QF_THEME=dark"
@@ -76,6 +77,7 @@ shots=(
 
 config="$(mktemp -d)"
 trap 'rm -rf "$config"' EXIT
+failed=0
 
 for shot in "${shots[@]}"; do
   name="${shot%%|*}"
@@ -83,18 +85,27 @@ for shot in "${shots[@]}"; do
   if (($# > 0)) && [[ " $* " != *" $name "* ]]; then
     continue
   fi
-  timeout -k 5 45 xvfb-run -a -s '-screen 0 1440x900x24' bash -c "
+  if timeout -k 5 45 xvfb-run -a -s '-screen 0 1440x900x24' bash -ec "
     env QF_FIXTURES='$root/src-tauri/fixtures' QF_PANEL=closed $settings QF_WINDOW_CONTROLS=1 \\
       XDG_CONFIG_HOME='$config' '$binary' &
     app=\$!
+    trap 'kill \$app 2>/dev/null || true' EXIT
     sleep 5
+    kill -0 \$app
+    xdotool search --onlyvisible --name '^Quantframe$' >/dev/null
+    xdotool mousemove_relative -- 4 2
     for step in 1 2 3 4 5 6; do
       xdotool mousemove_relative -- 30 72
       sleep 0.15
     done
     sleep 1
-    import -window root '$out/$name.png'
-    kill \$app; sleep 1; kill -9 \$app 2>/dev/null || true
-  " || echo "render timed out: $name" >&2
-  echo "$out/$name.png"
+    kill -0 \$app
+    import -window root '$config/$name.png'
+  " && mv "$config/$name.png" "$out/$name.png"; then
+    echo "$out/$name.png"
+  else
+    echo "Render failed: $name" >&2
+    failed=1
+  fi
 done
+exit "$failed"

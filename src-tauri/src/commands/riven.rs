@@ -26,7 +26,7 @@ pub async fn riven_prices_lookup(
             let error_type = e.error_type().to_string();
             let error = Error::from_qf(
                 "RivenPricesLookup",
-                "Failed to lookup riven prices: {}",
+                "Failed to lookup riven prices",
                 e,
                 get_location!(),
             )
@@ -65,7 +65,7 @@ pub async fn export_riven_price_data(
             let error_type = e.error_type().to_string();
             let error = Error::from_qf(
                 "RivenPricesLookup",
-                "Failed to lookup riven prices: {}",
+                "Failed to lookup riven prices",
                 e,
                 get_location!(),
             )

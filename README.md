@@ -1,5 +1,23 @@
 # QuantFrame
 
+## Run the GPUI app on x86-64 Linux
+
+From the repository root, build the app in the Nix development shell.
+
+```bash
+nix develop -c cargo build --release --locked --manifest-path app-gpui/Cargo.toml
+```
+
+Open the app with sample listings, orders, and trade messages. Fixture mode uses a temporary database and runs without a market account.
+
+```bash
+nix develop -c env QF_FIXTURES="$PWD/src-tauri/fixtures" app-gpui/target/release/quantframe
+```
+
+To use your own account, start the binary without `QF_FIXTURES`. Browse the [GPUI screenshots](docs/screenshots) for the screens available in this build.
+
+## Tauri app
+
 Inspired by [Akmayer's Warframe-Algo-Trader](https://github.com/akmayer/Warframe-Algo-Trader), this is a re-implementation using tauri. Tauri allows for easy distribution to windows & linux without technical knowledge.
 
 ## Features

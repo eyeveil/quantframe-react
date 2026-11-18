@@ -213,7 +213,7 @@ pub async fn populate_item_market_properties(
             .map_err(|e| {
                 Error::from_wfm(
                     "Command::StockItemGetById",
-                    "Failed to fetch orders from WFM: {}",
+                    "Failed to fetch orders from WFM",
                     e,
                     get_location!(),
                 )

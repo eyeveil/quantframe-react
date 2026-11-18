@@ -27,7 +27,7 @@ pub async fn syndicate_item_prices_lookup(
             let error_type = e.error_type().to_string();
             let error = Error::from_qf(
                 "SyndicateItemPricesLookup",
-                "Failed to lookup syndicate item prices: {}",
+                "Failed to lookup syndicate item prices",
                 e,
                 get_location!(),
             )
@@ -113,7 +113,7 @@ pub async fn export_syndicate_item_price_data(
             let error_type = e.error_type().to_string();
             let error = Error::from_qf(
                 "SyndicateItemPricesLookup",
-                "Failed to lookup syndicate item prices: {}",
+                "Failed to lookup syndicate item prices",
                 e,
                 get_location!(),
             )

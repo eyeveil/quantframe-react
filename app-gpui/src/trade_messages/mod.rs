@@ -118,25 +118,10 @@ pub enum Lookup {
 
 type LookupLoad = Pin<Box<dyn Future<Output = DataResult<Lookup>> + Send>>;
 
-fn today() -> String {
-    let seconds = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |elapsed| elapsed.as_secs() as i64);
-    let days = seconds.div_euclid(86_400) + 719_468;
-    let era = days.div_euclid(146_097);
-    let day_of_era = days.rem_euclid(146_097);
-    let year_of_era =
-        (day_of_era - day_of_era / 1_460 + day_of_era / 36_524 - day_of_era / 146_096) / 365;
-    let day_of_year = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
-    let month_index = (5 * day_of_year + 2) / 153;
-    let day = day_of_year - (153 * month_index + 2) / 5 + 1;
-    let month = if month_index < 10 {
-        month_index + 3
-    } else {
-        month_index - 9
-    };
-    let year = year_of_era + era * 400 + i64::from(month <= 2);
-    format!("{year:04}-{month:02}-{day:02}")
+fn previous_hour(seconds: i64) -> String {
+    let hour_start = (seconds.div_euclid(3_600) - 1) * 3_600;
+    let date = crate::kit::utc_date_time(hour_start * 1_000).replacen(' ', "T", 1);
+    format!("{date}.000Z")
 }
 
 fn tag_labels(tags: &[String]) -> Vec<String> {
@@ -314,7 +299,11 @@ impl TradeEntries {
         let source = source.clone();
         let existing = self.rows.clone();
         Outcome::Run(Box::pin(async move {
-            let mut params = PriceLookupParams::new(today(), today());
+            let seconds = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map_or(0, |elapsed| elapsed.as_secs() as i64);
+            let snapshot = previous_hour(seconds);
+            let mut params = PriceLookupParams::new(&snapshot, &snapshot);
             params.limit = -1;
             let prices = source.riven_prices_lookup(&params).await?.results;
             let round = search.round_to.max(1);
@@ -340,7 +329,7 @@ impl TradeEntries {
                     properties: TradeEntryProperties {
                         min_price: Some(market_low),
                         potential_profit: Some(market_low - price),
-                        last_updated: Some(today()),
+                        last_updated: Some(snapshot.clone()),
                     },
                     ..NewTradeEntry::new(riven.wfm_url, TradeEntryGroup::Riven, price)
                 };
@@ -482,7 +471,7 @@ impl Catalog for TradeEntries {
             toolbar.push(ToolbarItem {
                 id: "find-rivens",
                 icon: IconName::ScanSearch,
-                tooltip: "Find rivens worth buying from today's prices".to_owned(),
+                tooltip: "Find rivens using prices from the previous hour".to_owned(),
                 action: Some(TradeAction::FindRivens),
                 danger: false,
             });
@@ -567,7 +556,7 @@ impl Catalog for TradeEntries {
             TradeAction::FindRivens => Outcome::ask(
                 FormSpec::new("Find rivens", "Add to the list")
                     .description(
-                        "Looks through today's riven prices and adds every weapon that passes these limits, priced below its market low.",
+                        "Use prices from the previous hour to add matching rivens below their market low.",
                     )
                     .width(480.)
                     .field(Field::platinum("min_price", "Market low at least", Some(50)).half())
@@ -818,5 +807,15 @@ impl Catalog for TradeEntries {
                 PanelAction::new("Delete", IconName::Trash, TradeAction::Delete(vec![id])).danger(),
             ],
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::previous_hour;
+
+    #[test]
+    fn previous_hour_crosses_utc_midnight() {
+        assert_eq!(previous_hour(86_400 + 15 * 60), "1970-01-01T23:00:00.000Z");
     }
 }

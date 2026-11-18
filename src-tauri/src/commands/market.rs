@@ -17,7 +17,7 @@ pub async fn get_user_activity(
         Err(e) => {
             let error = Error::from_qf(
                 "UserActivityLookup",
-                "Failed to lookup user activity: {}",
+                "Failed to lookup user activity",
                 e,
                 get_location!(),
             )
