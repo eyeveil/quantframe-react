@@ -1,17 +1,34 @@
 import json
 import random
 import sys
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent
-SRC = Path(sys.argv[1])
+RECORDED = OUT / "recorded"
+API = "https://api.warframe.market/v2"
+ENDPOINTS = {
+    "items.json": "/items",
+    "riven_weapons.json": "/riven/weapons",
+    "riven_attributes.json": "/riven/attributes",
+}
 NOW = datetime(2026, 11, 17, 18, 0, tzinfo=timezone.utc)
 rng = random.Random(20261118)
 
 
 def load(name):
-    return json.loads((SRC / name).read_text())["data"]
+    path = RECORDED / name
+    if not path.exists():
+        request = urllib.request.Request(
+            API + ENDPOINTS[name],
+            headers={"Language": "en", "User-Agent": "quantframe-fixtures"},
+        )
+        with urllib.request.urlopen(request, timeout=60) as response:
+            body = response.read()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(body)
+    return json.loads(path.read_text())["data"]
 
 
 def write(rel, data, indent=1):
@@ -81,6 +98,23 @@ write(
     ],
 )
 write("cache/lang/en.json", {})
+
+WEAPON_FILES = {
+    "primary": "Primary.json", "secondary": "Secondary.json", "kitgun": "Secondary.json",
+    "melee": "Melee.json", "zaw": "Melee.json", "archgun": "Arch-Gun.json",
+    "sentinel": "SentinelWeapons.json",
+}
+weapon_groups = {name: [] for name in set(WEAPON_FILES.values()) | {"Arch-Melee.json"}}
+for w in sorted(weapons, key=lambda w: w["slug"]):
+    en = w["i18n"]["en"]
+    weapon_groups[WEAPON_FILES[w["group"]]].append({
+        "uniqueName": w["gameRef"], "name": en["name"], "icon": en.get("icon", ""),
+        "wfmRivenUrl": w["slug"], "wfmRivenId": w["id"], "rivenType": w["rivenType"],
+        "category": w["group"], "disposition": w.get("disposition", 0),
+        "subType": None,
+    })
+for name, rows in weapon_groups.items():
+    write(f"cache/items/{name}", rows)
 
 STOCK_SLUGS = [
     "saryn_prime_set", "rhino_prime_set", "mesa_prime_set", "nova_prime_set", "volt_prime_set",
@@ -347,23 +381,6 @@ CUSTOM_ENTRIES = [
 RIVEN_MARKET_LOWS = [320, 145, 260, 90, 410, 175]
 
 
-def rust_float(value):
-    text = repr(float(value))
-    return text[:-2] if text.endswith(".0") else text
-
-
-def stock_riven_uuid(riven):
-    import uuid
-    key = f"type:0;weapon:{riven['wfm_weapon_url']};mod_name:{riven['mod_name'].lower()};"
-    key += f"re_rolls:{riven['re_rolls']};mastery:{riven['mastery_rank']};"
-    if riven.get("sub_type"):
-        key += f"mod_rank:{riven['sub_type'].get('rank') or 0};"
-    key += f"polarity:{riven['polarity'].lower()};"
-    for a in sorted(riven["attributes"], key=lambda a: a["wfmUrl"]):
-        key += f"attr:{a['wfmUrl']}:{str(a['positive']).lower()}:{rust_float(a['value'])};"
-    return str(uuid.uuid5(uuid.NAMESPACE_OID, key))
-
-
 def add_trader_properties(db, orders, auctions):
     for n, row in enumerate(db["stock_items"]):
         props = {}
@@ -418,7 +435,8 @@ def add_trader_properties(db, orders, auctions):
                                "potential_profit": round(closed_avg - order["platinum"])}
     for n, auction in enumerate(auctions):
         riven = db["stock_rivens"][n]
-        auction["uuid"] = stock_riven_uuid(riven) if n < 3 else f"fixture-auction-{n:02d}"
+        if n >= 3:
+            auction["uuid"] = f"fixture-auction-{n:02d}"
         auction["properties"] = {"potential_profit": auction["starting_price"] - riven["bought"]}
     entries = db["trade_entries"]
     for n, (name, price, tags) in enumerate(CUSTOM_ENTRIES):

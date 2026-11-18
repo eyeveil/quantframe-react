@@ -10,7 +10,8 @@ use serde_json::{Map, Value, json};
 
 use super::{DataError, DataResult};
 use crate::model::{
-    ListParams, SortDirection, StockItemListParams, StockStatus, SyndicateItemListParams,
+    BulkEdit, Limit, ListParams, SortDirection, StockItemListParams, StockStatus,
+    SyndicateItemListParams,
 };
 
 fn dto<T: DeserializeOwned>(value: Value) -> DataResult<T> {
@@ -97,6 +98,14 @@ fn status_counts(
 
 fn changes(id: i64, fields: &[(&str, Option<Value>)]) -> Value {
     with_properties(id, fields, &[])
+}
+
+fn limit(edit: BulkEdit<Limit>) -> Option<Value> {
+    match edit {
+        BulkEdit::Keep => None,
+        BulkEdit::Set(Limit::Unset) => Some(json!(0)),
+        BulkEdit::Set(Limit::Value(value)) => Some(json!(value)),
+    }
 }
 
 fn with_properties(

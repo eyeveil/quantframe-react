@@ -374,10 +374,30 @@ impl Form {
         }
     }
 
-    fn read(&mut self, strict: bool, cx: &App) -> Option<FormValues> {
-        let mut values = Vec::with_capacity(self.controls.len());
+    fn draft(&self, cx: &App) -> FormValues {
+        FormValues(
+            self.parse(cx)
+                .into_iter()
+                .map(|(key, value, _)| (key, value))
+                .collect(),
+        )
+    }
+
+    fn validate(&mut self, cx: &App) -> Option<FormValues> {
+        let parsed = self.parse(cx);
+        let mut values = Vec::with_capacity(parsed.len());
         let mut valid = true;
-        for (index, (field, control)) in self.spec.fields.iter().zip(&self.controls).enumerate() {
+        for (index, (key, value, error)) in parsed.into_iter().enumerate() {
+            valid &= error.is_none();
+            self.errors[index] = error;
+            values.push((key, value));
+        }
+        valid.then_some(FormValues(values))
+    }
+
+    fn parse(&self, cx: &App) -> Vec<(&'static str, Value, Option<String>)> {
+        let mut parsed = Vec::with_capacity(self.controls.len());
+        for (field, control) in self.spec.fields.iter().zip(&self.controls) {
             let (value, error) = match (control, &field.kind) {
                 (Control::Input(input), FieldKind::Number { min, max, .. }) => {
                     let text = input.read(cx).value();
@@ -422,13 +442,9 @@ impl Form {
                 }
                 (Control::Toggle(value), _) => (Value::Flag(*value), None),
             };
-            valid &= error.is_none();
-            if strict {
-                self.errors[index] = error;
-            }
-            values.push((field.key, value));
+            parsed.push((field.key, value, error));
         }
-        (valid || !strict).then_some(FormValues(values))
+        parsed
     }
 
     fn render_field(&self, index: usize, cx: &mut Context<Self>) -> impl IntoElement + use<> {
@@ -525,9 +541,11 @@ impl Render for Form {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = Theme::global(cx).clone();
         let colors = theme.colors;
-        let preview = self.spec.preview.clone().and_then(|preview| {
-            self.read(false, cx).map(|values| preview(&values))
-        });
+        let preview = self
+            .spec
+            .preview
+            .clone()
+            .map(|preview| preview(&self.draft(cx)));
         let fields = (0..self.controls.len())
             .map(|index| self.render_field(index, cx))
             .collect::<Vec<_>>();
@@ -627,7 +645,7 @@ pub fn open(
                 return Submitted::Earlier;
             }
             let values = form.update(cx, |form, cx| {
-                let values = form.read(true, cx);
+                let values = form.validate(cx);
                 cx.notify();
                 values
             });

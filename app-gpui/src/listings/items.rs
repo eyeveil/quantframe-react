@@ -9,7 +9,9 @@ use super::{
 };
 use crate::{
     data::{DataKind, DataSource},
-    model::{NewStockItem, StockItem, StockItemUpdate, StockStatus, SubType, TradableItem},
+    model::{
+        BulkEdit, NewStockItem, StockItem, StockItemUpdate, StockStatus, SubType, TradableItem,
+    },
     theme::Theme,
     ui::{
         IconButton, cells, choices, day_and_time,
@@ -416,7 +418,7 @@ impl Catalog for Items {
                     Some((id, min_price)) => Outcome::run_quietly(source.stock_item_update(
                         id,
                         StockItemUpdate {
-                            min_price: Some(min_price),
+                            min_price: BulkEdit::Set(min_price),
                             ..StockItemUpdate::default()
                         },
                     )),
@@ -561,8 +563,10 @@ impl Catalog for Items {
                             "Sell one at the list price",
                         )
                         .in_row()
-                        .disabled(row.list_price.is_none())
-                        .on_click(emit.on_click(ItemAction::SellAtList(id))),
+                        .on_click_or_disabled(
+                            row.list_price
+                                .map(|_| emit.on_click(ItemAction::SellAtList(id))),
+                        ),
                     )
                     .child(
                         IconButton::new(("edit", id), IconName::SquarePen, "Edit")

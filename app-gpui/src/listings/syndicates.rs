@@ -9,7 +9,7 @@ use super::{
 };
 use crate::{
     data::{DataKind, DataSource},
-    model::{StockStatus, SyndicateItem, SyndicateItemListParams, SyndicateItemUpdate},
+    model::{BulkEdit, StockStatus, SyndicateItem, SyndicateItemListParams, SyndicateItemUpdate},
     theme::Theme,
     ui::{
         IconButton, cells, day_and_time,
@@ -342,7 +342,7 @@ impl Catalog for Syndicates {
                     Some((id, min_price)) => Outcome::run_quietly(source.syndicate_item_update(
                         id,
                         SyndicateItemUpdate {
-                            min_price: Some(min_price),
+                            min_price: BulkEdit::Set(min_price),
                             ..SyndicateItemUpdate::default()
                         },
                     )),
@@ -441,8 +441,10 @@ impl Catalog for Syndicates {
                             "Sell one at the list price",
                         )
                         .in_row()
-                        .disabled(row.list_price.is_none())
-                        .on_click(emit.on_click(SyndicateAction::SellAtList(id))),
+                        .on_click_or_disabled(
+                            row.list_price
+                                .map(|_| emit.on_click(SyndicateAction::SellAtList(id))),
+                        ),
                     )
                     .child(
                         IconButton::new(("edit", id), IconName::SquarePen, "Edit")

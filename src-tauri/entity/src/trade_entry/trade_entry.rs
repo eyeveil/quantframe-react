@@ -43,6 +43,7 @@ impl Model {
         group: impl Into<String>,
         properties: Option<serde_json::Value>,
     ) -> Self {
+        let now = DateTimeUtc::from(std::time::SystemTime::now());
         Self {
             id: Default::default(),
             wfm_id: wfm_id.into(),
@@ -55,8 +56,8 @@ impl Model {
                 .collect::<Vec<String>>()
                 .join(","),
             group: group.into(),
-            updated_at: Default::default(),
-            created_at: Default::default(),
+            updated_at: now,
+            created_at: now,
             properties,
         }
     }

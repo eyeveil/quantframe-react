@@ -7,7 +7,9 @@ use qf_app_lib::{
 };
 use serde_json::{Value, json};
 
-use super::{all, dto, status_counts, stock_list, syndicate_list, to_backend, with_properties};
+use super::{
+    all, dto, limit, status_counts, stock_list, syndicate_list, to_backend, with_properties,
+};
 use crate::{
     data::{DataResult, DataSource, convert},
     model::*,
@@ -511,7 +513,7 @@ impl DataSource {
                     ("list_price", update.list_price.map(|v| json!(v))),
                     ("standing_cost", update.standing_cost.map(|v| json!(v))),
                 ],
-                &[("min_price", update.min_price.map(|v| json!(v)))],
+                &[("min_price", limit(update.min_price))],
             ))?;
             Ok(convert::syndicate_item(
                 syndicate_item::syndicate_item_update(input).await?,
@@ -567,9 +569,9 @@ fn stock_item_changes(id: i64, update: &StockItemUpdate) -> Value {
             ("is_hidden", update.is_hidden.map(|v| json!(v))),
         ],
         &[
-            ("min_price", update.min_price.map(|v| json!(v))),
-            ("min_sma", update.min_sma.map(|v| json!(v))),
-            ("min_profit", update.min_profit.map(|v| json!(v))),
+            ("min_price", limit(update.min_price)),
+            ("min_sma", limit(update.min_sma)),
+            ("min_profit", limit(update.min_profit)),
             ("is_bulk", update.is_bulk.map(|v| json!(v))),
         ],
     )
@@ -589,7 +591,7 @@ fn stock_riven_changes(id: i64, update: &StockRivenUpdate) -> Value {
                 update.filter.as_ref().map(convert::backend_riven_filter),
             ),
         ],
-        &[("min_price", update.min_price.map(|v| json!(v)))],
+        &[("min_price", limit(update.min_price))],
     )
 }
 
@@ -602,8 +604,8 @@ fn wish_list_changes(id: i64, update: &WishListUpdate) -> Value {
             ("is_hidden", update.is_hidden.map(|v| json!(v))),
         ],
         &[
-            ("min_price", update.min_price.map(|v| json!(v))),
-            ("max_price", update.max_price.map(|v| json!(v))),
+            ("min_price", limit(update.min_price)),
+            ("max_price", limit(update.max_price)),
             ("is_bulk", update.is_bulk.map(|v| json!(v))),
         ],
     )

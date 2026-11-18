@@ -18,8 +18,8 @@ impl TradeEntryMutation {
             group: Set(form_data.group.to_owned()),
             properties: Set(form_data.properties.to_owned()),
             tags: Set(form_data.tags.to_owned()),
-            created_at: Set(chrono::Utc::now()),
-            updated_at: Set(chrono::Utc::now()),
+            created_at: Set(form_data.created_at),
+            updated_at: Set(form_data.updated_at),
             ..Default::default()
         }
         .insert(db)

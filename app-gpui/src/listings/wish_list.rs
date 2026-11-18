@@ -11,7 +11,9 @@ use super::{
 };
 use crate::{
     data::{DataKind, DataSource},
-    model::{NewStockItem, StockStatus, SubType, TradableItem, WishListItem, WishListUpdate},
+    model::{
+        BulkEdit, NewStockItem, StockStatus, SubType, TradableItem, WishListItem, WishListUpdate,
+    },
     theme::Theme,
     ui::{
         IconButton, cells, day_and_time,
@@ -379,7 +381,7 @@ impl Catalog for WishList {
                     Some((id, max_price)) => Outcome::run_quietly(source.wish_list_update(
                         id,
                         WishListUpdate {
-                            max_price: Some(max_price),
+                            max_price: BulkEdit::Set(max_price),
                             ..WishListUpdate::default()
                         },
                     )),
@@ -506,8 +508,10 @@ impl Catalog for WishList {
                             "Bought one at the bid price",
                         )
                         .in_row()
-                        .disabled(row.list_price.is_none())
-                        .on_click(emit.on_click(WishAction::BuyAtBid(id))),
+                        .on_click_or_disabled(
+                            row.list_price
+                                .map(|_| emit.on_click(WishAction::BuyAtBid(id))),
+                        ),
                     )
                     .child(
                         IconButton::new(("edit", id), IconName::SquarePen, "Edit")

@@ -1,4 +1,4 @@
-use super::{PriceHistory, StockStatus};
+use super::{BulkEdit, Limit, PriceHistory, StockStatus};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct StockRiven {
@@ -101,6 +101,6 @@ pub struct StockRivenUpdate {
     pub re_rolls: Option<i64>,
     pub mastery_rank: Option<i64>,
     pub is_hidden: Option<bool>,
-    pub min_price: Option<i64>,
+    pub min_price: BulkEdit<Limit>,
     pub filter: Option<RivenFilter>,
 }

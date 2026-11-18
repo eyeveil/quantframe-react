@@ -7,7 +7,7 @@ use chrono::{DateTime, Utc};
 use entity::{stock_item, stock_riven, syndicate_item, trade_entry, transaction, wish_list};
 use serde::Deserialize;
 use service::{
-    sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set},
+    sea_orm::{EntityTrait, PaginatorTrait},
     StockItemMutation, StockRivenMutation, SyndicateItemMutation, TradeEntryMutation,
     TransactionMutation, WishListMutation,
 };
@@ -129,33 +129,15 @@ async fn seed_database(fixtures: &Path) -> Result<(), Error> {
         StockRivenMutation::create(conn, model).await?;
     }
     for model in &db.wish_list {
-        let created = WishListMutation::create(conn, model).await?;
-        let update = wish_list::UpdateWishList::new(created.id)
-            .with_list_price(model.list_price)
-            .with_status(model.status.clone())
-            .with_price_history(model.price_history.0.clone());
-        WishListMutation::update_by_id(conn, update).await?;
+        WishListMutation::create(conn, model).await?;
     }
     for model in &db.transactions {
         TransactionMutation::create(conn, model, false).await?;
     }
-    for model in &db.trade_entries {
-        let created = TradeEntryMutation::create(conn, model).await?;
-        trade_entry::ActiveModel {
-            id: Set(created.id),
-            created_at: Set(model.created_at + trade_shift),
-            updated_at: Set(model.updated_at + trade_shift),
-            ..Default::default()
-        }
-        .update(conn)
-        .await
-        .map_err(|e| {
-            Error::new(
-                "Fixtures:Seed",
-                format!("Failed to date a trade entry: {e}"),
-                get_location!(),
-            )
-        })?;
+    for model in &mut db.trade_entries {
+        model.created_at += trade_shift;
+        model.updated_at += trade_shift;
+        TradeEntryMutation::create(conn, model).await?;
     }
     for model in db.syndicate_items {
         SyndicateItemMutation::create(conn, model).await?;
@@ -170,7 +152,8 @@ async fn seed_database(fixtures: &Path) -> Result<(), Error> {
 
 async fn seed_market(fixtures: &Path) -> Result<(), Error> {
     let mut orders: OrderList<Order> = read_json_file(&fixtures.join("wfm_orders.json"))?;
-    let auctions: AuctionList<Auction> = read_json_file(&fixtures.join("wfm_auctions.json"))?;
+    let mut auctions: AuctionList<Auction> = read_json_file(&fixtures.join("wfm_auctions.json"))?;
+    auctions.auctions.iter_mut().for_each(Auction::apply_uuid);
     let chats: ChatList = read_json_file(&fixtures.join("wfm_chats.json"))?;
     let wfm_counts = format!(
         "orders {}, auctions {}, chats {}",

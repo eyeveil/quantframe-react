@@ -4,6 +4,8 @@ use qf_app_lib::{
     State,
     app::{AppState, User as BackendUser},
     commands::{app, auth, debug, live_scraper, logs, user, warframe_gdpr, wf_inventory},
+    entity::dto::PaginatedResult,
+    wf_inventory::types::WFInvItemRiven,
 };
 use serde_json::{Value, json};
 
@@ -228,7 +230,8 @@ impl DataSource {
         self.call(async move {
             let value =
                 wf_inventory::wf_inventory_get_rivens(dto(query.into())?, State::get()).await?;
-            Ok(convert::inventory_rivens(&value))
+            let page: PaginatedResult<WFInvItemRiven> = serde_json::from_value(value)?;
+            Ok(convert::paginated(page, convert::inventory_riven))
         })
     }
 

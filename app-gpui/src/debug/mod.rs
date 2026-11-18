@@ -195,7 +195,7 @@ impl StateView {
                 .child(table(
                     "Requests this session",
                     "No request has gone to warframe.market yet.",
-                    &[("Route", 0.), ("Requests", 90.)],
+                    &[("Route", Width::Fill), ("Requests", Width::Fixed(90.))],
                     wfm.tracking
                         .iter()
                         .map(|(route, count)| vec![route.clone(), number(*count as i64)])
@@ -205,7 +205,12 @@ impl StateView {
                 .child(table(
                     "Rate limits",
                     "No route has a rate limit yet.",
-                    &[("Route", 0.), ("Limit", 70.), ("Wait", 80.), ("Quota", 90.)],
+                    &[
+                        ("Route", Width::Fill),
+                        ("Limit", Width::Fixed(70.)),
+                        ("Wait", Width::Fixed(80.)),
+                        ("Quota", Width::Fixed(90.)),
+                    ],
                     wfm.limiters
                         .iter()
                         .map(|limiter| {
@@ -224,27 +229,30 @@ impl StateView {
     }
 }
 
+#[derive(Clone, Copy)]
+enum Width {
+    Fill,
+    Fixed(f32),
+}
+
 fn table(
     title: &'static str,
     empty: &'static str,
-    columns: &[(&'static str, f32)],
+    columns: &[(&'static str, Width)],
     rows: Vec<Vec<String>>,
     cx: &App,
 ) -> Div {
     let theme = Theme::global(cx);
     let colors = theme.colors;
-    let cell = |text: String, width: f32| {
-        if width == 0. {
-            div().flex_1().min_w_0().truncate().child(text)
-        } else {
-            div()
-                .w(px(width))
-                .flex_shrink_0()
-                .flex()
-                .justify_end()
-                .font_features(tabular_figures())
-                .child(text)
-        }
+    let cell = |text: String, width: Width| match width {
+        Width::Fill => div().flex_1().min_w_0().truncate().child(text),
+        Width::Fixed(width) => div()
+            .w(px(width))
+            .flex_shrink_0()
+            .flex()
+            .justify_end()
+            .font_features(tabular_figures())
+            .child(text),
     };
     let card = kit::card(cx).flex_1().child(
         div()

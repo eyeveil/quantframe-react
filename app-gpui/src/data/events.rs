@@ -12,6 +12,7 @@ pub enum DataKind {
     WfmOrders,
     WfmAuctions,
     Transactions,
+    TradeEntries,
     Chats,
     Cache,
     Settings,
@@ -141,6 +142,7 @@ fn data_kind(event: &str) -> Option<DataKind> {
         "LiveScraper:RefreshWfmOrders" | "Wfm:OnDeleteOrders" => DataKind::WfmOrders,
         "Wfm:RefreshAuctions" | "Wfm:OnDeleteAuctions" => DataKind::WfmAuctions,
         "Transaction:RefreshTransactions" => DataKind::Transactions,
+        "TradeEntry:RefreshTradeEntries" => DataKind::TradeEntries,
         "Cache:Refresh" => DataKind::Cache,
         _ => return None,
     })

@@ -1,4 +1,4 @@
-use super::{PriceHistory, StockStatus, SubType};
+use super::{BulkEdit, Limit, PriceHistory, StockStatus, SubType};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct StockItem {
@@ -64,8 +64,8 @@ pub struct StockItemUpdate {
     pub bought: Option<i64>,
     pub list_price: Option<i64>,
     pub is_hidden: Option<bool>,
-    pub min_price: Option<i64>,
-    pub min_sma: Option<i64>,
-    pub min_profit: Option<i64>,
+    pub min_price: BulkEdit<Limit>,
+    pub min_sma: BulkEdit<Limit>,
+    pub min_profit: BulkEdit<Limit>,
     pub is_bulk: Option<bool>,
 }
