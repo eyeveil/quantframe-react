@@ -806,7 +806,11 @@ fn window_controls(cx: &App) -> Div {
     use gpui_component::IconName as KitIcon;
     let theme = Theme::global(cx);
     let colors = theme.colors;
-    let control = |id: &'static str, name: KitIcon, tooltip: &'static str| {
+    let control = |id: &'static str,
+                   name: KitIcon,
+                   tooltip: &'static str,
+                   hover: gpui::Hsla,
+                   hover_text: gpui::Hsla| {
         div()
             .id(id)
             .flex()
@@ -815,7 +819,7 @@ fn window_controls(cx: &App) -> Div {
             .w(px(40.))
             .h_full()
             .text_color(colors.text_muted)
-            .hover(|control| control.bg(colors.control_hover).text_color(colors.text))
+            .hover(move |control| control.bg(hover).text_color(hover_text))
             .tooltip(move |window, cx| Tooltip::new(tooltip).build(window, cx))
             .child(Icon::new(name).size(px(15.)))
     };
@@ -824,17 +828,34 @@ fn window_controls(cx: &App) -> Div {
         .flex_shrink_0()
         .h_full()
         .child(
-            control("window-minimize", KitIcon::WindowMinimize, "Minimise")
-                .on_click(|_, window, _| window.minimize_window()),
+            control(
+                "window-minimize",
+                KitIcon::WindowMinimize,
+                "Minimise",
+                colors.control_hover,
+                colors.text,
+            )
+            .on_click(|_, window, _| window.minimize_window()),
         )
         .child(
-            control("window-maximize", KitIcon::WindowMaximize, "Maximise")
-                .on_click(|_, window, _| window.zoom_window()),
+            control(
+                "window-maximize",
+                KitIcon::WindowMaximize,
+                "Maximise",
+                colors.control_hover,
+                colors.text,
+            )
+            .on_click(|_, window, _| window.zoom_window()),
         )
         .child(
-            control("window-close", KitIcon::WindowClose, "Close")
-                .hover(|control| control.bg(colors.negative).text_color(colors.on_accent))
-                .on_click(|_, window, _| window.remove_window()),
+            control(
+                "window-close",
+                KitIcon::WindowClose,
+                "Close",
+                colors.negative,
+                colors.on_accent,
+            )
+            .on_click(|_, window, _| window.remove_window()),
         )
 }
 
