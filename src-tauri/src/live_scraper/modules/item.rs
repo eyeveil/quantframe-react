@@ -14,7 +14,10 @@ use wf_market::{
 
 use crate::{
     app::{AppState, Settings},
-    cache::types::{CacheTradableItem, ItemPriceInfo},
+    cache::{
+        types::{CacheTradableItem, ItemPriceInfo},
+        CacheState,
+    },
     utils::OrderListExt,
 };
 use crate::{
@@ -76,7 +79,17 @@ impl ItemModule {
                 );
                 break;
             }
-            match app.wfm_client.order().delete(id).await {
+            let mut intent = writes::Intent::new(comp("Delete"), "Delete at start");
+            if let Some(order) = my_orders.get_by_id(id) {
+                intent = item_intent(&comp("Delete"), "Delete at start", &order.item_id)
+                    .order_type(match order.order_type {
+                        OrderType::Buy => "buy",
+                        OrderType::Sell => "sell",
+                    })
+                    .price(i64::from(order.platinum), None)
+                    .quantity(i64::from(order.quantity));
+            }
+            match writes::delete_order(&app.wfm_client, id, intent).await {
                 Ok(_) => {
                     info(
                         comp("Delete"),
@@ -112,6 +125,7 @@ impl ItemModule {
             &&LoggerOptions::default(),
         );
 
+        rate_limit::recover(&app.wfm_client, std::time::Instant::now());
         // Get My Orders from Warframe Market.
         let my_orders = app.wfm_client.order().cache_orders();
 
@@ -167,144 +181,22 @@ impl ItemModule {
                 break;
             }
 
-            // Get tradable item info from cache
-            let item_info = match cache.tradable_item().get_by(&item_entry.wfm_url) {
-                Ok(item) => item,
-                Err(e) => {
-                    e.set_component(comp("ProcessItem")).log(LOG_FILE);
-                    continue;
+            if let Err(e) = self
+                .process_entry(app, &cache, item_entry, current_index, total, use_fake)
+                .await
+            {
+                if is_fatal(&e) {
+                    return Err(e);
                 }
-            };
-
-            // Get item price from cache
-            let item_price = cache
-                .item_price()
-                .find_by(&item_entry.wfm_url, item_entry.sub_type.clone())?
-                .unwrap_or_default();
-
-            // GUI event for progress
-            self.send_event(
-                "checking",
-                Some(json!({
-                    "current": current_index,
-                    "total": total,
-                    "name": item_info.name,
-                    "sub_type": item_entry.sub_type,
-                    "price": item_price
-                })),
-            );
-
-            let order_path = PathBuf::from(utils::get_base_path())
-                .join("fake_orders")
-                .join(format!("order_{}.json", item_info.wfm_url));
-
-            let mut orders = load_orders(
-                &comp("ProcessItem:LoadOrders:"),
-                &app.wfm_client,
-                &item_entry.wfm_url,
-                use_fake.then_some(&order_path),
-            )
-            .await?;
-
-            // Apply filters to orders
-            orders.filter_by_sub_type(
-                wf_market::types::SubType::from_entity(item_entry.sub_type.clone()),
-                false,
-            );
-            orders.filter_username(&app.user.wfm_username, true);
-            orders.filter_user_status(StatusType::InGame, false);
-            orders.sort_by_platinum();
-
-            // Add Market Info to ItemEntry
-            item_entry.apply_market_info(&orders);
-
-            info(
-                &comp("ProcessItem"),
-                &format!(
-                    "Processing Item: {} | Buy Orders: {} | Sell Orders: {} | Operations: {:?} | Progress: {}/{}",
-                    item_info.name,
-                    orders.buy_orders.len(),
-                    orders.sell_orders.len(),
-                    item_entry.operations.operations,
-                    current_index,
-                    total
-                ),
-                &&LoggerOptions::default(),
-            );
-
-            if item_entry.operations.has("Buy") && !item_entry.operations.has("WishList") {
-                if let Err(e) = self
-                    .progress_buying(&item_info, item_entry, &item_price, &orders)
-                    .await
-                {
-                    return Err(e.with_location(get_location!()));
-                }
-
-                info(
-                    &comp("ProgressBuying"),
+                warning(
+                    comp("ProcessItem"),
                     &format!(
-                        "Successfully processed buying for item: {}",
-                        item_entry.wfm_url
+                        "Skipped {} after an error, moving to the next item: {}",
+                        item_entry.wfm_url, e.message
                     ),
                     &LoggerOptions::default(),
                 );
-            }
-
-            // Process wishlist logic (future expansion)
-            if item_entry.operations.has(&"WishList".to_string()) {
-                if let Err(e) = self
-                    .progress_wish_list(&item_info, item_entry, &item_price, &orders)
-                    .await
-                {
-                    return Err(e.with_location(get_location!()));
-                }
-
-                info(
-                    &comp("ProgressWishList"),
-                    &format!(
-                        "Successfully processed wishlist for item: {}",
-                        item_entry.wfm_url
-                    ),
-                    &LoggerOptions::default(),
-                );
-            }
-
-            // Process selling logic (future expansion)
-            if item_entry.operations.has("Sell") && item_entry.stock_id.is_some() {
-                if let Err(e) = self
-                    .progress_selling(&item_info, item_entry, &item_price, &orders)
-                    .await
-                {
-                    return Err(e.with_location(get_location!()));
-                }
-
-                info(
-                    &comp("ProgressSelling"),
-                    &format!(
-                        "Successfully processed selling for item: {}",
-                        item_entry.wfm_url
-                    ),
-                    &LoggerOptions::default(),
-                );
-            }
-
-            // Process syndicate logic (future expansion) DISABLED FOR NOW WIP
-            if item_entry.operations.has("Syndicate") {
-                if let Err(e) = self
-                    .progress_syndicate(&item_info, item_entry, &item_price, &orders)
-                    .await
-                {
-                    return Err(e.with_location(get_location!()));
-                }
-
-                info(
-                    &comp("ProgressSyndicate"),
-                    &format!(
-                        "Successfully processed syndicate for item: {}",
-                        item_entry.wfm_url
-                    ),
-                    &LoggerOptions::default(),
-                );
+                e.with_location(get_location!()).log(LOG_FILE);
             }
             current_index += 1;
         }
@@ -344,7 +236,10 @@ impl ItemModule {
                         // Skip orders created this cycle — let them survive until next check
                         continue;
                     }
-                    if let Err(err) = app.wfm_client.order().delete(&order.3).await {
+                    let intent = item_intent(&component, "Over the total buy budget", &order.2)
+                        .order_type("buy")
+                        .price(order.0, None);
+                    if let Err(err) = writes::delete_order(&app.wfm_client, &order.3, intent).await {
                         error(
                             &component,
                             &format!("Failed to delete {}: {}", order.3, err),
@@ -355,6 +250,146 @@ impl ItemModule {
             }
         }
 
+        Ok(())
+    }
+
+    async fn process_entry(
+        &self,
+        app: &AppState,
+        cache: &CacheState,
+        item_entry: &mut ItemEntry,
+        current_index: usize,
+        total: usize,
+        use_fake: bool,
+    ) -> Result<(), Error> {
+        let item_info = match cache.tradable_item().get_by(&item_entry.wfm_url) {
+            Ok(item) => item,
+            Err(e) => return Err(e.set_component(comp("ProcessItem"))),
+        };
+
+        let item_price = cache
+            .item_price()
+            .find_by(&item_entry.wfm_url, item_entry.sub_type.clone())?
+            .unwrap_or_default();
+
+        self.send_event(
+            "checking",
+            Some(json!({
+                "current": current_index,
+                "total": total,
+                "name": item_info.name,
+                "sub_type": item_entry.sub_type,
+                "price": item_price
+            })),
+        );
+
+        let order_path = PathBuf::from(utils::get_base_path())
+            .join("fake_orders")
+            .join(format!("order_{}.json", item_info.wfm_url));
+
+        let mut orders = load_orders(
+            &comp("ProcessItem:LoadOrders:"),
+            &app.wfm_client,
+            &item_entry.wfm_url,
+            use_fake.then_some(&order_path),
+        )
+        .await?;
+
+        orders.filter_by_sub_type(
+            wf_market::types::SubType::from_entity(item_entry.sub_type.clone()),
+            false,
+        );
+        orders.filter_username(&app.user.wfm_username, true);
+        orders.filter_user_status(StatusType::InGame, false);
+        orders.sort_by_platinum();
+
+        item_entry.apply_market_info(&orders);
+
+        info(
+            &comp("ProcessItem"),
+            &format!(
+                "Processing Item: {} | Buy Orders: {} | Sell Orders: {} | Operations: {:?} | Progress: {}/{}",
+                item_info.name,
+                orders.buy_orders.len(),
+                orders.sell_orders.len(),
+                item_entry.operations.operations,
+                current_index,
+                total
+            ),
+            &&LoggerOptions::default(),
+        );
+
+        if item_entry.operations.has("Buy") && !item_entry.operations.has("WishList") {
+            if let Err(e) = self
+                .progress_buying(&item_info, item_entry, &item_price, &orders)
+                .await
+            {
+                return Err(e.with_location(get_location!()));
+            }
+
+            info(
+                &comp("ProgressBuying"),
+                &format!(
+                    "Successfully processed buying for item: {}",
+                    item_entry.wfm_url
+                ),
+                &LoggerOptions::default(),
+            );
+        }
+
+        if item_entry.operations.has(&"WishList".to_string()) {
+            if let Err(e) = self
+                .progress_wish_list(&item_info, item_entry, &item_price, &orders)
+                .await
+            {
+                return Err(e.with_location(get_location!()));
+            }
+
+            info(
+                &comp("ProgressWishList"),
+                &format!(
+                    "Successfully processed wishlist for item: {}",
+                    item_entry.wfm_url
+                ),
+                &LoggerOptions::default(),
+            );
+        }
+
+        if item_entry.operations.has("Sell") && item_entry.stock_id.is_some() {
+            if let Err(e) = self
+                .progress_selling(&item_info, item_entry, &item_price, &orders)
+                .await
+            {
+                return Err(e.with_location(get_location!()));
+            }
+
+            info(
+                &comp("ProgressSelling"),
+                &format!(
+                    "Successfully processed selling for item: {}",
+                    item_entry.wfm_url
+                ),
+                &LoggerOptions::default(),
+            );
+        }
+
+        if item_entry.operations.has("Syndicate") {
+            if let Err(e) = self
+                .progress_syndicate(&item_info, item_entry, &item_price, &orders)
+                .await
+            {
+                return Err(e.with_location(get_location!()));
+            }
+
+            info(
+                &comp("ProgressSyndicate"),
+                &format!(
+                    "Successfully processed syndicate for item: {}",
+                    item_entry.wfm_url
+                ),
+                &LoggerOptions::default(),
+            );
+        }
         Ok(())
     }
 
@@ -433,6 +468,7 @@ impl ItemModule {
                     entry,
                     OrderType::Buy,
                     &states::app_state()?.wfm_client,
+                    "MaxStockQuantity",
                 )
                 .await
                 {
@@ -452,7 +488,7 @@ impl ItemModule {
         if let Some(reason) = should_apply_max_price_drop(
             settings.wtb.max_price_drop,
             settings.wtb.min_listings_below,
-            current_order_price,
+            (!order_id.is_empty()).then_some(current_order_price),
             post_price,
             live_orders.get_price_list(OrderType::Buy, None),
             OrderType::Buy,
@@ -461,19 +497,16 @@ impl ItemModule {
             trade_operations.add(reason);
         }
 
-        // How far above (positive) or below (negative) our post price is from the market average.
-        // Used to gauge whether we're overpaying relative to recent trades.
-        let closed_avg_metric = closed_avg as i64 - post_price;
-
-        // Rough expected profit: the margin between our buy price and the average sell price, minus 1 plat buffer.
-        let potential_profit = closed_avg_metric - 1;
-
         // Per-item max price cap — if this item has a specific max configured, clamp the post price.
         let item_max_price = settings.general.get_item_max_price(&item_info.wfm_id);
         if item_max_price > 0 && post_price > item_max_price {
             trade_operations.add("AboveMaxBuyPrice");
             post_price = item_max_price;
         }
+
+        let closed_avg_metric = closed_avg as i64 - post_price;
+
+        let potential_profit = ask_margin(entry.sell_market_info.lowest_price, post_price);
 
         // Global average price cap — if post price exceeds it, mark for deletion regardless of other checks.
         if !is_disabled(avg_price_cap) && post_price > avg_price_cap {
@@ -494,12 +527,13 @@ impl ItemModule {
                 .order()
                 .cache_orders()
                 .extract_order_summary(OrderType::Buy);
+            all_orders.retain(|order| order.2 != item_info.wfm_id || order.3 != order_id);
             if !all_orders.iter().any(|i| i.2 == item_info.wfm_id) {
                 all_orders.push((
                     post_price,
                     potential_profit as f64,
                     item_info.wfm_id.clone(),
-                    String::new(),
+                    order_id.clone(),
                 ));
             }
 
@@ -539,10 +573,9 @@ impl ItemModule {
             trade_operations.add("Overpriced");
         }
 
-        // If the spread between lowest and highest buy orders is too narrow, not worth competing.
-        if market_info.price_range < profit_threshold {
+        if potential_profit < profit_threshold {
             trade_operations.add("Delete");
-            trade_operations.add("Underpriced");
+            trade_operations.add("LowMargin");
         }
 
         // Warframe Market prices cannot be below 1 platinum.
@@ -600,18 +633,9 @@ impl ItemModule {
         )
         .await
         {
-            if e.cause == "CooldownError" {
-                let cooldown_info = get_cooldown(&e.properties);
-                log(&format!(
-                    "Item {} is on cooldown ({}). Skipping update.",
-                    item_info.name,
-                    cooldown_info.format_remaining()
-                ));
-            } else {
-                return Err(e
-                    .with_location(get_location!())
-                    .with_context(entry.to_json()));
-            }
+            return Err(e
+                .with_location(get_location!())
+                .with_context(entry.to_json()));
         }
         Ok(())
     }
@@ -650,7 +674,7 @@ impl ItemModule {
         let market_info = &entry.sell_market_info;
 
         // Fetch existing order details and prepare mutable state
-        let (_, current_order_price, mut properties, mut trade_operations) =
+        let (order_id, current_order_price, mut properties, mut trade_operations) =
             get_order_info(&entry, OrderType::Sell, &wfm_client);
 
         // Per-item overrides stored on the stock item (optional)
@@ -742,9 +766,9 @@ impl ItemModule {
 
         // Prevent prices from dropping too fast relative to existing order
         if let Some(reason) = should_apply_max_price_drop(
-            settings.wtb.max_price_drop,
-            settings.wtb.min_listings_below,
-            current_order_price,
+            settings.wts.max_price_drop,
+            settings.wts.min_listings_below,
+            (!order_id.is_empty()).then_some(current_order_price),
             post_price,
             live_orders.get_price_list(OrderType::Sell, None),
             OrderType::Sell,
@@ -871,23 +895,9 @@ impl ItemModule {
                 ));
             }
             Err(e) => {
-                if e.cause == "CooldownError" {
-                    let (is_dirty, cooldown_info) =
-                        set_cooldown(&mut stock_item.properties, &e.properties);
-                    if is_dirty {
-                        stock_item.is_dirty = true;
-                        stock_item.add_change("cooldown");
-                    }
-                    log(&format!(
-                        "Item {} is on cooldown ({}). Skipping update.",
-                        item_info.name,
-                        cooldown_info.format_remaining()
-                    ));
-                } else {
-                    return Err(e
-                        .with_location(get_location!())
-                        .with_context(entry.to_json()));
-                }
+                return Err(e
+                    .with_location(get_location!())
+                    .with_context(entry.to_json()));
             }
         };
 
@@ -1055,23 +1065,9 @@ impl ItemModule {
             }
 
             Err(e) => {
-                if e.cause == "CooldownError" {
-                    let (is_dirty, cooldown_info) =
-                        set_cooldown(&mut wishlist_item.properties, &e.properties);
-                    if is_dirty {
-                        wishlist_item.is_dirty = true;
-                        wishlist_item.add_change("cooldown");
-                    }
-                    log(&format!(
-                        "Item {} is on cooldown ({}). Skipping update.",
-                        item_info.name,
-                        cooldown_info.format_remaining()
-                    ));
-                } else {
-                    return Err(e
-                        .with_location(get_location!())
-                        .with_context(entry.to_json()));
-                }
+                return Err(e
+                    .with_location(get_location!())
+                    .with_context(entry.to_json()));
             }
         }
 
@@ -1182,7 +1178,7 @@ impl ItemModule {
         if let Some(reason) = should_apply_max_price_drop(
             syndicate_settings.wts.max_price_drop,
             syndicate_settings.wts.min_listings_below,
-            current_order_price,
+            (!order_id.is_empty()).then_some(current_order_price),
             post_price,
             live_orders.get_price_list(OrderType::Sell, None),
             OrderType::Sell,
@@ -1261,23 +1257,9 @@ impl ItemModule {
             }
 
             Err(e) => {
-                if e.cause == "CooldownError" {
-                    let (is_dirty, cooldown_info) =
-                        set_cooldown(&mut stock_syndicate.properties, &e.properties);
-                    if is_dirty {
-                        stock_syndicate.is_dirty = true;
-                        stock_syndicate.add_change("cooldown");
-                    }
-                    log(&format!(
-                        "Item {} is on cooldown ({}). Skipping update.",
-                        item_info.name,
-                        cooldown_info.format_remaining()
-                    ));
-                } else {
-                    return Err(e
-                        .with_location(get_location!())
-                        .with_context(entry.to_json()));
-                }
+                return Err(e
+                    .with_location(get_location!())
+                    .with_context(entry.to_json()));
             }
         }
 
@@ -1288,6 +1270,10 @@ impl ItemModule {
         Ok(())
     }
 }
+fn is_fatal(error: &Error) -> bool {
+    error.properties.get_property_value("type", String::new()) == "Unauthorized"
+}
+
 fn comp(suffix: &str) -> String {
     return format!("{}{}", COMPONENT, suffix);
 }

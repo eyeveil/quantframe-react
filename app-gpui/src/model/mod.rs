@@ -31,7 +31,7 @@ pub use gdpr::{
     GdprAccount, GdprItem, GdprLogin, GdprPayment, GdprPurchase, GdprTrade, GdprTradeKind,
 };
 pub use inventory::{InventoryRiven, InventorySyndicate};
-pub use live_scraper::{LiveScraperMessage, LiveScraperState};
+pub use live_scraper::{IntendedAction, IntendedOrder, LiveScraperMessage, LiveScraperState};
 pub use pagination::{
     ListParams, OrderListParams, Paginated, SortDirection, StockItemListParams,
     SyndicateItemListParams, TradeEntryListParams, TransactionListParams,

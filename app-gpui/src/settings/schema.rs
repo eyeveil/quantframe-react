@@ -361,6 +361,12 @@ pub const SECTIONS: &[Section] = &[
                         "Delete orders whose trade mode is switched off above, except those for blacklisted items.",
                         Kind::Toggle,
                     ),
+                    field(
+                        "live_scraper.general.dry_run",
+                        "Dry run",
+                        "Send no order to warframe.market. The live scraper lists each order it would create, change or delete on the Dry run tab of Orders.",
+                        Kind::Toggle,
+                    ),
                 ],
             ),
         ],

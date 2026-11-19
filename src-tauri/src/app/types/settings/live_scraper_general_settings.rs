@@ -9,6 +9,8 @@ pub struct LiveScraperGeneralSettings {
     pub stock_mode: StockMode,
     pub trade_modes: Vec<TradeMode>,
     pub delete_conflicting_orders: bool,
+    #[serde(default)]
+    pub dry_run: bool,
 }
 
 impl Default for LiveScraperGeneralSettings {
@@ -21,6 +23,7 @@ impl Default for LiveScraperGeneralSettings {
             stock_mode: StockMode::All,
             trade_modes: vec![TradeMode::Buy, TradeMode::Sell, TradeMode::WishList],
             delete_conflicting_orders: false,
+            dry_run: false,
         }
     }
 }

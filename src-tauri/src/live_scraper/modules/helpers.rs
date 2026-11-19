@@ -1,13 +1,10 @@
-use crate::live_scraper::types::cooldown::CooldownInfo;
 use std::{
     collections::HashMap,
     path::Path,
-    sync::{atomic::Ordering, Mutex, OnceLock},
-    time::Duration,
+    sync::{atomic::Ordering, OnceLock},
     vec,
 };
 
-use chrono::Utc;
 use entity::{
     dto::{add_price_history, PriceHistory},
     stock_item::*,
@@ -34,11 +31,6 @@ use crate::{
 };
 
 pub static INTERESTING_ITEMS: OnceLock<HashMap<String, Vec<ItemPriceInfo>>> = OnceLock::new();
-
-const ORDER_COOLDOWN_ENABLED: bool = false; // Set to true to enable order cooldowns, false to disable
-static ORDER_COOL_DOWNS: OnceLock<Mutex<HashMap<String, CooldownInfo>>> = OnceLock::new();
-const ORDER_SAME_PRICE_COOL_DOWN: Duration = Duration::from_secs(20 * 60);
-const ORDER_PRICE_CHANGE_COOL_DOWN: Duration = Duration::from_secs(5 * 60);
 
 pub fn is_disabled(value: i64) -> bool {
     value <= -1
@@ -303,6 +295,8 @@ pub fn get_order_info(
         let mut properties = order.properties;
         properties.set_property_value("id", order.id.clone());
         properties.set_property_value("old_price", order.platinum);
+        properties.set_property_value("old_quantity", order.quantity);
+        properties.set_property_value("old_per_trade", order.per_trade);
         properties.set_property_value("original_update_string", format!("p:{}", order.platinum));
         (
             order.id.clone(),
@@ -467,56 +461,6 @@ async fn handler_wfm_error(
     err
 }
 
-pub fn get_cooldown(new: &Properties) -> CooldownInfo {
-    let current_cooldown = new.get_property_value("cooldown", CooldownInfo::default());
-    current_cooldown
-}
-pub fn set_cooldown(current: &mut Properties, new: &Properties) -> (bool, CooldownInfo) {
-    let current_cooldown = get_cooldown(current);
-    let new_cooldown = get_cooldown(new);
-    if current_cooldown.start_time != new_cooldown.start_time {
-        current.set_property_value("cooldown", new_cooldown.clone());
-        return (true, new_cooldown);
-    }
-    (false, current_cooldown)
-}
-fn is_order_on_cooldown(
-    order_id: impl Into<String>,
-    old_price: u32,
-    new_price: u32,
-) -> Option<CooldownInfo> {
-    if !ORDER_COOLDOWN_ENABLED {
-        return None;
-    }
-    let order_id = order_id.into();
-    let now = Utc::now();
-
-    let (cooldown_type, duration) = if old_price == new_price {
-        ("order_same_price", ORDER_SAME_PRICE_COOL_DOWN)
-    } else {
-        ("order_price_change", ORDER_PRICE_CHANGE_COOL_DOWN)
-    };
-    // Start a new cooldown
-    let cooldown = CooldownInfo::new(order_id, now, cooldown_type, duration);
-    let key = cooldown.key();
-
-    let cooldowns = ORDER_COOL_DOWNS.get_or_init(|| Mutex::new(HashMap::new()));
-    let mut cooldowns = cooldowns.lock().unwrap();
-
-    // Check existing cooldown
-    if let Some(cooldown) = cooldowns.get(&key) {
-        if cooldown.remaining().is_some() {
-            return Some(cooldown.clone());
-        }
-
-        // Cooldown has expired
-        cooldowns.remove(&key);
-    }
-
-    cooldowns.insert(key, cooldown);
-
-    None
-}
 pub async fn progress_order(
     component: &str,
     entry: &ItemEntry,
@@ -538,11 +482,28 @@ pub async fn progress_order(
     let original_update_string =
         properties.get_property_value("original_update_string", String::new());
 
+    let profit = properties.get_property_value("potential_profit", None::<i64>);
+    let intent = |default_reason: &str| {
+        let intent = order_intent(
+            component,
+            entry,
+            &name,
+            order_type,
+            trade_operations,
+            default_reason,
+        )
+        .price(i64::from(post_price), (!order_id.is_empty()).then_some(i64::from(old_price)))
+        .quantity(quantity);
+        match profit {
+            Some(profit) => intent.profit(profit),
+            None => intent,
+        }
+    };
+
     if trade_operations.has("Create") && !trade_operations.has("Delete") && can_create_order {
-        match wfm_client
-            .order()
-            .create(
-                CreateOrderParams::new_with_subtype(
+        match writes::create_order(
+            wfm_client,
+            CreateOrderParams::new_with_subtype(
                     &entry.wfm_id,
                     order_type,
                     post_price,
@@ -551,11 +512,13 @@ pub async fn progress_order(
                     per_trade.map(|pt| pt as u32),
                     SubTypeExt::from_entity(entry.sub_type.clone()),
                 )
-                .with_properties(json!(properties.properties)),
-            )
-            .await
+            .with_properties(json!(properties.properties)),
+            intent("New order"),
+        )
+        .await
         {
-            Ok(order) => {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(order)) => {
                 info(
                     format!("{}CreateSuccess", component),
                     &format!("Created order for item {}: {}", name, order.id),
@@ -578,38 +541,38 @@ pub async fn progress_order(
             }
         }
     } else if trade_operations.has("Update") && !trade_operations.has("Delete") {
-        if let Some(info) = is_order_on_cooldown(&order_id, old_price, post_price) {
-            properties.set_property_value("cooldown", info.clone());
+        let old_quantity = properties.get_property_value("old_quantity", 0u32);
+        let old_per_trade = properties.get_property_value("old_per_trade", None::<u8>);
+        let new_per_trade = per_trade.map(|pt| pt as u8);
+        if old_price == post_price && i64::from(old_quantity) == quantity && old_per_trade == new_per_trade {
             wfm_client.order().cache_orders_mut().update(
-                order_id,
+                &order_id,
                 UpdateOrderParams::new().with_properties(json!(properties.properties)),
             );
-            return Err(Error::new(
-                format!("{}:Cooldown", component),
-                format!(
-                    "Order for item {} is on cooldown ({}). Skipping update.",
-                    name,
-                    info.format_remaining()
-                ),
-                get_location!(),
-            )
-            .with_cause("CooldownError")
-            .with_context(json!({"cooldown": info})));
+            trace(
+                format!("{}Unchanged", component),
+                &format!("Order for item {} is unchanged at {}. Nothing sent.", name, post_price),
+                log_options,
+            );
+            return Ok(OperationSet::default());
         }
 
-        match wfm_client
-            .order()
-            .update(
-                &order_id,
+        match writes::update_order(
+            wfm_client,
+            &order_id,
+            || {
                 UpdateOrderParams::new()
                     .with_platinum(post_price)
                     .with_quantity(entry.get_quantity(order_type) as u32)
                     .with_per_trade(per_trade.map(|pt| pt as u32))
-                    .with_properties(json!(properties.properties)),
-            )
-            .await
+                    .with_properties(json!(properties.properties))
+            },
+            intent("Price follows the market"),
+        )
+        .await
         {
-            Ok(order) => {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(order)) => {
                 info(
                     format!("{}UpdateSuccess", component),
                     &format!("Updated order for item {}: {}", name, order.id),
@@ -634,8 +597,9 @@ pub async fn progress_order(
             }
         }
     } else if trade_operations.has("Update") && trade_operations.has("Delete") {
-        match wfm_client.order().delete(&order_id).await {
-            Ok(_) => {
+        match writes::delete_order(wfm_client, &order_id, intent("Removed")).await {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(_)) => {
                 info(
                     format!("{}DeleteSuccess", component),
                     &format!("Deleted order for item {}: {}", name, order_id),
@@ -672,22 +636,70 @@ pub async fn progress_order(
     }
     Ok(OperationSet::default())
 }
+pub fn item_intent(component: &str, reason: &str, wfm_id: &str) -> writes::Intent {
+    let intent = writes::Intent::new(component, reason);
+    match states::cache_client().and_then(|cache| cache.tradable_item().get_by(wfm_id)) {
+        Ok(item) => intent.item(item.name, item.wfm_url, None),
+        Err(_) => intent.item(wfm_id, "", None),
+    }
+}
+
+fn order_type_key(order_type: OrderType) -> &'static str {
+    match order_type {
+        OrderType::Buy => "buy",
+        OrderType::Sell => "sell",
+    }
+}
+
+const ACTION_OPERATIONS: [&str; 7] = ["Create", "Update", "Delete", "Buy", "Sell", "WishList", "Syndicate"];
+
+pub fn order_intent(
+    component: &str,
+    entry: &ItemEntry,
+    name: &str,
+    order_type: OrderType,
+    operations: &OperationSet,
+    default_reason: &str,
+) -> writes::Intent {
+    let reasons: Vec<&str> = operations
+        .operations
+        .iter()
+        .map(String::as_str)
+        .filter(|operation| !ACTION_OPERATIONS.contains(operation))
+        .collect();
+    let reason = if reasons.is_empty() {
+        default_reason.to_owned()
+    } else {
+        reasons.join(", ")
+    };
+    let name = if name.is_empty() { entry.wfm_url.as_str() } else { name };
+    writes::Intent::new(component, reason)
+        .item(name, &entry.wfm_url, entry.sub_type.clone())
+        .order_type(order_type_key(order_type))
+}
+
 pub async fn delete_order(
     component: &str,
     entry: &ItemEntry,
     order_type: OrderType,
     wfm_client: &wf_market::Client<wf_market::Authenticated>,
+    reason: &str,
 ) -> Result<OperationSet, Error> {
+    let (order_id, current_price, mut properties, _) =
+        get_order_info(entry, order_type, wfm_client);
+    if order_id.is_empty() {
+        return Ok(OperationSet::default());
+    }
     progress_order(
         component,
         entry,
         wfm_client,
         order_type,
-        1,
-        Some(1),
+        current_price.max(1) as u32,
+        None,
         &LoggerOptions::default(),
-        &mut wf_market::types::Properties::default(),
-        &OperationSet::default(),
+        &mut properties,
+        &OperationSet::from(vec!["Update", "Delete", reason]),
     )
     .await
 }
@@ -702,11 +714,12 @@ pub async fn fetch_and_cache_orders(
     item_url: &str,
     cache_path: Option<&Path>,
 ) -> Result<OrderList<OrderWithUser>, Error> {
-    let orders = wfm_client
-        .order()
-        .get_orders_by_item(item_url)
-        .await
-        .map_err(|e| {
+    let orders = retry::retry_server_errors("Get orders", &retry::SERVER_ERRORS, || {
+        let route = wfm_client.order();
+        async move { route.get_orders_by_item(item_url).await }
+    })
+    .await
+    .map_err(|e| {
             Error::from_wfm(
                 format!("{}:FetchAndCacheOrders", component),
                 &format!("Failed to get live orders for item {}", item_url),
@@ -755,7 +768,7 @@ pub fn is_blacklisted(
 pub fn should_apply_max_price_drop(
     max_price_drop: i64,
     min_listings_below: i64,
-    current_order_price: i64,
+    current_order_price: Option<i64>,
     post_price: i64,
     prices: Vec<i64>,
     order_type: OrderType,
@@ -763,6 +776,7 @@ pub fn should_apply_max_price_drop(
     if is_disabled(max_price_drop) && is_disabled(min_listings_below) {
         return None;
     }
+    let current_order_price = current_order_price?;
     let (is_price_invalid, price_change, listing_count) = match order_type {
         OrderType::Buy => (
             current_order_price > post_price,
@@ -789,6 +803,10 @@ pub fn should_apply_max_price_drop(
     } else {
         None
     }
+}
+
+pub fn ask_margin(lowest_ask: i64, bid: i64) -> i64 {
+    lowest_ask - bid
 }
 
 pub fn minimum_profit_threshold(bought_price: i64, flat_profit: i64, percentage: i64) -> i64 {

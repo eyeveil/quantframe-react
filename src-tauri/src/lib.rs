@@ -337,6 +337,8 @@ pub fn run() {
             commands::logs::log,
             // Live Scraper commands
             commands::live_scraper::live_scraper_get_state,
+            commands::live_scraper::live_scraper_get_intended_orders,
+            commands::live_scraper::live_scraper_clear_intended_orders,
             commands::live_scraper::live_scraper_toggle,
             commands::live_scraper::live_scraper_get_interesting_wtb_items,
             // Stock Item commands

@@ -1,4 +1,5 @@
 mod auctions;
+mod intended;
 mod list;
 
 use gpui::{App, AppContext, Entity, Window};
@@ -19,6 +20,9 @@ pub fn screen(
         screen.add("orders", "Orders", page, cx);
         let page = cx.new(|cx| ListPage::new(auctions::Auctions::default(), backend, window, cx));
         screen.add("auctions", "Auctions", page, cx);
+        let page =
+            cx.new(|cx| ListPage::new(intended::IntendedOrders::default(), backend, window, cx));
+        screen.add("intended", "Dry run", page, cx);
         screen
     })
 }

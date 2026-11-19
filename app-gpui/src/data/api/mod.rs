@@ -4,6 +4,7 @@ mod gdpr;
 mod handlers;
 mod inventory;
 mod market;
+mod scraper;
 mod stock;
 mod trades;
 

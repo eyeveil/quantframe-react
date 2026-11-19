@@ -14,7 +14,7 @@ The Rust backend in `src-tauri` (`qf_app_lib`) feeds every screen:
 - Settings, Debug (State and Warframe log tabs) and About.
 - Sign-in, and the states of a suspended account and of an error the app can't work past.
 
-Not built: the update check, the theme editor and custom notification sounds.
+Not built: the update check, the theme editor, a screen to add or remove custom notification sounds, and translated interface text.
 
 ## Build and run
 
@@ -63,7 +63,7 @@ These variables open the app in a given state, so screenshots can be scripted.
 | Variable | Values |
 | --- | --- |
 | `QF_SCREEN` | `listings`, `orders`, `trade-messages`, `home`, `chat`, `analytics`, `inventory`, `settings`, `debug`, `about`. `login`, `banned` and `error` show those states with sample text, whatever the account's state is |
-| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`. Trade messages: `item`, `custom`, `riven`. Analytics: `transactions`, `items`, `rivens`, `syndicates`, `users`, `gdpr`. Inventory: `rivens`, `syndicates`. Debug: `state`, `game-log`. Settings: a section, such as `trading`, `buying`, `account` or `logs` (the `key` of each entry in `src/settings/schema.rs`) |
+| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`, `intended` (the Dry run tab). Trade messages: `item`, `custom`, `riven`. Analytics: `transactions`, `items`, `rivens`, `syndicates`, `users`, `gdpr`. Inventory: `rivens`, `syndicates`. Debug: `state`, `game-log`. Settings: a section, such as `trading`, `buying`, `account` or `logs` (the `key` of each entry in `src/settings/schema.rs`) |
 | `QF_VIEW` | `chart` opens the Transactions tab of Analytics on its chart. On the GDPR export tab, `overview`, `trades`, `purchases` and `payments` open that section, `trades-report`, `purchases-report` and `payments-report` open its report, and `import` shows the tab before any file is imported. With `QF_TRADE`, `edit` opens the sheet with its prices editable |
 | `QF_TRADE` | `sale`, `purchase`, or both with a comma. It sends a sample trade through the backend's `add_trade` event, so the detected-trade sheet opens without Warframe |
 | `QF_THEME` | `system`, `light`, `dark`. It takes precedence over the saved setting and doesn't change it |
