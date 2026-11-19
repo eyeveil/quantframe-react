@@ -293,3 +293,94 @@ fn a_quantity_change_alone_still_updates() {
         assert_eq!(update.intent.quantity, Some(saryn.owned));
     });
 }
+
+#[test]
+fn one_failing_item_does_not_stop_the_pass() {
+    run(|harness| async move {
+        let saryn = sell_saryn_with_own_order(100, &[90, 95]).await;
+        remove_market(NEKROS.0);
+        update_settings(|settings| {
+            settings.debugging.live_scraper.entries = vec![
+                entry(NEKROS.0, NEKROS.1, &["Buy"], None, 1, 0),
+                entry("saryn_prime_set", &saryn.wfm_id, &["Sell"], Some(saryn.id), 0, saryn.owned),
+            ];
+        });
+
+        scraper().item().check().await.expect("the pass ends normally");
+
+        let reads = requests(harness, "GET");
+        assert!(reads.iter().any(|url| url.contains(NEKROS.0)), "{reads:?}");
+        let update = only_record(WriteAction::Update, "saryn_prime_set").expect("Saryn still processed");
+        assert_eq!(update.intent.price, Some(90));
+    });
+}
+
+mod retry {
+    use std::{
+        sync::atomic::{AtomicU32, Ordering},
+        time::Duration,
+    };
+
+    use qf_app_lib::{
+        live_scraper::retry::{retry_server_errors, RetryPolicy, SERVER_ERRORS},
+        wf_market::{
+            enums::ApiVersion,
+            errors::{ApiError, RequestError},
+        },
+    };
+
+    const FAST: RetryPolicy = RetryPolicy {
+        attempts: 3,
+        base: Duration::from_millis(1),
+        max: Duration::from_millis(4),
+    };
+
+    fn request() -> RequestError {
+        RequestError::new(ApiVersion::V2, "GET".into(), "https://example.invalid".into(), None)
+    }
+
+    fn runtime() -> tokio::runtime::Runtime {
+        tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap()
+    }
+
+    #[test]
+    fn retries_server_errors_until_success() {
+        let calls = AtomicU32::new(0);
+        let result = runtime().block_on(retry_server_errors("test", &FAST, || async {
+            match calls.fetch_add(1, Ordering::SeqCst) {
+                0 | 1 => Err(ApiError::InternalServerError(request())),
+                _ => Ok(7),
+            }
+        }));
+        assert_eq!(result.unwrap(), 7);
+        assert_eq!(calls.load(Ordering::SeqCst), 3);
+    }
+
+    #[test]
+    fn stops_after_the_last_attempt() {
+        let calls = AtomicU32::new(0);
+        let result: Result<(), ApiError> = runtime().block_on(retry_server_errors("test", &FAST, || async {
+            calls.fetch_add(1, Ordering::SeqCst);
+            Err(ApiError::InternalServerError(request()))
+        }));
+        assert!(matches!(result, Err(ApiError::InternalServerError(_))));
+        assert_eq!(calls.load(Ordering::SeqCst), 3);
+    }
+
+    #[test]
+    fn does_not_retry_client_errors() {
+        let calls = AtomicU32::new(0);
+        let result: Result<(), ApiError> = runtime().block_on(retry_server_errors("test", &FAST, || async {
+            calls.fetch_add(1, Ordering::SeqCst);
+            Err(ApiError::BadRequest(request()))
+        }));
+        assert!(matches!(result, Err(ApiError::BadRequest(_))));
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn backoff_doubles_up_to_the_cap() {
+        let delays: Vec<u128> = (0..6).map(|retry| SERVER_ERRORS.delay(retry).as_millis()).collect();
+        assert_eq!(delays, vec![500, 1000, 2000, 4000, 4000, 4000]);
+    }
+}

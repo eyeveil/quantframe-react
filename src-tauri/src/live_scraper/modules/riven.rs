@@ -398,10 +398,12 @@ async fn apply_operations(
             }
         }
     } else if operations.has("Update") && !operations.has("Delete") {
-        let params = UpdateAuctionParams::new()
-            .with_buyout_price(Some(post_price as u32))
-            .with_starting_price(post_price as u32)
-            .with_properties(properties);
+        let params = || {
+            UpdateAuctionParams::new()
+                .with_buyout_price(Some(post_price as u32))
+                .with_starting_price(post_price as u32)
+                .with_properties(properties.clone())
+        };
         match writes::update_auction(wfm_client, auction_id, params, intent("Price follows the market")).await {
             Ok(writes::Written::Intended(_)) => {}
             Ok(writes::Written::Sent(auction)) => {

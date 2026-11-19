@@ -14,7 +14,12 @@ use wf_market::{
     Authenticated, Client,
 };
 
-use crate::{send_event, types::UIEvent, utils::modules::states};
+use crate::{
+    live_scraper::retry::{retry_server_errors, SERVER_ERRORS},
+    send_event,
+    types::UIEvent,
+    utils::modules::states,
+};
 
 const KEEP: usize = 500;
 
@@ -179,13 +184,19 @@ pub async fn create_order(
 pub async fn update_order(
     client: &Client<Authenticated>,
     order_id: &str,
-    params: UpdateOrderParams,
+    params: impl Fn() -> UpdateOrderParams,
     intent: Intent,
 ) -> Result<Written<Order>, ApiError> {
     if is_dry_run() {
         return Ok(Written::Intended(record(WriteAction::Update, MarketKind::Order, order_id, intent)));
     }
-    client.order().update(order_id, params).await.map(Written::Sent)
+    retry_server_errors("Update order", &SERVER_ERRORS, || {
+        let route = client.order();
+        let params = params();
+        async move { route.update(order_id, params).await }
+    })
+        .await
+        .map(Written::Sent)
 }
 
 pub async fn delete_order(
@@ -196,7 +207,12 @@ pub async fn delete_order(
     if is_dry_run() {
         return Ok(Written::Intended(record(WriteAction::Delete, MarketKind::Order, order_id, intent)));
     }
-    client.order().delete(order_id).await.map(Written::Sent)
+    retry_server_errors("Delete order", &SERVER_ERRORS, || {
+        let route = client.order();
+        async move { route.delete(order_id).await }
+    })
+        .await
+        .map(Written::Sent)
 }
 
 pub async fn create_auction(
@@ -213,13 +229,19 @@ pub async fn create_auction(
 pub async fn update_auction(
     client: &Client<Authenticated>,
     auction_id: &str,
-    params: UpdateAuctionParams,
+    params: impl Fn() -> UpdateAuctionParams,
     intent: Intent,
 ) -> Result<Written<Auction>, ApiError> {
     if is_dry_run() {
         return Ok(Written::Intended(record(WriteAction::Update, MarketKind::Auction, auction_id, intent)));
     }
-    client.auction().update(auction_id, params).await.map(Written::Sent)
+    retry_server_errors("Update auction", &SERVER_ERRORS, || {
+        let route = client.auction();
+        let params = params();
+        async move { route.update(auction_id, params).await }
+    })
+        .await
+        .map(Written::Sent)
 }
 
 pub async fn delete_auction(
@@ -230,5 +252,10 @@ pub async fn delete_auction(
     if is_dry_run() {
         return Ok(Written::Intended(record(WriteAction::Delete, MarketKind::Auction, auction_id, intent)));
     }
-    client.auction().delete(auction_id).await.map(Written::Sent)
+    retry_server_errors("Delete auction", &SERVER_ERRORS, || {
+        let route = client.auction();
+        async move { route.delete(auction_id).await }
+    })
+        .await
+        .map(Written::Sent)
 }

@@ -8,5 +8,7 @@ pub use modules::*;
 
 pub mod types;
 
+pub mod retry;
+
 pub mod writes;
 pub use types::*;

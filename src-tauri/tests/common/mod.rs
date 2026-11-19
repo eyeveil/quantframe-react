@@ -370,3 +370,10 @@ pub fn price(wfm_url: &str, wfm_id: &str, moving_avg: f64) -> Value {
 pub fn intended() -> Vec<qf_app_lib::live_scraper::writes::IntendedOrder> {
     qf_app_lib::live_scraper::writes::intended_orders()
 }
+
+pub fn remove_market(wfm_url: &str) {
+    let path = PathBuf::from(qf_app_lib::qf_utils::get_base_path())
+        .join("fake_orders")
+        .join(format!("order_{wfm_url}.json"));
+    let _ = std::fs::remove_file(path);
+}

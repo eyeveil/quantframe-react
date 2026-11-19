@@ -560,11 +560,13 @@ pub async fn progress_order(
         match writes::update_order(
             wfm_client,
             &order_id,
-            UpdateOrderParams::new()
-                .with_platinum(post_price)
-                .with_quantity(entry.get_quantity(order_type) as u32)
-                .with_per_trade(per_trade.map(|pt| pt as u32))
-                .with_properties(json!(properties.properties)),
+            || {
+                UpdateOrderParams::new()
+                    .with_platinum(post_price)
+                    .with_quantity(entry.get_quantity(order_type) as u32)
+                    .with_per_trade(per_trade.map(|pt| pt as u32))
+                    .with_properties(json!(properties.properties))
+            },
             intent("Price follows the market"),
         )
         .await
@@ -712,11 +714,12 @@ pub async fn fetch_and_cache_orders(
     item_url: &str,
     cache_path: Option<&Path>,
 ) -> Result<OrderList<OrderWithUser>, Error> {
-    let orders = wfm_client
-        .order()
-        .get_orders_by_item(item_url)
-        .await
-        .map_err(|e| {
+    let orders = retry::retry_server_errors("Get orders", &retry::SERVER_ERRORS, || {
+        let route = wfm_client.order();
+        async move { route.get_orders_by_item(item_url).await }
+    })
+    .await
+    .map_err(|e| {
             Error::from_wfm(
                 format!("{}:FetchAndCacheOrders", component),
                 &format!("Failed to get live orders for item {}", item_url),
