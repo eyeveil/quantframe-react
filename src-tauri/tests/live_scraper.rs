@@ -384,3 +384,37 @@ mod retry {
         assert_eq!(delays, vec![500, 1000, 2000, 4000, 4000, 4000]);
     }
 }
+
+#[test]
+fn rate_limited_routes_return_to_the_default_rate() {
+    use qf_app_lib::{
+        live_scraper::rate_limit::{last_rate_limited, note_rate_limited, recover, RECOVER_AFTER},
+        utils::modules::states,
+        wf_market::{types::Properties, RateLimitTier, RouteLimiter},
+    };
+    use std::time::{Duration, Instant};
+
+    run(|_| async move {
+        let client = states::app_state().unwrap().wfm_client;
+        let limiters = client.get_per_route_limiter();
+
+        client.emit("rate_limit:applied", &Properties::from(serde_json::json!({"key": "GET:quiet"})));
+        assert!(last_rate_limited("GET:quiet").is_some(), "the client callback records the 429");
+
+        let now = Instant::now();
+        {
+            let mut map = limiters.lock().unwrap();
+            map.insert("GET:quiet".into(), RouteLimiter::new(RateLimitTier::PerHour(1), 0.0));
+            map.insert("GET:busy".into(), RouteLimiter::new(RateLimitTier::PerMinute(40), 0.0));
+        }
+        note_rate_limited("GET:quiet", now - RECOVER_AFTER - Duration::from_secs(1));
+        note_rate_limited("GET:busy", now - Duration::from_secs(10));
+
+        let recovered = recover(&client, now);
+
+        assert_eq!(recovered, vec!["GET:quiet".to_owned()]);
+        let map = limiters.lock().unwrap();
+        assert!(!map.contains_key("GET:quiet"));
+        assert!(map.contains_key("GET:busy"));
+    });
+}

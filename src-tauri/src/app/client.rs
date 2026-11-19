@@ -124,6 +124,12 @@ impl AppState {
                     &LoggerOptions::default(),
                 );
             })
+            .with_callback("rate_limit:applied", |_, data| {
+                crate::live_scraper::rate_limit::note_rate_limited(
+                    data.get_property_value("key", String::new()),
+                    std::time::Instant::now(),
+                );
+            })
             .with_callback("api:refresh", |_, data| {
                 let state = data.get_property_value("state", String::from("unknown"));
                 emit_startup!(format!("wfm.{}", state), json!({}));

@@ -125,6 +125,7 @@ impl ItemModule {
             &&LoggerOptions::default(),
         );
 
+        rate_limit::recover(&app.wfm_client, std::time::Instant::now());
         // Get My Orders from Warframe Market.
         let my_orders = app.wfm_client.order().cache_orders();
 

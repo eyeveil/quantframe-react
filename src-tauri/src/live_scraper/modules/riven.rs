@@ -59,6 +59,7 @@ impl RivenModule {
         let cache = states::cache_client()?;
         let app = states::app_state()?;
         let wfm_client = &app.wfm_client;
+        crate::live_scraper::rate_limit::recover(wfm_client, std::time::Instant::now());
         let log_options = &LoggerOptions::default()
             .set_file("progress_riven.log")
             .set_show_component(false)
