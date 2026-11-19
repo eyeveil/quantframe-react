@@ -756,8 +756,8 @@ impl ItemModule {
 
         // Prevent prices from dropping too fast relative to existing order
         if let Some(reason) = should_apply_max_price_drop(
-            settings.wtb.max_price_drop,
-            settings.wtb.min_listings_below,
+            settings.wts.max_price_drop,
+            settings.wts.min_listings_below,
             current_order_price,
             post_price,
             live_orders.get_price_list(OrderType::Sell, None),

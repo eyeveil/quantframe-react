@@ -136,3 +136,42 @@ fn every_scraper_write_goes_through_the_gate() {
         }
     }
 }
+
+fn only_record(action: WriteAction, wfm_url: &str) -> Option<qf_app_lib::live_scraper::writes::IntendedOrder> {
+    let matches: Vec<_> = intended()
+        .into_iter()
+        .filter(|record| record.action == action && record.intent.wfm_url == wfm_url)
+        .collect();
+    assert!(matches.len() <= 1, "{matches:?}");
+    matches.into_iter().next()
+}
+
+async fn sell_saryn_with_own_order(own_price: u32, sells: &[u32]) -> StockItem {
+    let saryn = stock_item("saryn_prime_set").await;
+    write_market("saryn_prime_set", sells, &[40, 45]);
+    set_item_prices(vec![price("saryn_prime_set", &saryn.wfm_id, 92.0)]).await;
+    set_own_orders(vec![own_order("ask-saryn", "sell", &saryn.wfm_id, own_price, saryn.owned as u32)]);
+    let wanted = entry("saryn_prime_set", &saryn.wfm_id, &["Sell"], Some(saryn.id), 0, saryn.owned);
+    update_settings(|settings| {
+        settings.live_scraper.general.dry_run = true;
+        settings.debugging.live_scraper.entries = vec![wanted];
+    });
+    saryn
+}
+
+#[test]
+fn selling_uses_the_sell_side_max_price_drop() {
+    run(|_| async move {
+        sell_saryn_with_own_order(100, &[60, 62]).await;
+        update_settings(|settings| {
+            settings.live_scraper.items.wts.max_price_drop = 5;
+            settings.live_scraper.items.wtb.max_price_drop = -1;
+        });
+
+        scraper().item().check().await.expect("pass");
+
+        let update = only_record(WriteAction::Update, "saryn_prime_set").expect("update");
+        assert_eq!(update.intent.price, Some(100), "{update:?}");
+        assert!(update.intent.reason.contains("MaxPriceDrop"), "{update:?}");
+    });
+}
