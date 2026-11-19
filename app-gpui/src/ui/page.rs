@@ -212,6 +212,16 @@ impl<C: Catalog> ListPage<C> {
         page
     }
 
+    pub fn update_catalog(
+        &mut self,
+        edit: impl FnOnce(&mut C),
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        edit(&mut self.catalog);
+        self.load(window, cx);
+    }
+
     fn set_state(&mut self, state: LoadState, cx: &mut Context<Self>) {
         self.table.update(cx, |table, cx| {
             table.delegate_mut().set_state(state);

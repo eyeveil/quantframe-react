@@ -7,12 +7,14 @@ The Rust backend in `src-tauri` (`qf_app_lib`) feeds every screen:
 - Listings (Items, Rivens, Wish list and Syndicates tabs), Orders (Orders and Auctions tabs) and Trade messages (Items, Custom and Rivens tabs).
 - Home, the dashboard of profit totals, profit charts, the latest transactions and totals per category.
 - Chat, the warframe.market conversations.
-- Analytics (Transactions with a list and a chart, Items, Rivens, Syndicates and Users tabs). The Items, Rivens, Syndicates and Users tabs read Quantframe's server, so in fixture mode they show the backend's refusal.
+- Analytics (Transactions with a list and a chart, Items, Rivens, Syndicates, Users and GDPR export tabs). The Items, Rivens, Syndicates and Users tabs read Quantframe's server, so in fixture mode they show the backend's refusal.
+- The GDPR export tab of Analytics, which imports the text file of a Warframe GDPR data request and shows an overview, the trades, the market purchases and the real-money payments of each account in it. Each list has a report with totals, the most traded items and a chart per month. Fixture mode loads `src-tauri/fixtures/warframe_gdpr.txt`.
+- The detected-trade sheet, which opens when the backend reads a finished trade from Warframe's log that has several items, or one item whose stars or roll the log leaves out. It shows what each side gave, what Quantframe will record and the stock change, and its buttons record the trade, edit the prices or ignore it.
 - Inventory (Rivens and Syndicates tabs), read from the game through the source picked in Settings. Fixture mode has no inventory.
 - Settings, Debug (State and Warframe log tabs) and About.
 - Sign-in, and the states of a suspended account and of an error the app can't work past.
 
-Not built: the Warframe GDPR parser tab of Analytics, the popup that confirms a trade the game log shows (`src/pages/clean`), the update check, the theme editor and custom notification sounds.
+Not built: the update check, the theme editor and custom notification sounds.
 
 ## Build and run
 
@@ -61,8 +63,9 @@ These variables open the app in a given state, so screenshots can be scripted.
 | Variable | Values |
 | --- | --- |
 | `QF_SCREEN` | `listings`, `orders`, `trade-messages`, `home`, `chat`, `analytics`, `inventory`, `settings`, `debug`, `about`. `login`, `banned` and `error` show those states with sample text, whatever the account's state is |
-| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`. Trade messages: `item`, `custom`, `riven`. Analytics: `transactions`, `items`, `rivens`, `syndicates`, `users`. Inventory: `rivens`, `syndicates`. Debug: `state`, `game-log`. Settings: a section, such as `trading`, `buying`, `account` or `logs` (the `key` of each entry in `src/settings/schema.rs`) |
-| `QF_VIEW` | `chart` opens the Transactions tab of Analytics on its chart |
+| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`. Trade messages: `item`, `custom`, `riven`. Analytics: `transactions`, `items`, `rivens`, `syndicates`, `users`, `gdpr`. Inventory: `rivens`, `syndicates`. Debug: `state`, `game-log`. Settings: a section, such as `trading`, `buying`, `account` or `logs` (the `key` of each entry in `src/settings/schema.rs`) |
+| `QF_VIEW` | `chart` opens the Transactions tab of Analytics on its chart. On the GDPR export tab, `overview`, `trades`, `purchases` and `payments` open that section, `trades-report`, `purchases-report` and `payments-report` open its report, and `import` shows the tab before any file is imported. With `QF_TRADE`, `edit` opens the sheet with its prices editable |
+| `QF_TRADE` | `sale`, `purchase`, or both with a comma. It sends a sample trade through the backend's `add_trade` event, so the detected-trade sheet opens without Warframe |
 | `QF_THEME` | `system`, `light`, `dark`. It takes precedence over the saved setting and doesn't change it |
 | `QF_PANEL` | `open`, `closed`. It takes precedence over the saved setting |
 | `QF_ROW` | The index of a row to select once the rows have loaded. On Chat, the conversation to open |
@@ -99,6 +102,7 @@ The Settings screen edits a draft of the backend's settings and saves the whole 
 - `src/shell/` holds the sidebar, title bar, live scraper control and status bar.
 - `src/ui/` holds what every list screen shares. `grid.rs` has the `Catalog` trait and the table. `page.rs` loads a catalog through the backend and draws its toolbar, totals, filter chips, table and item panel. `screen.rs` puts pages behind tabs. `form.rs` builds the dialogs from a list of fields.
 - `src/listings/`, `src/orders/`, `src/trade_messages/`, `src/inventory/` and the price and transaction tabs of `src/analytics/` hold one `Catalog` per tab: its columns, row actions, dialogs and backend calls.
+- `src/gdpr/` holds the GDPR export tab: the view with its sections and file import, one `Catalog` per list, the overview and the report. `src/detected_trade/` holds the trade sheet and its sample trades.
 - `src/home/`, `src/chat/`, `src/settings/`, `src/about/` and `src/auth/` hold the screens that are not tables. `src/debug/` holds a state view and the Warframe log table.
 - `src/kit.rs` holds what those screens share: cards, facts, link rows and the loading and error states. `src/chart.rs` draws grouped bars. The line charts are gpui-component's `LineChart`.
 

@@ -5,6 +5,8 @@ mod auth;
 mod chart;
 mod chat;
 mod debug;
+mod detected_trade;
+mod gdpr;
 mod home;
 mod inventory;
 mod kit;

@@ -45,6 +45,8 @@ pub fn screen(backend: &Entity<Backend>, window: &mut Window, cx: &mut App) -> E
         screen.add("syndicates", "Syndicates", page, cx);
         let users = cx.new(|cx| users::Users::new(backend, cx));
         screen.add_view("users", "Users", users, cx);
+        let export = crate::gdpr::view(backend, window, cx);
+        screen.add_view("gdpr", "GDPR export", export, cx);
         screen
     })
 }

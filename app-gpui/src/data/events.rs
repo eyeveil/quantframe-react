@@ -1,7 +1,7 @@
 use serde_json::Value;
 
 use super::convert;
-use crate::model::{ChatMessage, LiveScraperMessage};
+use crate::model::{ChatMessage, DetectedItem, LiveScraperMessage, SubType};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum DataKind {
@@ -53,6 +53,62 @@ pub struct Trade {
     pub platinum: i64,
     pub credits: i64,
     pub item_names: Vec<String>,
+    pub time: String,
+    pub items: Vec<DetectedItem>,
+}
+
+fn detected_item(item: &Value) -> DetectedItem {
+    let properties = &item["properties"];
+    let sub_types = &properties["subTypes"];
+    let sub_type = &item["sub_type"];
+    let stars = |keys: &[&str]| keys.iter().find_map(|key| sub_type[*key].as_i64());
+    DetectedItem {
+        name: text(properties, &["name", "item_name"]),
+        wfm_url: text(properties, &["wfm_url"]),
+        quantity: item["quantity"].as_i64().unwrap_or(1),
+        sub_type: sub_type.is_object().then(|| SubType {
+            rank: sub_type["rank"].as_i64(),
+            charges: sub_type["charges"].as_i64(),
+            variant: sub_type["variant"].as_str().map(str::to_owned),
+            amber_stars: stars(&["amber_stars", "amberStars"]),
+            cyan_stars: stars(&["cyan_stars", "cyanStars"]),
+        }),
+        price: int(properties, &["price"]),
+        on_wish_list: properties["isWishListItem"].as_bool().unwrap_or(false),
+        needs_sub_type: properties["requireSubType"].as_bool().unwrap_or(false),
+        max_rank: sub_types["maxRank"].as_i64(),
+        variants: sub_types["variants"]
+            .as_array()
+            .map(|variants| {
+                variants
+                    .iter()
+                    .filter_map(|variant| variant.as_str().map(str::to_owned))
+                    .collect()
+            })
+            .unwrap_or_default(),
+        max_amber_stars: sub_types["amberStars"].as_i64(),
+        max_cyan_stars: sub_types["cyanStars"].as_i64(),
+    }
+}
+
+fn detected_trade(payload: &Value) -> Trade {
+    let items: Vec<DetectedItem> = payload["items"]
+        .as_array()
+        .map(|items| items.iter().map(detected_item).collect())
+        .unwrap_or_default();
+    Trade {
+        player_name: text(payload, &["playerName", "player_name"]),
+        trade_type: text(payload, &["type", "tradeType", "trade_type"]),
+        platinum: int(payload, &["platinum"]),
+        credits: int(payload, &["credits"]),
+        item_names: items
+            .iter()
+            .map(|item| item.name.clone())
+            .filter(|name| !name.is_empty())
+            .collect(),
+        time: text(payload, &["tradeTime", "trade_time"]),
+        items,
+    }
 }
 
 fn text(value: &Value, keys: &[&str]) -> String {
@@ -80,22 +136,7 @@ impl BackendEvent {
                 file: text(payload, &["file_name"]),
                 volume: payload["volume"].as_f64().unwrap_or(1.0) as f32,
             },
-            "add_trade" => Self::TradeDetected(Trade {
-                player_name: text(payload, &["playerName", "player_name"]),
-                trade_type: text(payload, &["tradeType", "trade_type"]),
-                platinum: int(payload, &["platinum"]),
-                credits: int(payload, &["credits"]),
-                item_names: payload["items"]
-                    .as_array()
-                    .map(|items| {
-                        items
-                            .iter()
-                            .map(|item| text(&item["properties"], &["name"]))
-                            .filter(|name| !name.is_empty())
-                            .collect()
-                    })
-                    .unwrap_or_default(),
-            }),
+            "add_trade" => Self::TradeDetected(detected_trade(payload)),
             other => Self::Other(other.to_owned()),
         }
     }

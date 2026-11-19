@@ -70,6 +70,20 @@ pub fn day_and_time(timestamp: &str) -> String {
     }
 }
 
+pub fn date_with_year(timestamp: &str) -> String {
+    match (day_and_month(timestamp), timestamp.get(..4)) {
+        (Some(day), Some(year)) => format!("{day} {year}"),
+        _ => timestamp.to_owned(),
+    }
+}
+
+pub fn date_time_with_year(timestamp: &str) -> String {
+    match (day_and_month(timestamp), timestamp.get(..4), timestamp.get(11..16)) {
+        (Some(day), Some(year), Some(time)) => format!("{day} {year}, {time}"),
+        _ => timestamp.to_owned(),
+    }
+}
+
 /// The outline of a control that has keyboard focus. It is drawn inside the
 /// control's bounds, because a shadow outside them would show through a
 /// control with no background as a filled block.
@@ -473,5 +487,11 @@ mod tests {
         assert_eq!(short_date("04:00"), "04:00");
         assert_eq!(day_and_time("2026-11-18T03:39:10Z"), "18 Nov, 03:39");
         assert_eq!(day_and_time("2026-13-18T03:39:10Z"), "2026-13-18T03:39:10Z");
+        assert_eq!(date_with_year("2019-03-14T18:22:05+00:00"), "14 Mar 2019");
+        assert_eq!(
+            date_time_with_year("2025-01-18T19:04:11+00:00"),
+            "18 Jan 2025, 19:04"
+        );
+        assert_eq!(date_time_with_year("soon"), "soon");
     }
 }

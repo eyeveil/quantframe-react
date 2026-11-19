@@ -481,6 +481,199 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
     );
 }
 
+async fn warframe_gdpr(source: &DataSource) {
+    assert!(ok("wfgdpr_get_state", source.wfgdpr_get_state().await).was_initialized);
+    let accounts = ok("wfgdpr_get_accounts", source.wfgdpr_get_accounts().await);
+    assert_eq!(accounts.len(), 1);
+    let account = &accounts[0];
+    assert_eq!(account.display_name, "FixtureTrader");
+    assert_eq!(account.email, "fixture.trader@example.com");
+    assert_eq!(account.ips.len(), 3);
+    assert_eq!(
+        account.created_at.as_deref().and_then(|date| date.get(..10)),
+        Some("2019-03-14")
+    );
+    assert_eq!(
+        (
+            account.trades.len(),
+            account.logins.len(),
+            account.purchases.len(),
+            account.payments.len()
+        ),
+        (18, 8, 7, 5)
+    );
+    let count = |kind| {
+        account
+            .trades
+            .iter()
+            .filter(|trade| trade.kind == kind)
+            .count()
+    };
+    assert_eq!(
+        (
+            count(GdprTradeKind::Sale),
+            count(GdprTradeKind::Purchase),
+            count(GdprTradeKind::Swap)
+        ),
+        (11, 5, 2)
+    );
+    let first = &account.trades[0];
+    assert_eq!(first.time.get(..16), Some("2025-01-18T19:04"));
+    assert_eq!((first.platinum, first.kind), (85, GdprTradeKind::Sale));
+    assert_eq!(first.gave.len(), 1);
+    assert_eq!(first.gave[0].name, "Rhino Prime Set");
+    assert!(first.received.is_empty());
+    let taxed = &account.trades[2];
+    assert_eq!((taxed.credits, taxed.platinum), (16_000, 70));
+    assert!(
+        account
+            .trades
+            .iter()
+            .flat_map(|trade| trade.gave.iter().chain(&trade.received))
+            .all(|item| item.quantity == 1 && item.name.contains(' '))
+    );
+    let booster = &account.purchases[4];
+    assert_eq!(booster.platinum, 40);
+    assert_eq!(booster.items[0].name, "Affinity Booster 3 Days");
+    assert_eq!(account.purchases[2].items[0].quantity, 2);
+    let payment = &account.payments[1];
+    assert_eq!(
+        (payment.sku.as_str(), payment.price, payment.currency.as_str()),
+        ("Platinum1000", 49.99, "EUR")
+    );
+    assert_eq!(payment.time.get(..10), Some("2025-06-14"));
+
+    let missing = source
+        .wfgdpr_load(export_path("no-such-export"))
+        .await
+        .expect_err("wfgdpr_load read a file that doesn't exist");
+    assert!(!missing.to_string().is_empty());
+    ok(
+        "wfgdpr_load",
+        source.wfgdpr_load(fixtures().join("warframe_gdpr.txt")).await,
+    );
+    assert_eq!(
+        ok("wfgdpr_get_accounts", source.wfgdpr_get_accounts().await),
+        accounts
+    );
+}
+
+async fn detected_trade(source: &DataSource, all: &StockItemListParams) {
+    let payload = serde_json::json!({
+        "playerName": "Vexi_Nox",
+        "tradeTime": "2026-11-19T14:32:10Z",
+        "type": "sale",
+        "platinum": 225,
+        "credits": 16000,
+        "items": [
+            {
+                "raw": "Mesa Prime Set",
+                "quantity": 2,
+                "unique_name": "/Lotus/Powersuits/Cowgirl/MesaPrime",
+                "item_type": "Set",
+                "properties": {
+                    "name": "Mesa Prime Set",
+                    "wfm_url": "mesa_prime_set",
+                    "price": 67,
+                    "isWishListItem": false
+                }
+            },
+            {
+                "raw": "Primed Flow",
+                "quantity": 1,
+                "unique_name": "/Lotus/Upgrades/Mods/Warframe/Expert/AvatarPowerMaxModExpert",
+                "sub_type": { "rank": 10 },
+                "item_type": "Mod",
+                "properties": {
+                    "name": "Primed Flow",
+                    "wfm_url": "primed_flow",
+                    "price": 91,
+                    "isWishListItem": false,
+                    "subTypes": { "maxRank": 10 }
+                }
+            }
+        ]
+    });
+    let BackendEvent::TradeDetected(trade) = BackendEvent::parse("add_trade", &payload) else {
+        panic!("add_trade did not parse as a detected trade");
+    };
+    assert_eq!(trade.trade_type, "sale");
+    assert_eq!(trade.time, "2026-11-19T14:32:10Z");
+    assert_eq!(trade.item_names, ["Mesa Prime Set", "Primed Flow"]);
+    assert_eq!(trade.items[1].sub_type, Some(SubType::rank(10)));
+    assert_eq!(trade.items[1].max_rank, Some(10));
+
+    let owned = |items: &[StockItem], url: &str| {
+        items
+            .iter()
+            .find(|item| item.wfm_url == url)
+            .map(|item| item.owned)
+    };
+    let transactions = TransactionListParams {
+        list: ListParams {
+            limit: -1,
+            ..ListParams::default()
+        },
+        ..TransactionListParams::default()
+    };
+    let stock = ok(
+        "get_stock_item_pagination",
+        source.get_stock_item_pagination(all).await,
+    )
+    .results;
+    let ledger = ok(
+        "get_transaction_pagination",
+        source.get_transaction_pagination(&transactions).await,
+    )
+    .total;
+    let mesa = owned(&stock, "mesa_prime_set").expect("Mesa Prime Set in stock");
+    let flow = owned(&stock, "primed_flow").expect("Primed Flow in stock");
+
+    let items = trade
+        .items
+        .iter()
+        .map(|item| HandleItem {
+            wfm_url: item.wfm_url.clone(),
+            sub_type: item.sub_type.clone(),
+            quantity: item.quantity,
+            price: item.price * item.quantity,
+            user_name: trade.player_name.clone(),
+            order_type: OrderType::Sell,
+            operations: vec![format!("SetDate:{}", trade.time), "NotWishList".to_owned()],
+        })
+        .collect();
+    assert_eq!(
+        ok(
+            "handles_handle_items",
+            source.handles_handle_items(items).await
+        ),
+        2
+    );
+
+    let stock = ok(
+        "get_stock_item_pagination",
+        source.get_stock_item_pagination(all).await,
+    )
+    .results;
+    assert_eq!(owned(&stock, "mesa_prime_set"), Some(mesa - 2));
+    assert_eq!(owned(&stock, "primed_flow"), Some(flow - 1));
+    let page = ok(
+        "get_transaction_pagination",
+        source.get_transaction_pagination(&transactions).await,
+    );
+    assert_eq!(page.total, ledger + 2);
+    let sale = page
+        .results
+        .iter()
+        .find(|row| row.user_name == "Vexi_Nox" && row.wfm_url == "mesa_prime_set")
+        .expect("the Mesa Prime Set sale");
+    assert_eq!(
+        (sale.price, sale.quantity, sale.transaction_type),
+        (134, 2, TransactionType::Sale)
+    );
+    assert_eq!(sale.created_at.get(..16), Some("2026-11-19T14:32"));
+}
+
 #[test]
 fn every_data_source_method_works_in_fixture_mode() {
     let (source, mut events) =
@@ -1275,7 +1468,7 @@ fn every_data_source_method_works_in_fixture_mode() {
                 .debug_export_ee_logs(&EeLogParams::default(), export_path("ee"))
                 .await,
         );
-        assert!(!ok("wfgdpr_get_state", source.wfgdpr_get_state().await).was_initialized);
+        warframe_gdpr(&source).await;
         ok(
             "wf_inventory_get_rivens",
             source.wf_inventory_get_rivens(&list).await,
@@ -1300,6 +1493,8 @@ fn every_data_source_method_works_in_fixture_mode() {
         let log = ok("log_export", source.log_export().await);
         assert!(log.exists());
         let _ = std::fs::remove_file(log);
+
+        detected_trade(&source, &all).await;
 
         ok("auth_logout", source.auth_logout().await);
     });
