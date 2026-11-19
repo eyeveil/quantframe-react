@@ -1,6 +1,6 @@
 use std::{
     path::{Path, PathBuf},
-    sync::Mutex,
+    sync::{Arc, Mutex},
 };
 
 use chrono::{DateTime, Utc};
@@ -14,7 +14,10 @@ use service::{
 use utils::{get_location, info, read_json_file, Error, LoggerOptions};
 use wf_market::types::{Auction, AuctionList, ChatList, Order, OrderList};
 
-use crate::{app::AppState, cache::CacheState, helper, host, utils::OrderListExt, DATABASE};
+use crate::{
+    app::AppState, cache::CacheState, helper, host, log_parser::LogParserState,
+    utils::OrderListExt, DATABASE,
+};
 
 #[derive(Deserialize)]
 struct Database {
@@ -94,7 +97,19 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
             &LoggerOptions::default(),
         );
     }
-    seed_market(fixtures).await
+    seed_market(fixtures).await?;
+    load_warframe_gdpr(fixtures)
+}
+
+fn load_warframe_gdpr(fixtures: &Path) -> Result<(), Error> {
+    let export = fixtures.join("warframe_gdpr.txt");
+    if !export.exists() {
+        return Ok(());
+    }
+    let parser = host::managed::<Mutex<Arc<LogParserState>>>()?
+        .lock()?
+        .clone();
+    parser.warframe_gdpr().load(&export.to_string_lossy())
 }
 
 fn shift_to(now: DateTime<Utc>, dates: impl Iterator<Item = DateTime<Utc>>) -> chrono::Duration {

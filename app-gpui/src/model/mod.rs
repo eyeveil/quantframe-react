@@ -2,8 +2,10 @@ mod analytics;
 mod app;
 mod cache;
 mod dashboard;
+mod detected_trade;
 mod edit;
 mod financial_report;
+mod gdpr;
 mod inventory;
 mod live_scraper;
 mod pagination;
@@ -22,8 +24,12 @@ pub use analytics::{ItemPrice, PriceLookupParams, RivenPrice, SyndicateItemPrice
 pub use app::{AppInfo, EeLogLine, EeLogParams, GdprState, RouteLimiter, WfmDebugState};
 pub use cache::{RivenStat, RivenWeapon, TradableItem};
 pub use dashboard::{BestSeller, CategorySummary, Chart, DashboardSummary, PeriodSummary};
+pub use detected_trade::{DetectedItem, HandleItem};
 pub use edit::{BulkEdit, Limit};
 pub use financial_report::FinancialReport;
+pub use gdpr::{
+    GdprAccount, GdprItem, GdprLogin, GdprPayment, GdprPurchase, GdprTrade, GdprTradeKind,
+};
 pub use inventory::{InventoryRiven, InventorySyndicate};
 pub use live_scraper::{LiveScraperMessage, LiveScraperState};
 pub use pagination::{

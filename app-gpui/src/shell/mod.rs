@@ -20,6 +20,7 @@ use crate::{
     chat::ChatView,
     data::{Backend, BackendEvent, DataKind, DataSource},
     debug,
+    detected_trade::TradeDesk,
     home::HomeView,
     inventory, listings,
     model::{Ban, BanService, LiveScraperMessage, LiveScraperState, StockStatus, User, UserStatus},
@@ -27,7 +28,10 @@ use crate::{
     settings::SettingsView,
     theme::{Appearance, AppearanceChoice, Theme, tabular_figures},
     trade_messages,
-    ui::{IconButton, dot, focus_ring, icon, number, page, screen::TabbedScreen, text_button},
+    ui::{
+        IconButton, counted, dot, focus_ring, icon, number, page, screen::TabbedScreen,
+        text_button,
+    },
 };
 use nav::{Screen, ScreenGroup};
 
@@ -71,6 +75,7 @@ pub struct AppShell {
     settings: Option<Entity<SettingsView>>,
     about: Option<Entity<AboutView>>,
     login: Entity<LoginView>,
+    trades: Entity<TradeDesk>,
     preview: Option<Gate>,
     app_error: Option<String>,
     scraper: LiveScraperState,
@@ -86,6 +91,8 @@ struct Startup {
     tab: Option<String>,
     row: Option<usize>,
     dialog: Option<String>,
+    trade: Option<String>,
+    edit: bool,
 }
 
 impl Startup {
@@ -97,6 +104,8 @@ impl Startup {
             tab: var("QF_TAB"),
             row: var("QF_ROW").and_then(|row| row.parse().ok()),
             dialog: var("QF_DIALOG"),
+            trade: var("QF_TRADE"),
+            edit: var("QF_VIEW").as_deref() == Some("edit"),
         }
     }
 }
@@ -108,6 +117,7 @@ impl AppShell {
         let source = backend.read(cx).source.clone();
         let startup = Startup::from_env();
         let login = cx.new(|cx| LoginView::new(&backend, window, cx));
+        let trades = cx.new(|cx| TradeDesk::new(&backend, window, cx));
         let mut shell = Self {
             analytics: None,
             inventory: None,
@@ -152,8 +162,10 @@ impl AppShell {
                     cx.notify();
                 }),
                 cx.subscribe(&login, |shell, _, _: &SignedIn, cx| shell.refresh(cx)),
+                cx.observe(&trades, |_, _, cx| cx.notify()),
             ],
             login,
+            trades,
             backend,
         };
         shell.refresh(cx);
@@ -209,6 +221,10 @@ impl AppShell {
             self.login
                 .clone()
                 .update(cx, |login, cx| login.focus(window, cx));
+        }
+        if let Some(kinds) = &startup.trade {
+            self.trades
+                .update(cx, |desk, cx| desk.preview(kinds, startup.edit, cx));
         }
     }
 
@@ -518,6 +534,26 @@ impl AppShell {
         button.on_click(cx.listener(|shell, _, _, cx| shell.toggle_scraper(cx)))
     }
 
+    fn trades_button(&self, cx: &App) -> Option<impl IntoElement + use<>> {
+        let pending = self.trades.read(cx).pending();
+        if pending == 0 {
+            return None;
+        }
+        let theme = Theme::global(cx);
+        let trades = self.trades.downgrade();
+        Some(
+            text_button(
+                "trades-pending",
+                &counted(pending as i64, "trade to review", "trades to review"),
+                cx,
+            )
+            .icon(Icon::new(IconName::Handshake).size(theme.metrics.icon - px(1.)))
+            .on_click(move |_, window, cx| {
+                trades.update(cx, |desk, cx| desk.open(window, cx)).ok();
+            }),
+        )
+    }
+
     fn appearance_button(&self, cx: &App) -> impl IntoElement + use<> {
         let theme = Theme::global(cx);
         let current = theme.choice;
@@ -669,6 +705,7 @@ impl AppShell {
                             .child(self.appearance_button(cx))
                             .when(!gated, |buttons| {
                                 buttons
+                                    .children(self.trades_button(cx))
                                     .child(self.scraper_state(cx))
                                     .child(self.scraper_button(cx))
                             }),

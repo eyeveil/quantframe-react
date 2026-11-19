@@ -1,5 +1,7 @@
 mod app;
 mod cache;
+mod gdpr;
+mod handlers;
 mod inventory;
 mod market;
 mod stock;
