@@ -47,4 +47,19 @@ impl Account {
         }
         self.trades.push(trade);
     }
+
+    pub fn add_pending(
+        &mut self,
+        trade: &mut Option<PlayerTrade>,
+        login: &mut Option<Login>,
+        purchase: &mut Option<Purchase>,
+        transaction: &mut Option<Transaction>,
+    ) {
+        if let Some(trade) = trade.take() {
+            self.add_trade(trade);
+        }
+        self.logins.extend(login.take());
+        self.purchases.extend(purchase.take());
+        self.transactions.extend(transaction.take());
+    }
 }

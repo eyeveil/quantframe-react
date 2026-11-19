@@ -76,7 +76,13 @@ impl WarframeGDPRModule {
                METADATA
             ======================= */
             if line.eq("ACCOUNT") {
-                if let Some(acc) = current_account.take() {
+                if let Some(mut acc) = current_account.take() {
+                    acc.add_pending(
+                        &mut current_trade,
+                        &mut current_login,
+                        &mut current_purchase,
+                        &mut current_transaction,
+                    );
                     accounts.push(acc);
                 }
                 section = Some("account");
@@ -87,7 +93,13 @@ impl WarframeGDPRModule {
 
             // Separator line (e.g. "------...") — flush the current account
             if section == Some("account") && !line.is_empty() && line.chars().all(|c| c == '-') {
-                if let Some(acc) = current_account.take() {
+                if let Some(mut acc) = current_account.take() {
+                    acc.add_pending(
+                        &mut current_trade,
+                        &mut current_login,
+                        &mut current_purchase,
+                        &mut current_transaction,
+                    );
                     accounts.push(acc);
                 }
                 section = None;
@@ -525,21 +537,13 @@ impl WarframeGDPRModule {
             }
             previous_line = line.clone();
         }
-        if let Some(acc) = current_account.as_mut() {
-            if let Some(trade) = current_trade.take() {
-                acc.add_trade(trade);
-            }
-            if let Some(login) = current_login.take() {
-                acc.logins.push(login);
-            }
-            if let Some(purchase) = current_purchase.take() {
-                acc.purchases.push(purchase);
-            }
-            if let Some(transaction) = current_transaction.take() {
-                acc.transactions.push(transaction);
-            }
-        }
-        if let Some(acc) = current_account {
+        if let Some(mut acc) = current_account {
+            acc.add_pending(
+                &mut current_trade,
+                &mut current_login,
+                &mut current_purchase,
+                &mut current_transaction,
+            );
             accounts.push(acc);
         }
 
@@ -671,5 +675,61 @@ mod tests {
                 assert!(!name.contains(" x ") && !name.contains("_x_"), "{name}");
             }
         }
+    }
+
+    #[test]
+    fn each_record_lands_on_its_own_account() {
+        let accounts = parse("warframe_gdpr_two_accounts.txt");
+        let summary: Vec<_> = accounts
+            .iter()
+            .map(|account| {
+                (
+                    account.display_name.as_str(),
+                    account
+                        .trades
+                        .iter()
+                        .map(|trade| trade.platinum)
+                        .collect::<Vec<_>>(),
+                    account.logins.len(),
+                    account
+                        .purchases
+                        .iter()
+                        .map(|p| p.shop_id.rsplit('/').next().unwrap().to_string())
+                        .collect::<Vec<_>>(),
+                    account
+                        .transactions
+                        .iter()
+                        .map(|t| t.account.as_str())
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            summary,
+            [
+                (
+                    "FixtureTrader",
+                    vec![85, 144],
+                    2,
+                    vec!["OrokinReactor".to_string(), "TwoWeaponSlotItem".to_string()],
+                    vec!["FixtureTrader", "FixtureTrader"],
+                ),
+                (
+                    "FixtureAlt",
+                    vec![120],
+                    1,
+                    vec!["OrokinCatalyst".to_string()],
+                    vec!["FixtureAlt"],
+                ),
+            ]
+        );
+        assert_eq!(
+            items(&accounts[0].trades[1].offered_items),
+            [("Mesa Prime Set".to_string(), 2)]
+        );
+        assert_eq!(
+            items(&accounts[1].trades[0].received_items),
+            [("Arcane Energize".to_string(), 3)]
+        );
     }
 }
