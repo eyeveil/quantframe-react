@@ -21,6 +21,7 @@ use crate::{
     data::{Backend, BackendEvent, DataKind, DataSource},
     kit::{self, Loaded},
     model::{Settings, User, UserStatus},
+    notify::sound,
     theme::{AppearanceChoice, Theme, tabular_figures},
     ui::{
         IconButton, Segment, chip, focus_ring,
@@ -35,6 +36,8 @@ const NAV_WIDTH: f32 = 232.;
 const CONTENT_WIDTH: f32 = 760.;
 const SOURCE_DETAIL: &str = "wf_inventory.source#detail";
 const SOURCE_PATH: &str = "wf_inventory.source";
+const SOUND_SUFFIX: &str = ".system_notify.sound_file";
+const CUSTOM_SOUNDS_PATH: &str = "notifications.custom_sounds";
 
 const SOURCES: [(&str, &str, &str, &str); 4] = [
     ("None", "None", "", ""),
@@ -181,6 +184,27 @@ fn cell_text(kind: Kind, value: &Value) -> String {
         Kind::Int { .. } => value.as_i64().map(crate::ui::number).unwrap_or_default(),
         _ => editor_text(kind, value),
     }
+}
+
+fn custom_sound_choices(draft: &Value) -> Vec<(SharedString, SharedString)> {
+    get(draft, CUSTOM_SOUNDS_PATH)
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|sound| {
+            let file = sound["file_name"]
+                .as_str()
+                .filter(|file| !file.is_empty())?;
+            let name = sound["name"]
+                .as_str()
+                .filter(|name| !name.is_empty())
+                .unwrap_or(file);
+            Some((
+                format!("{}{file}", sound::CUSTOM_PREFIX).into(),
+                name.to_owned().into(),
+            ))
+        })
+        .collect()
 }
 
 fn source_parts(value: &Value) -> (&'static str, String) {
@@ -613,6 +637,9 @@ impl SettingsView {
                 Some(Editor::Area(area)) => Textarea::new(area).into_any_element(),
                 _ => div().into_any_element(),
             },
+            Kind::Choice(choices) if path.ends_with(SOUND_SUFFIX) => {
+                self.sound_control(path, choices, value.as_str().unwrap_or_default(), cx)
+            }
             Kind::Choice(choices) => self.popup(
                 SharedString::from(path),
                 choices
@@ -645,6 +672,44 @@ impl SettingsView {
                     .into_any_element()
             }
         }
+    }
+
+    fn sound_control(
+        &self,
+        path: &'static str,
+        choices: Choices,
+        current: &str,
+        cx: &mut Context<Self>,
+    ) -> AnyElement {
+        let mut options: Vec<(SharedString, SharedString)> = choices
+            .iter()
+            .map(|(key, label)| ((*key).into(), (*label).into()))
+            .collect();
+        options.extend(custom_sound_choices(&self.draft));
+        let volume_path = format!("{}volume", path.trim_end_matches("sound_file"));
+        let volume = get(&self.draft, &volume_path).as_f64().unwrap_or(1.0) as f32;
+        let file = current.to_owned();
+        let test = IconButton::new(
+            SharedString::from(format!("{path}-test")),
+            IconName::Play,
+            "Play this sound",
+        )
+        .on_click_or_disabled((!sound::is_silent(current)).then_some(
+            move |_: &gpui::ClickEvent, _: &mut Window, _: &mut App| sound::play(&file, volume),
+        ));
+        div()
+            .flex()
+            .items_center()
+            .gap(px(6.))
+            .child(test)
+            .child(self.popup(
+                SharedString::from(path),
+                options,
+                current,
+                move |view, key, _, cx| view.put(path, json!(key), cx),
+                cx,
+            ))
+            .into_any_element()
     }
 
     fn row(&self, field: Field, cx: &mut Context<Self>) -> Div {

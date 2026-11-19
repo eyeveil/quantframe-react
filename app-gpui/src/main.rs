@@ -23,7 +23,7 @@ use gpui::{
 };
 use gpui_component::{Root, TitleBar};
 
-use quantframe_gpui::{data, model};
+use quantframe_gpui::{data, model, notify};
 
 use data::{Backend, BackendStatus, DataSource, StartOptions};
 use shell::AppShell;

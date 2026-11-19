@@ -37,7 +37,7 @@ impl SystemNotify {
         if !self.sound_file.is_empty() && self.sound_file != "none" {
             play_sound!(self.sound_file.clone(), self.volume);
         }
-        #[cfg(target_os = "windows")]
+        #[cfg(any(target_os = "windows", not(feature = "tauri")))]
         crate::host::notify(&title, &content);
     }
 }

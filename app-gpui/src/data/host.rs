@@ -23,6 +23,13 @@ impl GpuiHost {
     }
 
     pub fn send(&self, event: BackendEvent) {
+        match &event {
+            BackendEvent::PlaySound { file, volume } => crate::notify::sound::play(file, *volume),
+            BackendEvent::SystemNotification { title, body } => {
+                crate::notify::desktop::show(title, body)
+            }
+            _ => {}
+        }
         let _ = self.events.unbounded_send(event);
     }
 }
