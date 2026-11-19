@@ -219,3 +219,49 @@ fn max_price_drop_rule_needs_an_existing_order() {
         Some("MaxPriceDrop".to_owned())
     );
 }
+
+#[test]
+fn buying_deletes_a_bid_whose_ask_margin_is_below_the_threshold() {
+    run(|_| async move {
+        buy_nekros(&[60, 65], &[30, 40, 55], 80.0).await;
+        let mut bid = own_order("bid-nekros", "buy", NEKROS.1, 50, 1);
+        bid.properties.set_property_value("potential_profit", 20);
+        set_own_orders(vec![bid]);
+
+        scraper().item().check().await.expect("pass");
+
+        assert!(only_record(WriteAction::Update, NEKROS.0).is_none(), "{:?}", intended());
+        let deleted = only_record(WriteAction::Delete, NEKROS.0).expect("delete");
+        assert_eq!(deleted.market_id, "bid-nekros");
+        assert!(deleted.intent.reason.contains("LowMargin"), "{deleted:?}");
+    });
+}
+
+#[test]
+fn buying_bids_when_the_ask_margin_meets_the_threshold() {
+    run(|_| async move {
+        buy_nekros(&[70, 75], &[30, 40, 55], 80.0).await;
+
+        scraper().item().check().await.expect("pass");
+
+        let created = only_record(WriteAction::Create, NEKROS.0).expect("create");
+        assert_eq!(created.intent.price, Some(55));
+    });
+}
+
+#[test]
+fn buying_gates_and_estimates_profit_against_the_posted_bid() {
+    run(|_| async move {
+        buy_nekros(&[60, 62], &[30, 55], 80.0).await;
+        update_settings(|settings| {
+            settings.live_scraper.items.general.buy_list =
+                vec![serde_json::from_value(serde_json::json!({"wfmId": NEKROS.1, "max_price": 45})).unwrap()];
+        });
+
+        scraper().item().check().await.expect("pass");
+
+        let created = only_record(WriteAction::Create, NEKROS.0).expect("create");
+        assert_eq!(created.intent.price, Some(45));
+        assert_eq!(created.intent.profit, Some(15), "{created:?}");
+    });
+}

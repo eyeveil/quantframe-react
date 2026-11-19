@@ -475,19 +475,16 @@ impl ItemModule {
             trade_operations.add(reason);
         }
 
-        // How far above (positive) or below (negative) our post price is from the market average.
-        // Used to gauge whether we're overpaying relative to recent trades.
-        let closed_avg_metric = closed_avg as i64 - post_price;
-
-        // Rough expected profit: the margin between our buy price and the average sell price, minus 1 plat buffer.
-        let potential_profit = closed_avg_metric - 1;
-
         // Per-item max price cap — if this item has a specific max configured, clamp the post price.
         let item_max_price = settings.general.get_item_max_price(&item_info.wfm_id);
         if item_max_price > 0 && post_price > item_max_price {
             trade_operations.add("AboveMaxBuyPrice");
             post_price = item_max_price;
         }
+
+        let closed_avg_metric = closed_avg as i64 - post_price;
+
+        let potential_profit = ask_margin(entry.sell_market_info.lowest_price, post_price);
 
         // Global average price cap — if post price exceeds it, mark for deletion regardless of other checks.
         if !is_disabled(avg_price_cap) && post_price > avg_price_cap {
@@ -508,12 +505,13 @@ impl ItemModule {
                 .order()
                 .cache_orders()
                 .extract_order_summary(OrderType::Buy);
+            all_orders.retain(|order| order.2 != item_info.wfm_id || order.3 != order_id);
             if !all_orders.iter().any(|i| i.2 == item_info.wfm_id) {
                 all_orders.push((
                     post_price,
                     potential_profit as f64,
                     item_info.wfm_id.clone(),
-                    String::new(),
+                    order_id.clone(),
                 ));
             }
 
@@ -553,10 +551,9 @@ impl ItemModule {
             trade_operations.add("Overpriced");
         }
 
-        // If the spread between lowest and highest buy orders is too narrow, not worth competing.
-        if market_info.price_range < profit_threshold {
+        if potential_profit < profit_threshold {
             trade_operations.add("Delete");
-            trade_operations.add("Underpriced");
+            trade_operations.add("LowMargin");
         }
 
         // Warframe Market prices cannot be below 1 platinum.

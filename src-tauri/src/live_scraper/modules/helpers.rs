@@ -538,8 +538,9 @@ pub async fn progress_order(
     let original_update_string =
         properties.get_property_value("original_update_string", String::new());
 
+    let profit = properties.get_property_value("potential_profit", None::<i64>);
     let intent = |default_reason: &str| {
-        order_intent(
+        let intent = order_intent(
             component,
             entry,
             &name,
@@ -548,7 +549,11 @@ pub async fn progress_order(
             default_reason,
         )
         .price(i64::from(post_price), (!order_id.is_empty()).then_some(i64::from(old_price)))
-        .quantity(quantity)
+        .quantity(quantity);
+        match profit {
+            Some(profit) => intent.profit(profit),
+            None => intent,
+        }
     };
 
     if trade_operations.has("Create") && !trade_operations.has("Delete") && can_create_order {
@@ -854,6 +859,10 @@ pub fn should_apply_max_price_drop(
     } else {
         None
     }
+}
+
+pub fn ask_margin(lowest_ask: i64, bid: i64) -> i64 {
+    lowest_ask - bid
 }
 
 pub fn minimum_profit_threshold(bought_price: i64, flat_profit: i64, percentage: i64) -> i64 {

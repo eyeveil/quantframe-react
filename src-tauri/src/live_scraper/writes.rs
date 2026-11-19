@@ -46,6 +46,8 @@ pub struct Intent {
     pub price: Option<i64>,
     pub old_price: Option<i64>,
     pub quantity: Option<i64>,
+    #[serde(default)]
+    pub profit: Option<i64>,
     pub reason: String,
 }
 
@@ -73,6 +75,11 @@ impl Intent {
     pub fn price(mut self, price: i64, old_price: Option<i64>) -> Self {
         self.price = Some(price);
         self.old_price = old_price;
+        self
+    }
+
+    pub fn profit(mut self, profit: i64) -> Self {
+        self.profit = Some(profit);
         self
     }
 
