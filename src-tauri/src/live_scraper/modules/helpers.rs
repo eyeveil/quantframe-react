@@ -678,16 +678,21 @@ pub async fn delete_order(
     order_type: OrderType,
     wfm_client: &wf_market::Client<wf_market::Authenticated>,
 ) -> Result<OperationSet, Error> {
+    let (order_id, current_price, mut properties, _) =
+        get_order_info(entry, order_type, wfm_client);
+    if order_id.is_empty() {
+        return Ok(OperationSet::default());
+    }
     progress_order(
         component,
         entry,
         wfm_client,
         order_type,
-        1,
-        Some(1),
+        current_price.max(1) as u32,
+        None,
         &LoggerOptions::default(),
-        &mut wf_market::types::Properties::default(),
-        &OperationSet::default(),
+        &mut properties,
+        &OperationSet::from(vec!["Update", "Delete"]),
     )
     .await
 }

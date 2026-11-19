@@ -36,7 +36,7 @@ impl LiveScraperState {
         })
     }
 
-    fn init_modules(self: &Arc<Self>) {
+    pub fn init_modules(self: &Arc<Self>) {
         self.item_module
             .get_or_init(|| ItemModule::new(self.clone()));
         self.riven_module
