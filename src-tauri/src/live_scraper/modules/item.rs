@@ -611,18 +611,9 @@ impl ItemModule {
         )
         .await
         {
-            if e.cause == "CooldownError" {
-                let cooldown_info = get_cooldown(&e.properties);
-                log(&format!(
-                    "Item {} is on cooldown ({}). Skipping update.",
-                    item_info.name,
-                    cooldown_info.format_remaining()
-                ));
-            } else {
-                return Err(e
-                    .with_location(get_location!())
-                    .with_context(entry.to_json()));
-            }
+            return Err(e
+                .with_location(get_location!())
+                .with_context(entry.to_json()));
         }
         Ok(())
     }
@@ -882,23 +873,9 @@ impl ItemModule {
                 ));
             }
             Err(e) => {
-                if e.cause == "CooldownError" {
-                    let (is_dirty, cooldown_info) =
-                        set_cooldown(&mut stock_item.properties, &e.properties);
-                    if is_dirty {
-                        stock_item.is_dirty = true;
-                        stock_item.add_change("cooldown");
-                    }
-                    log(&format!(
-                        "Item {} is on cooldown ({}). Skipping update.",
-                        item_info.name,
-                        cooldown_info.format_remaining()
-                    ));
-                } else {
-                    return Err(e
-                        .with_location(get_location!())
-                        .with_context(entry.to_json()));
-                }
+                return Err(e
+                    .with_location(get_location!())
+                    .with_context(entry.to_json()));
             }
         };
 
@@ -1066,23 +1043,9 @@ impl ItemModule {
             }
 
             Err(e) => {
-                if e.cause == "CooldownError" {
-                    let (is_dirty, cooldown_info) =
-                        set_cooldown(&mut wishlist_item.properties, &e.properties);
-                    if is_dirty {
-                        wishlist_item.is_dirty = true;
-                        wishlist_item.add_change("cooldown");
-                    }
-                    log(&format!(
-                        "Item {} is on cooldown ({}). Skipping update.",
-                        item_info.name,
-                        cooldown_info.format_remaining()
-                    ));
-                } else {
-                    return Err(e
-                        .with_location(get_location!())
-                        .with_context(entry.to_json()));
-                }
+                return Err(e
+                    .with_location(get_location!())
+                    .with_context(entry.to_json()));
             }
         }
 
@@ -1272,23 +1235,9 @@ impl ItemModule {
             }
 
             Err(e) => {
-                if e.cause == "CooldownError" {
-                    let (is_dirty, cooldown_info) =
-                        set_cooldown(&mut stock_syndicate.properties, &e.properties);
-                    if is_dirty {
-                        stock_syndicate.is_dirty = true;
-                        stock_syndicate.add_change("cooldown");
-                    }
-                    log(&format!(
-                        "Item {} is on cooldown ({}). Skipping update.",
-                        item_info.name,
-                        cooldown_info.format_remaining()
-                    ));
-                } else {
-                    return Err(e
-                        .with_location(get_location!())
-                        .with_context(entry.to_json()));
-                }
+                return Err(e
+                    .with_location(get_location!())
+                    .with_context(entry.to_json()));
             }
         }
 

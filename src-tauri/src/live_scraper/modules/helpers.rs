@@ -1,13 +1,10 @@
-use crate::live_scraper::types::cooldown::CooldownInfo;
 use std::{
     collections::HashMap,
     path::Path,
-    sync::{atomic::Ordering, Mutex, OnceLock},
-    time::Duration,
+    sync::{atomic::Ordering, OnceLock},
     vec,
 };
 
-use chrono::Utc;
 use entity::{
     dto::{add_price_history, PriceHistory},
     stock_item::*,
@@ -34,11 +31,6 @@ use crate::{
 };
 
 pub static INTERESTING_ITEMS: OnceLock<HashMap<String, Vec<ItemPriceInfo>>> = OnceLock::new();
-
-const ORDER_COOLDOWN_ENABLED: bool = false; // Set to true to enable order cooldowns, false to disable
-static ORDER_COOL_DOWNS: OnceLock<Mutex<HashMap<String, CooldownInfo>>> = OnceLock::new();
-const ORDER_SAME_PRICE_COOL_DOWN: Duration = Duration::from_secs(20 * 60);
-const ORDER_PRICE_CHANGE_COOL_DOWN: Duration = Duration::from_secs(5 * 60);
 
 pub fn is_disabled(value: i64) -> bool {
     value <= -1
@@ -303,6 +295,8 @@ pub fn get_order_info(
         let mut properties = order.properties;
         properties.set_property_value("id", order.id.clone());
         properties.set_property_value("old_price", order.platinum);
+        properties.set_property_value("old_quantity", order.quantity);
+        properties.set_property_value("old_per_trade", order.per_trade);
         properties.set_property_value("original_update_string", format!("p:{}", order.platinum));
         (
             order.id.clone(),
@@ -467,56 +461,6 @@ async fn handler_wfm_error(
     err
 }
 
-pub fn get_cooldown(new: &Properties) -> CooldownInfo {
-    let current_cooldown = new.get_property_value("cooldown", CooldownInfo::default());
-    current_cooldown
-}
-pub fn set_cooldown(current: &mut Properties, new: &Properties) -> (bool, CooldownInfo) {
-    let current_cooldown = get_cooldown(current);
-    let new_cooldown = get_cooldown(new);
-    if current_cooldown.start_time != new_cooldown.start_time {
-        current.set_property_value("cooldown", new_cooldown.clone());
-        return (true, new_cooldown);
-    }
-    (false, current_cooldown)
-}
-fn is_order_on_cooldown(
-    order_id: impl Into<String>,
-    old_price: u32,
-    new_price: u32,
-) -> Option<CooldownInfo> {
-    if !ORDER_COOLDOWN_ENABLED {
-        return None;
-    }
-    let order_id = order_id.into();
-    let now = Utc::now();
-
-    let (cooldown_type, duration) = if old_price == new_price {
-        ("order_same_price", ORDER_SAME_PRICE_COOL_DOWN)
-    } else {
-        ("order_price_change", ORDER_PRICE_CHANGE_COOL_DOWN)
-    };
-    // Start a new cooldown
-    let cooldown = CooldownInfo::new(order_id, now, cooldown_type, duration);
-    let key = cooldown.key();
-
-    let cooldowns = ORDER_COOL_DOWNS.get_or_init(|| Mutex::new(HashMap::new()));
-    let mut cooldowns = cooldowns.lock().unwrap();
-
-    // Check existing cooldown
-    if let Some(cooldown) = cooldowns.get(&key) {
-        if cooldown.remaining().is_some() {
-            return Some(cooldown.clone());
-        }
-
-        // Cooldown has expired
-        cooldowns.remove(&key);
-    }
-
-    cooldowns.insert(key, cooldown);
-
-    None
-}
 pub async fn progress_order(
     component: &str,
     entry: &ItemEntry,
@@ -597,23 +541,20 @@ pub async fn progress_order(
             }
         }
     } else if trade_operations.has("Update") && !trade_operations.has("Delete") {
-        if let Some(info) = is_order_on_cooldown(&order_id, old_price, post_price) {
-            properties.set_property_value("cooldown", info.clone());
+        let old_quantity = properties.get_property_value("old_quantity", 0u32);
+        let old_per_trade = properties.get_property_value("old_per_trade", None::<u8>);
+        let new_per_trade = per_trade.map(|pt| pt as u8);
+        if old_price == post_price && i64::from(old_quantity) == quantity && old_per_trade == new_per_trade {
             wfm_client.order().cache_orders_mut().update(
-                order_id,
+                &order_id,
                 UpdateOrderParams::new().with_properties(json!(properties.properties)),
             );
-            return Err(Error::new(
-                format!("{}:Cooldown", component),
-                format!(
-                    "Order for item {} is on cooldown ({}). Skipping update.",
-                    name,
-                    info.format_remaining()
-                ),
-                get_location!(),
-            )
-            .with_cause("CooldownError")
-            .with_context(json!({"cooldown": info})));
+            trace(
+                format!("{}Unchanged", component),
+                &format!("Order for item {} is unchanged at {}. Nothing sent.", name, post_price),
+                log_options,
+            );
+            return Ok(OperationSet::default());
         }
 
         match writes::update_order(

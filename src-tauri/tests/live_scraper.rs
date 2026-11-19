@@ -163,7 +163,8 @@ async fn sell_saryn_with_own_order(own_price: u32, sells: &[u32]) -> StockItem {
 #[test]
 fn selling_uses_the_sell_side_max_price_drop() {
     run(|_| async move {
-        sell_saryn_with_own_order(100, &[60, 62]).await;
+        let saryn = sell_saryn_with_own_order(100, &[60, 62]).await;
+        set_own_orders(vec![own_order("ask-saryn", "sell", &saryn.wfm_id, 100, 1)]);
         update_settings(|settings| {
             settings.live_scraper.items.wts.max_price_drop = 5;
             settings.live_scraper.items.wtb.max_price_drop = -1;
@@ -263,5 +264,32 @@ fn buying_gates_and_estimates_profit_against_the_posted_bid() {
         let created = only_record(WriteAction::Create, NEKROS.0).expect("create");
         assert_eq!(created.intent.price, Some(45));
         assert_eq!(created.intent.profit, Some(15), "{created:?}");
+    });
+}
+
+#[test]
+fn unchanged_orders_send_no_update() {
+    run(|harness| async move {
+        sell_saryn_with_own_order(90, &[90, 95]).await;
+        update_settings(|settings| settings.live_scraper.general.dry_run = false);
+
+        let _ = scraper().item().check().await;
+
+        assert!(harness.writes().is_empty(), "{:?}", harness.writes());
+        assert!(harness.proxy_lines().is_empty(), "{:?}", harness.proxy_lines());
+    });
+}
+
+#[test]
+fn a_quantity_change_alone_still_updates() {
+    run(|_| async move {
+        let saryn = sell_saryn_with_own_order(90, &[90, 95]).await;
+        set_own_orders(vec![own_order("ask-saryn", "sell", &saryn.wfm_id, 90, 1)]);
+
+        scraper().item().check().await.expect("pass");
+
+        let update = only_record(WriteAction::Update, "saryn_prime_set").expect("update");
+        assert_eq!(update.intent.price, Some(90));
+        assert_eq!(update.intent.quantity, Some(saryn.owned));
     });
 }
