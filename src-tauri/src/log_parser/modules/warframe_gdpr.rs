@@ -325,23 +325,20 @@ impl WarframeGDPRModule {
                         raw.push_str(" (RIVEN RANK 0)");
                     }
                     _ if raw.ends_with("PLATINUM") || raw.ends_with("PREMIUM CREDITS") => {
-                        raw = detection.platinum_name.clone();
+                        raw = format!("{} x {quantity}", detection.platinum_name);
                         trade.platinum = quantity;
                     }
                     _ if raw.ends_with("CREDITS") || raw.ends_with("REGULAR CREDITS") => {
-                        raw = detection.credits_name.clone();
+                        raw = format!("{} x {quantity}", detection.credits_name);
                         trade.credits = quantity;
                     }
                     _ => {}
                 }
 
-                if quantity > 1 {
-                    raw = format!("{raw} x {quantity}");
-                }
-
                 /* ---------- Create + Validate Item ---------- */
 
                 let (_, mut item) = TradeItem::from_string(&raw, "", &detection, &[]);
+                item.quantity = quantity;
 
                 if item.item_type == TradeItemType::Unknown {
                     let validations = [
@@ -586,5 +583,93 @@ impl WarframeGDPRModule {
     }
     pub fn accounts(&self) -> Vec<Account> {
         self.accounts.lock().unwrap().clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{
+        path::PathBuf,
+        sync::{Mutex, Once},
+    };
+
+    use super::*;
+    use crate::{cache::CacheState, helper, host};
+
+    fn fixture(name: &str) -> String {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("fixtures")
+            .join(name)
+            .to_string_lossy()
+            .into_owned()
+    }
+
+    fn parse(name: &str) -> Vec<Account> {
+        static SETUP: Once = Once::new();
+        SETUP.call_once(|| {
+            let storage = std::env::temp_dir().join(format!("qf-gdpr-test-{}", std::process::id()));
+            helper::STORAGE_PATH.get_or_init(|| storage);
+            crate::fixtures::prepare_storage(&PathBuf::from(fixture(""))).unwrap();
+            init_detections();
+            host::manage(Mutex::new(CacheState::new_offline("en").unwrap()));
+        });
+        let module = WarframeGDPRModule::new();
+        module.load(&fixture(name)).unwrap();
+        module.accounts()
+    }
+
+    fn items(items: &[TradeItem]) -> Vec<(String, i64)> {
+        items
+            .iter()
+            .filter(|item| {
+                !matches!(
+                    item.item_type,
+                    TradeItemType::Platinum | TradeItemType::Credits
+                )
+            })
+            .map(|item| {
+                (
+                    item.properties
+                        .get_property_value("item_name", String::new()),
+                    item.quantity,
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn trade_items_keep_their_name_and_quantity() {
+        let accounts = parse("warframe_gdpr.txt");
+        let trades = &accounts[0].trades;
+        let mesa = trades
+            .iter()
+            .find(|trade| trade.platinum == 144)
+            .expect("the Mesa Prime Set x 2 sale");
+        assert_eq!(
+            items(&mesa.offered_items),
+            [("Mesa Prime Set".to_string(), 2)]
+        );
+        let paid: Vec<_> = mesa
+            .received_items
+            .iter()
+            .map(|item| (item.item_type.clone(), item.quantity))
+            .collect();
+        assert_eq!(paid, [(TradeItemType::Platinum, 144)]);
+        let energize = trades
+            .iter()
+            .find(|trade| trade.platinum == 360)
+            .expect("the Arcane Energize x 3 purchase");
+        assert_eq!(
+            items(&energize.received_items),
+            [("Arcane Energize".to_string(), 3)]
+        );
+        for trade in trades {
+            for (name, _) in items(&trade.offered_items)
+                .into_iter()
+                .chain(items(&trade.received_items))
+            {
+                assert!(!name.contains(" x ") && !name.contains("_x_"), "{name}");
+            }
+        }
     }
 }
