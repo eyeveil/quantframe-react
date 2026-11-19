@@ -525,13 +525,18 @@ async fn warframe_gdpr(source: &DataSource) {
     assert!(first.received.is_empty());
     let taxed = &account.trades[2];
     assert_eq!((taxed.credits, taxed.platinum), (16_000, 70));
-    assert!(
-        account
-            .trades
-            .iter()
-            .flat_map(|trade| trade.gave.iter().chain(&trade.received))
-            .all(|item| item.quantity == 1 && item.name.contains(' '))
-    );
+    let items: Vec<_> = account
+        .trades
+        .iter()
+        .flat_map(|trade| trade.gave.iter().chain(&trade.received))
+        .collect();
+    assert!(items.iter().all(|item| item.name.contains(' ')));
+    let several: Vec<_> = items
+        .iter()
+        .filter(|item| item.quantity != 1)
+        .map(|item| (item.name.as_str(), item.quantity))
+        .collect();
+    assert_eq!(several, [("Arcane Energize", 3), ("Mesa Prime Set", 2)]);
     let booster = &account.purchases[4];
     assert_eq!(booster.platinum, 40);
     assert_eq!(booster.items[0].name, "Affinity Booster 3 Days");
