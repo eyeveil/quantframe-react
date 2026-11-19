@@ -7,4 +7,6 @@ pub mod modules;
 pub use modules::*;
 
 pub mod types;
+
+pub mod writes;
 pub use types::*;

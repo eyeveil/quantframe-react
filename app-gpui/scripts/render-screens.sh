@@ -33,6 +33,8 @@ shots=(
   "orders-orders-panel|QF_SCREEN=orders QF_TAB=orders QF_THEME=dark QF_PANEL=open QF_ROW=0"
   "orders-auctions|QF_SCREEN=orders QF_TAB=auctions QF_THEME=dark"
   "orders-auctions-panel|QF_SCREEN=orders QF_TAB=auctions QF_THEME=dark QF_PANEL=open QF_ROW=1"
+  "orders-dry-run|QF_SCREEN=orders QF_TAB=intended QF_THEME=dark"
+  "orders-dry-run-panel|QF_SCREEN=orders QF_TAB=intended QF_THEME=dark QF_PANEL=open QF_ROW=1"
   "trade-messages-items|QF_SCREEN=trade-messages QF_TAB=item QF_THEME=dark"
   "trade-messages-custom|QF_SCREEN=trade-messages QF_TAB=custom QF_THEME=dark"
   "trade-messages-rivens|QF_SCREEN=trade-messages QF_TAB=riven QF_THEME=dark"

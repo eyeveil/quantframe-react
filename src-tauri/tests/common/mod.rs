@@ -213,6 +213,9 @@ where
         }
         let harness = HARNESS.get().unwrap();
         reset_settings();
+        set_own_orders(Vec::new());
+        set_item_prices(Vec::new()).await;
+        qf_app_lib::live_scraper::writes::clear_intended_orders();
         harness.clear();
         test(harness).await
     })
@@ -328,4 +331,42 @@ pub fn set_own_orders(orders: Vec<Order>) {
     let list: OrderList<Order> =
         serde_json::from_value(json!({ "sell_orders": sell, "buy_orders": buy })).unwrap();
     app.wfm_client.order().set_orders(list);
+}
+
+pub async fn set_item_prices(prices: Vec<Value>) {
+    let path = qf_app_lib::helper::get_app_storage_path().join("cache/items/ItemPrices.json");
+    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+    std::fs::write(&path, serde_json::to_string(&prices).unwrap()).unwrap();
+    let app = states::app_state().unwrap();
+    let module = host::managed::<Mutex<qf_app_lib::cache::CacheState>>()
+        .unwrap()
+        .lock()
+        .unwrap()
+        .item_price();
+    module
+        .load(&app.qf_client, false)
+        .await
+        .unwrap();
+}
+
+pub fn price(wfm_url: &str, wfm_id: &str, moving_avg: f64) -> Value {
+    json!({
+        "wfm_url": wfm_url,
+        "wfm_id": wfm_id,
+        "uuid": wfm_url,
+        "volume": 40.0,
+        "max_price": moving_avg * 1.5,
+        "min_price": moving_avg * 0.5,
+        "avg_price": moving_avg,
+        "moving_avg": moving_avg,
+        "median": moving_avg,
+        "profit": 20.0,
+        "profit_margin": 20.0,
+        "trading_tax": 0,
+        "week_price_shift": 0.0
+    })
+}
+
+pub fn intended() -> Vec<qf_app_lib::live_scraper::writes::IntendedOrder> {
+    qf_app_lib::live_scraper::writes::intended_orders()
 }

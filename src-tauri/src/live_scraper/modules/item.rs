@@ -76,7 +76,17 @@ impl ItemModule {
                 );
                 break;
             }
-            match app.wfm_client.order().delete(id).await {
+            let mut intent = writes::Intent::new(comp("Delete"), "Delete at start");
+            if let Some(order) = my_orders.get_by_id(id) {
+                intent = item_intent(&comp("Delete"), "Delete at start", &order.item_id)
+                    .order_type(match order.order_type {
+                        OrderType::Buy => "buy",
+                        OrderType::Sell => "sell",
+                    })
+                    .price(i64::from(order.platinum), None)
+                    .quantity(i64::from(order.quantity));
+            }
+            match writes::delete_order(&app.wfm_client, id, intent).await {
                 Ok(_) => {
                     info(
                         comp("Delete"),
@@ -344,7 +354,10 @@ impl ItemModule {
                         // Skip orders created this cycle — let them survive until next check
                         continue;
                     }
-                    if let Err(err) = app.wfm_client.order().delete(&order.3).await {
+                    let intent = item_intent(&component, "Over the total buy budget", &order.2)
+                        .order_type("buy")
+                        .price(order.0, None);
+                    if let Err(err) = writes::delete_order(&app.wfm_client, &order.3, intent).await {
                         error(
                             &component,
                             &format!("Failed to delete {}: {}", order.3, err),
@@ -433,6 +446,7 @@ impl ItemModule {
                     entry,
                     OrderType::Buy,
                     &states::app_state()?.wfm_client,
+                    "MaxStockQuantity",
                 )
                 .await
                 {

@@ -17,6 +17,7 @@ pub enum DataKind {
     Cache,
     Settings,
     User,
+    IntendedOrders,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -144,6 +145,7 @@ fn data_kind(event: &str) -> Option<DataKind> {
         "Transaction:RefreshTransactions" => DataKind::Transactions,
         "TradeEntry:RefreshTradeEntries" => DataKind::TradeEntries,
         "Cache:Refresh" => DataKind::Cache,
+        "LiveScraper:IntendedOrder" => DataKind::IntendedOrders,
         _ => return None,
     })
 }

@@ -18,7 +18,7 @@ use wf_market::{
 
 use crate::{
     cache::types::RivenPriceInput,
-    live_scraper::{is_disabled, LiveScraperState},
+    live_scraper::{is_disabled, writes, LiveScraperState},
     send_event,
     types::*,
     utils::{modules::states, ErrorFromExt},
@@ -317,6 +317,28 @@ async fn apply_operations(
     log_options: &LoggerOptions,
 ) -> Result<(), Error> {
     let can_create = wfm_client.auction().can_create_auction();
+    let reasons: Vec<&str> = operations
+        .operations
+        .iter()
+        .map(String::as_str)
+        .filter(|operation| !["Create", "Update", "Delete"].contains(operation))
+        .collect();
+    let intent = |default_reason: &str| {
+        let reason = if reasons.is_empty() {
+            default_reason.to_owned()
+        } else {
+            reasons.join(", ")
+        };
+        writes::Intent::new(COMPONENT, reason)
+            .item(
+                format!("{} {}", stock_riven.weapon_name, stock_riven.mod_name),
+                &stock_riven.wfm_weapon_url,
+                stock_riven.sub_type.clone(),
+            )
+            .order_type("sell")
+            .price(post_price, stock_riven.list_price)
+            .quantity(1)
+    };
 
     if operations.has("Create") && !operations.has("Delete") && can_create {
         let item = CreateAuctionItem::new_riven(
@@ -350,8 +372,9 @@ async fn apply_operations(
         )
         .with_properties(json!(properties));
 
-        match wfm_client.auction().create(params).await {
-            Ok(auction) => {
+        match writes::create_auction(wfm_client, params, intent("New auction")).await {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(auction)) => {
                 info(
                     format!("{}CreateSuccess", COMPONENT),
                     &format!(
@@ -379,8 +402,9 @@ async fn apply_operations(
             .with_buyout_price(Some(post_price as u32))
             .with_starting_price(post_price as u32)
             .with_properties(properties);
-        match wfm_client.auction().update(auction_id, params).await {
-            Ok(auction) => {
+        match writes::update_auction(wfm_client, auction_id, params, intent("Price follows the market")).await {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(auction)) => {
                 info(
                     format!("{}UpdateSuccess", COMPONENT),
                     &format!(
@@ -403,8 +427,9 @@ async fn apply_operations(
             }
         }
     } else if operations.has("Update") && operations.has("Delete") {
-        match wfm_client.auction().delete(auction_id).await {
-            Ok(_) => {
+        match writes::delete_auction(wfm_client, auction_id, intent("Removed")).await {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(_)) => {
                 send_event!(UIEvent::RefreshWfmAuctions, json!({"source": COMPONENT}));
                 info(
                     format!("{}DeleteSuccess", COMPONENT),

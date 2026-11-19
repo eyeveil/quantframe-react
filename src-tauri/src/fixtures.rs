@@ -94,7 +94,22 @@ pub async fn seed(fixtures: &Path) -> Result<(), Error> {
             &LoggerOptions::default(),
         );
     }
-    seed_market(fixtures).await
+    seed_market(fixtures).await?;
+    seed_intended_orders(fixtures)
+}
+
+fn seed_intended_orders(fixtures: &Path) -> Result<(), Error> {
+    let path = fixtures.join("intended_orders.json");
+    if !path.exists() {
+        return Ok(());
+    }
+    let mut records: Vec<crate::live_scraper::writes::IntendedOrder> = read_json_file(&path)?;
+    let now = Utc::now();
+    for (index, record) in records.iter_mut().enumerate() {
+        record.created_at = (now - chrono::Duration::minutes(3 * index as i64)).to_rfc3339();
+    }
+    crate::live_scraper::writes::seed_intended_orders(records);
+    Ok(())
 }
 
 fn shift_to(now: DateTime<Utc>, dates: impl Iterator<Item = DateTime<Utc>>) -> chrono::Duration {

@@ -538,11 +538,23 @@ pub async fn progress_order(
     let original_update_string =
         properties.get_property_value("original_update_string", String::new());
 
+    let intent = |default_reason: &str| {
+        order_intent(
+            component,
+            entry,
+            &name,
+            order_type,
+            trade_operations,
+            default_reason,
+        )
+        .price(i64::from(post_price), (!order_id.is_empty()).then_some(i64::from(old_price)))
+        .quantity(quantity)
+    };
+
     if trade_operations.has("Create") && !trade_operations.has("Delete") && can_create_order {
-        match wfm_client
-            .order()
-            .create(
-                CreateOrderParams::new_with_subtype(
+        match writes::create_order(
+            wfm_client,
+            CreateOrderParams::new_with_subtype(
                     &entry.wfm_id,
                     order_type,
                     post_price,
@@ -551,11 +563,13 @@ pub async fn progress_order(
                     per_trade.map(|pt| pt as u32),
                     SubTypeExt::from_entity(entry.sub_type.clone()),
                 )
-                .with_properties(json!(properties.properties)),
-            )
-            .await
+            .with_properties(json!(properties.properties)),
+            intent("New order"),
+        )
+        .await
         {
-            Ok(order) => {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(order)) => {
                 info(
                     format!("{}CreateSuccess", component),
                     &format!("Created order for item {}: {}", name, order.id),
@@ -597,19 +611,20 @@ pub async fn progress_order(
             .with_context(json!({"cooldown": info})));
         }
 
-        match wfm_client
-            .order()
-            .update(
-                &order_id,
-                UpdateOrderParams::new()
-                    .with_platinum(post_price)
-                    .with_quantity(entry.get_quantity(order_type) as u32)
-                    .with_per_trade(per_trade.map(|pt| pt as u32))
-                    .with_properties(json!(properties.properties)),
-            )
-            .await
+        match writes::update_order(
+            wfm_client,
+            &order_id,
+            UpdateOrderParams::new()
+                .with_platinum(post_price)
+                .with_quantity(entry.get_quantity(order_type) as u32)
+                .with_per_trade(per_trade.map(|pt| pt as u32))
+                .with_properties(json!(properties.properties)),
+            intent("Price follows the market"),
+        )
+        .await
         {
-            Ok(order) => {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(order)) => {
                 info(
                     format!("{}UpdateSuccess", component),
                     &format!("Updated order for item {}: {}", name, order.id),
@@ -634,8 +649,9 @@ pub async fn progress_order(
             }
         }
     } else if trade_operations.has("Update") && trade_operations.has("Delete") {
-        match wfm_client.order().delete(&order_id).await {
-            Ok(_) => {
+        match writes::delete_order(wfm_client, &order_id, intent("Removed")).await {
+            Ok(writes::Written::Intended(_)) => {}
+            Ok(writes::Written::Sent(_)) => {
                 info(
                     format!("{}DeleteSuccess", component),
                     &format!("Deleted order for item {}: {}", name, order_id),
@@ -672,11 +688,54 @@ pub async fn progress_order(
     }
     Ok(OperationSet::default())
 }
+pub fn item_intent(component: &str, reason: &str, wfm_id: &str) -> writes::Intent {
+    let intent = writes::Intent::new(component, reason);
+    match states::cache_client().and_then(|cache| cache.tradable_item().get_by(wfm_id)) {
+        Ok(item) => intent.item(item.name, item.wfm_url, None),
+        Err(_) => intent.item(wfm_id, "", None),
+    }
+}
+
+fn order_type_key(order_type: OrderType) -> &'static str {
+    match order_type {
+        OrderType::Buy => "buy",
+        OrderType::Sell => "sell",
+    }
+}
+
+const ACTION_OPERATIONS: [&str; 7] = ["Create", "Update", "Delete", "Buy", "Sell", "WishList", "Syndicate"];
+
+pub fn order_intent(
+    component: &str,
+    entry: &ItemEntry,
+    name: &str,
+    order_type: OrderType,
+    operations: &OperationSet,
+    default_reason: &str,
+) -> writes::Intent {
+    let reasons: Vec<&str> = operations
+        .operations
+        .iter()
+        .map(String::as_str)
+        .filter(|operation| !ACTION_OPERATIONS.contains(operation))
+        .collect();
+    let reason = if reasons.is_empty() {
+        default_reason.to_owned()
+    } else {
+        reasons.join(", ")
+    };
+    let name = if name.is_empty() { entry.wfm_url.as_str() } else { name };
+    writes::Intent::new(component, reason)
+        .item(name, &entry.wfm_url, entry.sub_type.clone())
+        .order_type(order_type_key(order_type))
+}
+
 pub async fn delete_order(
     component: &str,
     entry: &ItemEntry,
     order_type: OrderType,
     wfm_client: &wf_market::Client<wf_market::Authenticated>,
+    reason: &str,
 ) -> Result<OperationSet, Error> {
     let (order_id, current_price, mut properties, _) =
         get_order_info(entry, order_type, wfm_client);
@@ -692,7 +751,7 @@ pub async fn delete_order(
         None,
         &LoggerOptions::default(),
         &mut properties,
-        &OperationSet::from(vec!["Update", "Delete"]),
+        &OperationSet::from(vec!["Update", "Delete", reason]),
     )
     .await
 }

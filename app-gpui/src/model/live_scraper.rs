@@ -62,3 +62,45 @@ impl LiveScraperMessage {
         }
     }
 }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum IntendedAction {
+    Create,
+    Update,
+    Delete,
+}
+
+impl IntendedAction {
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Create => "Create",
+            Self::Update => "Update",
+            Self::Delete => "Delete",
+        }
+    }
+
+    pub const fn key(self) -> &'static str {
+        match self {
+            Self::Create => "create",
+            Self::Update => "update",
+            Self::Delete => "delete",
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct IntendedOrder {
+    pub id: u64,
+    pub created_at: String,
+    pub action: IntendedAction,
+    pub is_auction: bool,
+    pub market_id: String,
+    pub item_name: String,
+    pub wfm_url: String,
+    pub sub_type: Option<super::SubType>,
+    pub order_type: Option<super::OrderType>,
+    pub price: Option<i64>,
+    pub old_price: Option<i64>,
+    pub quantity: Option<i64>,
+    pub reason: String,
+}

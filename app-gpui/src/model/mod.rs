@@ -25,7 +25,7 @@ pub use dashboard::{BestSeller, CategorySummary, Chart, DashboardSummary, Period
 pub use edit::{BulkEdit, Limit};
 pub use financial_report::FinancialReport;
 pub use inventory::{InventoryRiven, InventorySyndicate};
-pub use live_scraper::{LiveScraperMessage, LiveScraperState};
+pub use live_scraper::{IntendedAction, IntendedOrder, LiveScraperMessage, LiveScraperState};
 pub use pagination::{
     ListParams, OrderListParams, Paginated, SortDirection, StockItemListParams,
     SyndicateItemListParams, TradeEntryListParams, TransactionListParams,

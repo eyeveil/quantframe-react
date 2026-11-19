@@ -356,6 +356,15 @@ async fn trader_fields(source: &DataSource, all: &StockItemListParams, list: &Li
         sell_profit as f64
     );
 
+    let intended = ok(
+        "live_scraper_get_intended_orders",
+        source.live_scraper_get_intended_orders().await,
+    );
+    assert_eq!(intended.len(), 9);
+    assert_eq!(intended[0].action, IntendedAction::Create);
+    assert_eq!(intended[0].price, Some(50));
+    assert!(intended.iter().any(|row| row.is_auction));
+
     let auctions = ok(
         "get_wfm_auctions_pagination",
         source.get_wfm_auctions_pagination(list).await,

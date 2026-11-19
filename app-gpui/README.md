@@ -61,7 +61,7 @@ These variables open the app in a given state, so screenshots can be scripted.
 | Variable | Values |
 | --- | --- |
 | `QF_SCREEN` | `listings`, `orders`, `trade-messages`, `home`, `chat`, `analytics`, `inventory`, `settings`, `debug`, `about`. `login`, `banned` and `error` show those states with sample text, whatever the account's state is |
-| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`. Trade messages: `item`, `custom`, `riven`. Analytics: `transactions`, `items`, `rivens`, `syndicates`, `users`. Inventory: `rivens`, `syndicates`. Debug: `state`, `game-log`. Settings: a section, such as `trading`, `buying`, `account` or `logs` (the `key` of each entry in `src/settings/schema.rs`) |
+| `QF_TAB` | Listings: `items`, `rivens`, `wish-list`, `syndicates`. Orders: `orders`, `auctions`, `intended` (the Dry run tab). Trade messages: `item`, `custom`, `riven`. Analytics: `transactions`, `items`, `rivens`, `syndicates`, `users`. Inventory: `rivens`, `syndicates`. Debug: `state`, `game-log`. Settings: a section, such as `trading`, `buying`, `account` or `logs` (the `key` of each entry in `src/settings/schema.rs`) |
 | `QF_VIEW` | `chart` opens the Transactions tab of Analytics on its chart |
 | `QF_THEME` | `system`, `light`, `dark`. It takes precedence over the saved setting and doesn't change it |
 | `QF_PANEL` | `open`, `closed`. It takes precedence over the saved setting |

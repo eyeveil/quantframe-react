@@ -2,6 +2,7 @@ mod app;
 mod cache;
 mod inventory;
 mod market;
+mod scraper;
 mod stock;
 mod trades;
 

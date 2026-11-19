@@ -7,7 +7,11 @@ use utils::Error;
 use crate::{
     app::ItemSettings,
     cache::{CacheState, ItemPriceInfo},
-    live_scraper::{self, LiveScraperState},
+    live_scraper::{
+        self,
+        writes::{self, IntendedOrder},
+        LiveScraperState,
+    },
     send_event,
     types::*,
 };
@@ -34,6 +38,15 @@ pub async fn live_scraper_get_state(
     Ok(json!({
         "is_running": live_scraper.is_running.load(Ordering::SeqCst)
     }))
+}
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn live_scraper_get_intended_orders() -> Result<Vec<IntendedOrder>, Error> {
+    Ok(writes::intended_orders())
+}
+#[cfg_attr(feature = "tauri", tauri::command)]
+pub async fn live_scraper_clear_intended_orders() -> Result<(), Error> {
+    writes::clear_intended_orders();
+    Ok(())
 }
 #[cfg_attr(feature = "tauri", tauri::command)]
 pub async fn live_scraper_get_interesting_wtb_items(
