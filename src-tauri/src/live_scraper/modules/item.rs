@@ -466,7 +466,7 @@ impl ItemModule {
         if let Some(reason) = should_apply_max_price_drop(
             settings.wtb.max_price_drop,
             settings.wtb.min_listings_below,
-            current_order_price,
+            (!order_id.is_empty()).then_some(current_order_price),
             post_price,
             live_orders.get_price_list(OrderType::Buy, None),
             OrderType::Buy,
@@ -664,7 +664,7 @@ impl ItemModule {
         let market_info = &entry.sell_market_info;
 
         // Fetch existing order details and prepare mutable state
-        let (_, current_order_price, mut properties, mut trade_operations) =
+        let (order_id, current_order_price, mut properties, mut trade_operations) =
             get_order_info(&entry, OrderType::Sell, &wfm_client);
 
         // Per-item overrides stored on the stock item (optional)
@@ -758,7 +758,7 @@ impl ItemModule {
         if let Some(reason) = should_apply_max_price_drop(
             settings.wts.max_price_drop,
             settings.wts.min_listings_below,
-            current_order_price,
+            (!order_id.is_empty()).then_some(current_order_price),
             post_price,
             live_orders.get_price_list(OrderType::Sell, None),
             OrderType::Sell,
@@ -1196,7 +1196,7 @@ impl ItemModule {
         if let Some(reason) = should_apply_max_price_drop(
             syndicate_settings.wts.max_price_drop,
             syndicate_settings.wts.min_listings_below,
-            current_order_price,
+            (!order_id.is_empty()).then_some(current_order_price),
             post_price,
             live_orders.get_price_list(OrderType::Sell, None),
             OrderType::Sell,

@@ -819,7 +819,7 @@ pub fn is_blacklisted(
 pub fn should_apply_max_price_drop(
     max_price_drop: i64,
     min_listings_below: i64,
-    current_order_price: i64,
+    current_order_price: Option<i64>,
     post_price: i64,
     prices: Vec<i64>,
     order_type: OrderType,
@@ -827,6 +827,7 @@ pub fn should_apply_max_price_drop(
     if is_disabled(max_price_drop) && is_disabled(min_listings_below) {
         return None;
     }
+    let current_order_price = current_order_price?;
     let (is_price_invalid, price_change, listing_count) = match order_type {
         OrderType::Buy => (
             current_order_price > post_price,

@@ -4,6 +4,7 @@ use common::*;
 use qf_app_lib::{
     entity::stock_item::{Model as StockItem, StockItemPaginationQueryDto},
     live_scraper::writes::WriteAction,
+    wf_market::enums::OrderType,
     service::StockItemQuery,
     DATABASE,
 };
@@ -174,4 +175,47 @@ fn selling_uses_the_sell_side_max_price_drop() {
         assert_eq!(update.intent.price, Some(100), "{update:?}");
         assert!(update.intent.reason.contains("MaxPriceDrop"), "{update:?}");
     });
+}
+
+fn buy_nekros(sells: &[u32], buys: &[u32], moving_avg: f64) -> impl std::future::Future<Output = ()> {
+    let sells = sells.to_vec();
+    let buys = buys.to_vec();
+    async move {
+        write_market(NEKROS.0, &sells, &buys);
+        set_item_prices(vec![price(NEKROS.0, NEKROS.1, moving_avg)]).await;
+        update_settings(|settings| {
+            settings.live_scraper.general.dry_run = true;
+            settings.debugging.live_scraper.entries = vec![entry(NEKROS.0, NEKROS.1, &["Buy"], None, 1, 0)];
+        });
+    }
+}
+
+#[test]
+fn max_price_drop_ignores_a_missing_order() {
+    run(|_| async move {
+        buy_nekros(&[80, 85, 90], &[30, 40, 50], 80.0).await;
+        update_settings(|settings| settings.live_scraper.items.wtb.max_price_drop = 5);
+
+        scraper().item().check().await.expect("pass");
+
+        let created = only_record(WriteAction::Create, NEKROS.0).expect("create");
+        assert_eq!(created.intent.price, Some(50), "{created:?}");
+        assert!(!created.intent.reason.contains("MaxPriceDrop"), "{created:?}");
+    });
+}
+
+#[test]
+fn max_price_drop_rule_needs_an_existing_order() {
+    assert_eq!(
+        qf_app_lib::live_scraper::should_apply_max_price_drop(5, -1, None, 50, vec![50, 40], OrderType::Buy),
+        None
+    );
+    assert_eq!(
+        qf_app_lib::live_scraper::should_apply_max_price_drop(5, -1, Some(20), 50, vec![50, 40], OrderType::Buy),
+        Some("MaxPriceDrop".to_owned())
+    );
+    assert_eq!(
+        qf_app_lib::live_scraper::should_apply_max_price_drop(5, -1, Some(100), 60, vec![60, 62], OrderType::Sell),
+        Some("MaxPriceDrop".to_owned())
+    );
 }
